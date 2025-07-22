@@ -80,8 +80,43 @@ A root .htaccess file enables clean URLs, routing, and basic security controls (
 **Overview of Modular**
 
 
+text**
 
-<pre> ```text | htaccess | index.php | +---admin | | htaccess | | index.php | | | +---include | +---private | \---public +---authentication | | htaccess | | index.php | | | +---include | +---private | \---public +---backup | +---databases | \---websites +---database +---global +---media +---siteidentity | +---favicon | \---logo \---user | htaccess | index.php | +---include +---private \---public ``` </pre>
+ProjectRoot/
+├── htaccess
+├── index.php
+├── admin/
+│   ├── htaccess
+│   ├── index.php
+│   ├── include/         # Shared frontend components (e.g. header, footer)
+│   ├── private/         # Backend logic for admin
+│   └── public/          # Admin frontend pages
+├── user/
+│   ├── htaccess
+│   ├── index.php
+│   ├── include/         # Shared frontend components for user
+│   ├── private/         # Backend logic for user
+│   └── public/          # User frontend pages
+├── authentication/
+│   ├── htaccess
+│   ├── index.php
+│   ├── include/         # Shared login UI parts
+│   ├── private/         # Login/session backend logic
+│   └── public/          # Login/register pages
+├── backup/
+│   ├── databases/       # Auto-generated database backups
+│   └── websites/        # Auto-generated website file backups
+├── database/            # Raw SQL files (manual setup/schema)
+├── global/              # Global PHP utilities (e.g. DB connect/close)
+├── media/               # Uploaded media files
+├── siteidentity/
+│   ├── logo/            # Site logo uploads
+│   └── favicon/         # Site favicon uploads
+
+**
+
+
+
 
 
 
