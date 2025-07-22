@@ -14,18 +14,18 @@ Berans Trading is a comprehensive inventory and order management system designed
 
 Built to support growing trading operations, Berans Trading offers a robust backend foundation for seamless workflow management and cross-border trading visibility.
 
-📁 Project Modular Architecture
+# 📁 Project Modular Architecture
 
 The Berans Trading project is organized using a modular directory structure designed for clarity, separation of concerns, and ease of maintenance. The folders are grouped by functionality, with special attention to backend/frontend separation, code reuse, and automation.
 
 Here’s a breakdown of the main structure:
 
-🔐 User-Based Modules
+**🔐 User-Based Modules**
 Each user-type module (admin/, user/, and authentication/) follows a consistent internal structure:
 
-public/ – Contains frontend assets like UI pages, forms, and displays.
-private/ – Contains backend logic, scripts, and controllers.
-include/ – Holds reusable components like headers, footers, navigation bars, etc.
+`public/` – Contains frontend assets like UI pages, forms, and displays.
+`private/` – Contains backend logic, scripts, and controllers.
+'include/' – Holds reusable components like headers, footers, navigation bars, etc.
 
 This separation ensures a clean distinction between presentation, logic, and shared elements.
 
