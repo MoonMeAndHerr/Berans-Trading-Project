@@ -75,8 +75,11 @@ Contains raw SQL files (e.g. schema.sql, seeders.sql) necessary for setting up o
 **📄 index.php and .htaccess**
 
 Each main folder (admin/, user/, etc.) includes an index.php file to handle redirection or access control.
-
 A root .htaccess file enables clean URLs, routing, and basic security controls (e.g., preventing directory listing).
+
+**Overview of Modular**
+
+`<pre> project-root/ ├── admin/ │ ├── public/ │ ├── private/ │ └── include/ ├── user/ │ ├── public/ │ ├── private/ │ └── include/ ├── authentication/ │ ├── public/ │ ├── private/ │ └── include/ ├── global/ ├── media/ ├── siteidentity/ │ ├── logo/ │ └── favicon/ ├── backup/ │ ├── databases/ │ └── websites/ └── database/ </pre>`
 
 
 
