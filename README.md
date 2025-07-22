@@ -21,49 +21,61 @@ The Berans Trading project is organized using a modular directory structure desi
 Here’s a breakdown of the main structure:
 
 **🔐 User-Based Modules**
+
 Each user-type module (admin/, user/, and authentication/) follows a consistent internal structure:
 
 `public/` – Contains frontend assets like UI pages, forms, and displays.
 
 `private/` – Contains backend logic, scripts, and controllers.
 
-'include/' – Holds reusable components like headers, footers, navigation bars, etc.
+`include/` – Holds reusable components like headers, footers, navigation bars, etc.
 
 This separation ensures a clean distinction between presentation, logic, and shared elements.
 
-🛡️ authentication/
+**🛡️ authentication/**
+
 Handles all authentication-related processes such as login, registration, and session management, with its own public/, private/, and include/ folders just like the user and admin modules.
 
-🌐 global/
+**🌐 global/**
+
 Contains globally used resources like:
 
-db_connect.php – Establishes database connections.
-db_close.php – Handles closing connections.
+`db_connect.php` – Establishes database connections.
+
+`db_close.php` – Handles closing connections.
 
 Other utility files that are shared project-wide.
 
-🗂️ siteidentity/
+**🗂️ siteidentity/**
+
 Houses branding elements:
 
-logo/ – Stores uploaded logos.
-favicon/ – Stores site favicons.
+`logo/` – Stores uploaded logos.
+
+`favicon/` – Stores site favicons.
 
 Useful for dynamic site identity management.
 
-🖼️ media/
+**🖼️ media/**
+
 Stores user-uploaded files, such as product images, receipts, or other assets.
 
-💾 backup/
+**💾 backup/**
+
 Automates and organizes project backups with:
 
-databases/ – Stores SQL dump backups of the database.
-websites/ – Stores zipped or mirrored backups of the web application files.
+`databases/` – Stores SQL dump backups of the database.
 
-🗃️ database/
+`websites/` – Stores zipped or mirrored backups of the web application files.
+
+**🗃️ database/**
+
 Contains raw SQL files (e.g. schema.sql, seeders.sql) necessary for setting up or resetting the database. This is not connected to the backup automation—rather, it's used for manual or development setups.
 
-📄 index.php and .htaccess
+**📄 index.php and .htaccess**
+
 Each main folder (admin/, user/, etc.) includes an index.php file to handle redirection or access control.
+
 A root .htaccess file enables clean URLs, routing, and basic security controls (e.g., preventing directory listing).
 
 
