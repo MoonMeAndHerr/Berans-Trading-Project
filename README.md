@@ -80,8 +80,9 @@ A root .htaccess file enables clean URLs, routing, and basic security controls (
 **Overview of Modular**
 
 
-text**
+<pre> ```text 
 
+  
 ProjectRoot/
 ├── htaccess
 ├── index.php
@@ -113,7 +114,7 @@ ProjectRoot/
 │   ├── logo/            # Site logo uploads
 │   └── favicon/         # Site favicon uploads
 
-**
+``` </pre>
 
 
 
