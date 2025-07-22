@@ -1,0 +1,1 @@
+delete this file if this folder will be used (creating another empty folder is not using this folder)
