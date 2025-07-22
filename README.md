@@ -24,7 +24,9 @@ Here’s a breakdown of the main structure:
 Each user-type module (admin/, user/, and authentication/) follows a consistent internal structure:
 
 `public/` – Contains frontend assets like UI pages, forms, and displays.
+
 `private/` – Contains backend logic, scripts, and controllers.
+
 'include/' – Holds reusable components like headers, footers, navigation bars, etc.
 
 This separation ensures a clean distinction between presentation, logic, and shared elements.
