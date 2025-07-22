@@ -79,7 +79,39 @@ A root .htaccess file enables clean URLs, routing, and basic security controls (
 
 **Overview of Modular**
 
-`<pre> project-root/ ├── admin/ │ ├── public/ │ ├── private/ │ └── include/ ├── user/ │ ├── public/ │ ├── private/ │ └── include/ ├── authentication/ │ ├── public/ │ ├── private/ │ └── include/ ├── global/ ├── media/ ├── siteidentity/ │ ├── logo/ │ └── favicon/ ├── backup/ │ ├── databases/ │ └── websites/ └── database/ </pre>`
+`|   htaccess
+|   index.php
+|
++---admin
+|   |   htaccess
+|   |   index.php
+|   |
+|   +---include
+|   +---private
+|   \---public
++---authentication
+|   |   htaccess
+|   |   index.php
+|   |
+|   +---include
+|   +---private
+|   \---public
++---backup
+|   +---databases
+|   \---websites
++---database
++---global
++---media
++---siteidentity
+|   +---favicon
+|   \---logo
+\---user
+    |   htaccess
+    |   index.php
+    |
+    +---include
+    +---private
+    \---public`
 
 
 
