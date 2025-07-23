@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -136,13 +137,26 @@ try {
 
 
 
+=======
+// At the very top of the file
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once __DIR__ . '/Backend/auth_check.php';
+?>
+
+>>>>>>> 2e54e392af60789845e496a103274c7c421a9965
 <!doctype html>
 <html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg">
 
 <head>
 
     <meta charset="utf-8" />
+<<<<<<< HEAD
     <title>Berans Trading</title>
+=======
+    <title>Basic Elements | Velzon - Admin & Dashboard Template</title>
+>>>>>>> 2e54e392af60789845e496a103274c7c421a9965
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
@@ -376,10 +390,16 @@ try {
                         <a class="dropdown-item" href="auth-lockscreen-basic.html"><i
                                 class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span
                                 class="align-middle">Lock screen</span></a>
+<<<<<<< HEAD
                         <a class="dropdown-item" href="../private/logout.php">
                                 <i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i>
                                 <span class="align-middle" data-key="t-logout">Logout</span>
                         </a>
+=======
+                        <a class="dropdown-item" href="Backend/logout.php"><i
+                                class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span
+                                class="align-middle" data-key="t-logout">Logout</span></a>
+>>>>>>> 2e54e392af60789845e496a103274c7c421a9965
                     </div>
                 </div>
             </div>
@@ -543,6 +563,7 @@ try {
                         </div>
                     </div>
 
+<<<<<<< HEAD
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
@@ -813,6 +834,14 @@ try {
         <!-- ============================================================== -->
         <!-- End Page-content -->
         <!-- ============================================================== -->                
+=======
+
+
+
+
+                    
+                </div> <!-- container-fluid -->
+>>>>>>> 2e54e392af60789845e496a103274c7c421a9965
             </div><!-- End Page-content -->
 
             <footer class="footer">
@@ -1382,7 +1411,10 @@ try {
     <script src="assets/libs/feather-icons/feather.min.js"></script>
     <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="assets/js/plugins.js"></script>
+<<<<<<< HEAD
     <script src="assets/js/calculate.js"></script>
+=======
+>>>>>>> 2e54e392af60789845e496a103274c7c421a9965
 
     <!-- prismjs plugin -->
     <script src="assets/libs/prismjs/prism.js"></script>

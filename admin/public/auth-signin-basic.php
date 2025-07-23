@@ -1,7 +1,12 @@
 <?php
 session_start();
+<<<<<<< HEAD
 require_once __DIR__ . '/../private/config.php';
 require_once __DIR__ . '/../private/logger.php';
+=======
+require_once __DIR__ . '/Backend/config.php';
+require_once __DIR__ . '/Backend/logger.php';
+>>>>>>> 2e54e392af60789845e496a103274c7c421a9965
 
 
 // Initialize variables
@@ -69,7 +74,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     logDebug("Last login updated", ['staff_id' => $user['staff_id']]);
 
                     // Redirect to dashboard
+<<<<<<< HEAD
                     header('Location: ../public/forms-elements.php');  // relative path example
+=======
+                    header('Location: forms-elements.php');
+>>>>>>> 2e54e392af60789845e496a103274c7c421a9965
                     exit;
                 } else {
                     $error = 'Invalid password';
