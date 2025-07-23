@@ -1,33 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<!-- Basic -->
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Coming Soon | Porto - Multipurpose Website Template</title>	
-		<meta name="keywords" content="WebSite Template" />
-		<meta name="description" content="Porto - Multipurpose Website Template">
-		<meta name="author" content="okler.net">
-		<!-- Favicon -->
-		<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-		<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
-		<!-- Mobile Metas -->
-		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no">
-		<!-- Web Fonts  -->		<link id="googleFonts" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800%7CShadows+Into+Light&display=swap" rel="stylesheet" type="text/css">
-		<!-- Vendor CSS -->
-		<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">		<link rel="stylesheet" href="vendor/fontawesome-free/css/all.min.css">		<link rel="stylesheet" href="vendor/animate/animate.compat.css">		<link rel="stylesheet" href="vendor/simple-line-icons/css/simple-line-icons.min.css">		<link rel="stylesheet" href="vendor/owl.carousel/assets/owl.carousel.min.css">		<link rel="stylesheet" href="vendor/owl.carousel/assets/owl.theme.default.min.css">		<link rel="stylesheet" href="vendor/magnific-popup/magnific-popup.min.css">
-		<!-- Theme CSS -->
-		<link rel="stylesheet" href="css/theme.css">
-		<link rel="stylesheet" href="css/theme-elements.css">
-		<link rel="stylesheet" href="css/theme-blog.css">
-		<link rel="stylesheet" href="css/theme-shop.css">
+<?php
 
-		<!-- Skin CSS -->		<link id="skinCSS" rel="stylesheet" href="css/skins/default.css">
-		<!-- Theme Custom CSS -->
-		<link rel="stylesheet" href="css/custom.css">
+	include_once __DIR__ . '../include/header.php';
 
-	</head>
-	<body data-plugin-page-transition>
+?>
+	<body data-plugin-page-transition>
+
 		<div class="body coming-soon">
 			<header id="header" data-plugin-options="{'stickyEnabled': false}">
 				<div class="header-body border border-top-0 border-end-0 border-start-0">
@@ -73,7 +50,8 @@
 						</div>
 					</div>
 				</div>
-			</header>
+			</header>
+
 			<div role="main" class="main">
 				<div class="container">
 					<div class="row mt-5">
@@ -139,11 +117,14 @@
 					</div>
 					<div class="row justify-content-center pt-2 pb-4">
 						<div class="col-lg-6">
-							<h5 class="text-dark">Let me know when the site is done</h5>
+							<h5 class="text-dark">Let me know when the site is done</h5>
+
 							<div class="alert alert-success d-none" id="newsletterSuccess">
 								<strong>Success!</strong> You've been added to our email list.
-							</div>
-							<div class="alert alert-danger d-none" id="newsletterError"></div>
+							</div>
+
+							<div class="alert alert-danger d-none" id="newsletterError"></div>
+
 							<form id="newsletterForm" action="php/newsletter-subscribe.php" method="get">
 								<div class="input-group input-group-lg">
 									<input class="form-control h-auto" placeholder="E-mail Address" name="newsletterEmail" id="newsletterEmail" type="email">
@@ -153,7 +134,8 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div>
+
 			<footer id="footer">
 				<div class="container">
 					<div class="footer-ribbon">
@@ -246,11 +228,15 @@
 			</footer>
 		</div>
 
-		<!-- Vendor -->		<script src="vendor/plugins/js/plugins.min.js"></script>
+		<!-- Vendor -->
+		<script src="vendor/plugins/js/plugins.min.js"></script>
+
 		<!-- Theme Base, Components and Settings -->
 		<script src="js/theme.js"></script>
 
-		<!-- Theme Custom -->		<script src="js/custom.js"></script>
+		<!-- Theme Custom -->
+		<script src="js/custom.js"></script>
+
 		<!-- Theme Initialization Files -->
 		<script src="js/theme.init.js"></script>
 
