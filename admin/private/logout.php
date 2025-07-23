@@ -6,8 +6,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/logger.php';
+require_once __DIR__ . '/../private/config.php';
+require_once __DIR__ . '/../private/logger.php';
 
 // Log logout attempt
 logDebug("Logout initiated", [
@@ -80,6 +80,6 @@ logDebug("Logout completed successfully", [
 ]);
 
 // Redirect to the logout confirmation page
-header('Location: ../auth-logout-basic.php');
+header('Location: ../public/auth-logout-basic.php');
 exit;
 ?>

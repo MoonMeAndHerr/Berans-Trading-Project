@@ -1,4 +1,143 @@
 <?php
+<<<<<<< HEAD
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once __DIR__ . '/../private/auth_check.php';
+require_once __DIR__ . '/../private/config.php'; // $pdo
+
+
+$successMsg = '';
+$errorMsg = '';
+
+// Show success message once after redirect
+if (isset($_SESSION['successMsg'])) {
+    $successMsg = $_SESSION['successMsg'];
+    unset($_SESSION['successMsg']);
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Collect all inputs safely using null coalescing
+    $product_id       = intval($_POST['product_id'] ?? 0);
+    $supplier_id      = intval($_POST['supplier_id'] ?? 0);
+    $quantity         = floatval($_POST['quantity'] ?? 0);
+    $carton_width     = floatval($_POST['carton_width'] ?? 0);
+    $carton_height    = floatval($_POST['carton_height'] ?? 0);
+    $carton_length    = floatval($_POST['carton_length'] ?? 0);
+    $pcs_per_carton   = intval($_POST['pcs_per_carton'] ?? 0);
+    $no_of_carton     = intval($_POST['no_of_carton'] ?? 0);
+    $designlogo       = trim($_POST['designlogo'] ?? '');
+    $price            = floatval($_POST['price'] ?? 0);
+    $shipping_price   = floatval($_POST['shipping_price'] ?? 0);
+    $additional_price = floatval($_POST['additional_price'] ?? 0);
+    $production_time  = trim($_POST['production_time'] ?? '');
+    $conversion_rate  = floatval($_POST['conversion_rate'] ?? 0);
+    $weight_carton    = floatval($_POST['weight_carton'] ?? 0);
+    $estimated_arrival= $_POST['estimated_arrival'] ?? null;
+
+    // calculated values from hidden fields
+    $total_price_yen   = floatval($_POST['total_price_yen'] ?? 0);
+    $total_price_rm    = floatval($_POST['total_price_rm'] ?? 0);
+    $deposit_50_yen    = floatval($_POST['deposit_50_yen'] ?? 0);
+    $deposit_50_rm     = floatval($_POST['deposit_50_rm'] ?? 0);
+    $cbm_carton        = floatval($_POST['cbm_carton'] ?? 0);
+    $total_cbm         = floatval($_POST['total_cbm'] ?? 0);
+    $vm_carton         = floatval($_POST['vm_carton'] ?? 0);
+    $total_vm          = floatval($_POST['total_vm'] ?? 0);
+    $total_weight      = floatval($_POST['total_weight'] ?? 0); // ✅ from hidden
+    $sg_tax            = floatval($_POST['sg_tax'] ?? 0);
+    $supplier_1st_yen  = floatval($_POST['supplier_1st_yen'] ?? 0); // ✅ from hidden
+    $supplier_2nd_yen  = floatval($_POST['supplier_2nd_yen'] ?? 0); // ✅ from hidden
+    $customer_1st_rm   = floatval($_POST['customer_1st_rm'] ?? 0);  // ✅ from hidden
+    $customer_2nd_rm   = floatval($_POST['customer_2nd_rm'] ?? 0);  // ✅ from hidden
+
+    try {
+        $stmt = $pdo->prepare("
+            INSERT INTO Price 
+            (
+                product_id, supplier_id, quantity, carton_width, carton_height, carton_length,
+                pcs_per_carton, no_of_carton, designlogo, price, shipping_price, additional_price,
+                production_time, conversion_rate,
+                total_price_yen, total_price_rm, deposit_50_yen, deposit_50_rm,
+                cbm_carton, total_cbm, vm_carton, total_vm, total_weight, sg_tax,
+                supplier_1st_yen, supplier_2nd_yen, customer_1st_rm, customer_2nd_rm,
+                estimated_arrival
+            )
+            VALUES
+            (
+                :product_id, :supplier_id, :quantity, :carton_width, :carton_height, :carton_length,
+                :pcs_per_carton, :no_of_carton, :designlogo, :price, :shipping_price, :additional_price,
+                :production_time, :conversion_rate,
+                :total_price_yen, :total_price_rm, :deposit_50_yen, :deposit_50_rm,
+                :cbm_carton, :total_cbm, :vm_carton, :total_vm, :total_weight, :sg_tax,
+                :supplier_1st_yen, :supplier_2nd_yen, :customer_1st_rm, :customer_2nd_rm,
+                :estimated_arrival
+            )
+        ");
+
+        $stmt->execute([
+            ':product_id'       => $product_id,
+            ':supplier_id'      => $supplier_id,
+            ':quantity'         => $quantity,
+            ':carton_width'     => $carton_width,
+            ':carton_height'    => $carton_height,
+            ':carton_length'    => $carton_length,
+            ':pcs_per_carton'   => $pcs_per_carton,
+            ':no_of_carton'     => $no_of_carton,
+            ':designlogo'       => $designlogo,
+            ':price'            => $price,
+            ':shipping_price'   => $shipping_price,
+            ':additional_price' => $additional_price,
+            ':production_time'  => $production_time,
+            ':conversion_rate'  => $conversion_rate,
+            ':total_price_yen'  => $total_price_yen,
+            ':total_price_rm'   => $total_price_rm,
+            ':deposit_50_yen'   => $deposit_50_yen,
+            ':deposit_50_rm'    => $deposit_50_rm,
+            ':cbm_carton'       => $cbm_carton,
+            ':total_cbm'        => $total_cbm,
+            ':vm_carton'        => $vm_carton,
+            ':total_vm'         => $total_vm,
+            ':total_weight'     => $total_weight,          // ✅ total_weight instead of weight_carton
+            ':sg_tax'           => $sg_tax,
+            ':supplier_1st_yen' => $supplier_1st_yen,      // ✅
+            ':supplier_2nd_yen' => $supplier_2nd_yen,      // ✅
+            ':customer_1st_rm'  => $customer_1st_rm,       // ✅
+            ':customer_2nd_rm'  => $customer_2nd_rm,       // ✅
+            ':estimated_arrival'=> $estimated_arrival
+        ]);
+
+        $_SESSION['successMsg'] = "✅ Price record saved successfully!";
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    } catch (PDOException $e) {
+        $errorMsg = "❌ Error: " . $e->getMessage();
+    }
+}
+
+// Fetch products
+$productOptions = [];
+try {
+    $stmt = $pdo->query("SELECT product_id, name, size_volume FROM Product WHERE deleted_at IS NULL AND is_active = 1");
+    $productOptions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $errorMsg = "❌ Error fetching products: " . $e->getMessage();
+}
+
+// Fetch suppliers
+$supplierOptions = [];
+try {
+    $stmt = $pdo->query("SELECT supplier_id, supplier_name FROM Supplier WHERE deleted_at IS NULL");
+    $supplierOptions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $errorMsg = "❌ Error fetching suppliers: " . $e->getMessage();
+}
+?>
+
+
+
+
+=======
 // At the very top of the file
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -6,13 +145,18 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/Backend/auth_check.php';
 ?>
 
+>>>>>>> 2e54e392af60789845e496a103274c7c421a9965
 <!doctype html>
 <html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg">
 
 <head>
 
     <meta charset="utf-8" />
+<<<<<<< HEAD
+    <title>Berans Trading</title>
+=======
     <title>Basic Elements | Velzon - Admin & Dashboard Template</title>
+>>>>>>> 2e54e392af60789845e496a103274c7c421a9965
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
@@ -246,9 +390,16 @@ require_once __DIR__ . '/Backend/auth_check.php';
                         <a class="dropdown-item" href="auth-lockscreen-basic.html"><i
                                 class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span
                                 class="align-middle">Lock screen</span></a>
+<<<<<<< HEAD
+                        <a class="dropdown-item" href="../private/logout.php">
+                                <i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i>
+                                <span class="align-middle" data-key="t-logout">Logout</span>
+                        </a>
+=======
                         <a class="dropdown-item" href="Backend/logout.php"><i
                                 class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span
                                 class="align-middle" data-key="t-logout">Logout</span></a>
+>>>>>>> 2e54e392af60789845e496a103274c7c421a9965
                     </div>
                 </div>
             </div>
@@ -412,12 +563,285 @@ require_once __DIR__ . '/Backend/auth_check.php';
                         </div>
                     </div>
 
+<<<<<<< HEAD
+        <!-- ============================================================== -->
+        <!-- Start right Content here -->
+        <!-- ============================================================== -->
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <?php if ($successMsg): ?>
+                                <div class="alert alert-success"><?= htmlspecialchars($successMsg) ?></div>
+                            <?php elseif ($errorMsg): ?>
+                                <div class="alert alert-danger"><?= htmlspecialchars($errorMsg) ?></div>
+                            <?php endif; ?>
+
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-center align-items-center">
+                                    <h2 class="card-title mb-0 text-center fw-bold" style="font-size: 2rem; width: 100%;">Enter Product Price Details</h2>
+                                </div>
+
+                                <div class="card-body">
+                                    <form method="POST" id="priceForm">
+                                        <div class="row g-3">
+
+                                            <!-- Product -->
+                                            <div class="col-md-6">
+                                                <label for="product_id" class="form-label">Product (Item Name & Size)</label>
+                                                <select class="form-select" id="product_id" name="product_id" required>
+                                                    <option value="">Select product</option>
+                                                    <?php foreach ($productOptions as $p): ?>
+                                                        <option value="<?= $p['product_id'] ?>">
+                                                            <?= htmlspecialchars($p['name'] . ' - ' . $p['size_volume']) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+
+                                            <!-- Supplier -->
+                                            <div class="col-md-6">
+                                                <label for="supplier_id" class="form-label">Supplier</label>
+                                                <select class="form-select" id="supplier_id" name="supplier_id" required>
+                                                    <option value="">Select supplier</option>
+                                                    <?php foreach ($supplierOptions as $s): ?>
+                                                        <option value="<?= $s['supplier_id'] ?>"><?= htmlspecialchars($s['supplier_name']) ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+
+                                            <!-- Quantity -->
+                                            <div class="col-md-4">
+                                                <label class="form-label">Quantity (pcs)</label>
+                                                <input type="number" class="form-control" name="quantity" id="quantity" value="1000" min="1" required>
+                                            </div>
+
+                                            <!-- Carton Width -->
+                                            <div class="col-md-4">
+                                                <label class="form-label">Carton Width (cm)</label>
+                                                <input type="number" step="0.01" class="form-control" name="carton_width" id="carton_width" value="30.00" min="0" required>
+                                            </div>
+
+                                            <!-- Carton Height -->
+                                            <div class="col-md-4">
+                                                <label class="form-label">Carton Height (cm)</label>
+                                                <input type="number" step="0.01" class="form-control" name="carton_height" id="carton_height" value="20.00" min="0" required>
+                                            </div>
+
+                                            <!-- Carton Length -->
+                                            <div class="col-md-4">
+                                                <label class="form-label">Carton Length (cm)</label>
+                                                <input type="number" step="0.01" class="form-control" name="carton_length" id="carton_length" value="40.00" min="0" required>
+                                            </div>
+
+                                            <!-- PCS per Carton -->
+                                            <div class="col-md-4">
+                                                <label class="form-label">PCS per Carton</label>
+                                                <input type="number" class="form-control" name="pcs_per_carton" id="pcs_per_carton" value="50" min="1" required>
+                                            </div>
+
+                                            <!-- Number of Carton -->
+                                            <div class="col-md-4">
+                                                <label class="form-label">Number of Carton</label>
+                                                <input type="number" class="form-control" name="no_of_carton" id="no_of_carton" value="20" min="1" required>
+                                            </div>
+
+                                            <!-- Design & Logo -->
+                                            <div class="col-md-12">
+                                                <label class="form-label">Design & Logo Details</label>
+                                                <textarea class="form-control" name="designlogo" id="designlogo" rows="2" placeholder="Enter design and logo details"></textarea>
+                                            </div>
+
+                                            <!-- Price (Yen) -->
+                                            <div class="col-md-4">
+                                                <label class="form-label">Price (Yen)</label>
+                                                <input type="number" step="0.0000001" class="form-control" name="price" id="price" value="5.0000000" min="0" required>
+                                            </div>
+
+                                            <!-- Shipping Price (Yen) -->
+                                            <div class="col-md-4">
+                                                <label class="form-label">Shipping Price (Yen)</label>
+                                                <input type="number" step="0.01" class="form-control" name="shipping_price" id="shipping_price" value="500" min="0" required>
+                                            </div>
+
+                                            <!-- Additional Price (Yen) -->
+                                            <div class="col-md-4">
+                                                <label class="form-label">Additional Price (Yen)</label>
+                                                <input type="number" step="0.01" class="form-control" name="additional_price" id="additional_price" value="0" min="0" required>
+                                            </div>
+
+                                            <!-- Production Time (days) -->
+                                            <div class="col-md-6">
+                                                <label class="form-label">Production Time (days)</label>
+                                                <input type="text" class="form-control" name="production_time" id="production_time" value="7" required>
+                                            </div>
+
+                                            <!-- Weight per Carton (kg) -->
+                                            <div class="col-md-6">
+                                                <label class="form-label">Weight per Carton (kg)</label>
+                                                <input type="number" step="0.01" class="form-control" name="weight_carton" id="weight_carton" value="10.00" min="0" required>
+                                            </div>
+
+                                            <!-- Conversion Rate -->
+                                            <div class="col-md-6">
+                                                <label class="form-label">Conversion Rate (Yen to MYR)</label>
+                                                <input type="number" step="0.0001" class="form-control" name="conversion_rate" id="conversion_rate" value="0.032" min="0" required>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Estimated Arrival Date</label>
+                                                <input type="date" class="form-control" id="estimated_arrival" name="estimated_arrival">
+                                            </div>
+
+                                            <div class="card-header d-flex justify-content-center align-items-center">
+                                                <h2 class="card-title mb-0 text-center fw-bold" style="font-size: 2rem; width: 100%;">Calculated Price</h2>
+                                            </div>        
+
+                                            <!-- ✅ CALCULATED RESULTS WITH HIDDEN FIELDS -->
+                                            <div class="col-md-6">
+                                                <label class="form-label">Price (RM)</label>
+                                                <input type="text" class="form-control" id="price_rm" readonly>
+                                                <input type="hidden" name="price_rm" id="price_rm_hidden">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Total Price (Yen)</label>
+                                                <input type="text" class="form-control" id="total_price_yen" readonly>
+                                                <input type="hidden" name="total_price_yen" id="total_price_yen_hidden">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Total Price (RM)</label>
+                                                <input type="text" class="form-control" id="total_price_rm" readonly>
+                                                <input type="hidden" name="total_price_rm" id="total_price_rm_hidden">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">50% Deposit Price (Yen)</label>
+                                                <input type="text" class="form-control" id="deposit_50_yen" readonly>
+                                                <input type="hidden" name="deposit_50_yen" id="deposit_50_yen_hidden">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">50% Deposit Price (RM)</label>
+                                                <input type="text" class="form-control" id="deposit_50_rm" readonly>
+                                                <input type="hidden" name="deposit_50_rm" id="deposit_50_rm_hidden">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">CBM per Carton (m³)</label>
+                                                <input type="text" class="form-control" id="cbm_carton" readonly>
+                                                <input type="hidden" name="cbm_carton" id="cbm_carton_hidden">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Total CBM (m³)</label>
+                                                <input type="text" class="form-control" id="total_cbm" readonly>
+                                                <input type="hidden" name="total_cbm" id="total_cbm_hidden">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Vm per Carton (kg/m³)</label>
+                                                <input type="text" class="form-control" id="vm_carton" readonly>
+                                                <input type="hidden" name="vm_carton" id="vm_carton_hidden">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Total Vm (kg/m³)</label>
+                                                <input type="text" class="form-control" id="total_vm" readonly>
+                                                <input type="hidden" name="total_vm" id="total_vm_hidden">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Total Weight (kg)</label>
+                                                <input type="text" class="form-control" id="total_weight" readonly>
+                                                <input type="hidden" name="total_weight" id="total_weight_hidden">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">SG TAX (9%) (Yen)</label>
+                                                <input type="text" class="form-control" id="sg_tax" readonly>
+                                                <input type="hidden" name="sg_tax" id="sg_tax_hidden">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Supplier 1st (Yen)</label>
+                                                <input type="text" class="form-control" id="supplier_1st" readonly>
+                                                <input type="hidden" name="supplier_1st_yen" id="supplier_1st_hidden">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Supplier 2nd (Yen)</label>
+                                                <input type="text" class="form-control" id="supplier_2nd" readonly>
+                                                <input type="hidden" name="supplier_2nd_yen" id="supplier_2nd_hidden">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Customer 1st (RM)</label>
+                                                <input type="text" class="form-control" id="customer_1st" readonly>
+                                                <input type="hidden" name="customer_1st_rm" id="customer_1st_hidden">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Customer 2nd (RM)</label>
+                                                <input type="text" class="form-control" id="customer_2nd" readonly>
+                                                <input type="hidden" name="customer_2nd_rm" id="customer_2nd_hidden">
+                                            </div>
+                                             <div class="col-12 text-end mt-3">
+                                                <button type="submit" class="btn btn-primary">Save Price</button>
+                                            </div>
+
+                                            <div class="additional-carton" id="add-carton1">
+                                            <h5>Additional Carton 1</h5>
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                <label>Carton Width (W)</label>
+                                                <input type="number" step="0.01" name="add_carton1_width" id="add_carton1_width" class="form-control" value="0">
+                                                </div>
+                                                <div class="col-md-2">
+                                                <label>Carton Height (H)</label>
+                                                <input type="number" step="0.01" name="add_carton1_height" id="add_carton1_height" class="form-control" value="0">
+                                                </div>
+                                                <div class="col-md-2">
+                                                <label>Carton Length (L)</label>
+                                                <input type="number" step="0.01" name="add_carton1_length" id="add_carton1_length" class="form-control" value="0">
+                                                </div>
+                                                <div class="col-md-2">
+                                                <label>PCS / Carton</label>
+                                                <input type="number" name="add_carton1_pcs" id="add_carton1_pcs" class="form-control" value="0">
+                                                </div>
+                                                <div class="col-md-2">
+                                                <label>No Of Carton</label>
+                                                <input type="number" name="add_carton1_no" id="add_carton1_no" class="form-control" value="0">
+                                                </div>
+                                                <div class="col-md-2">
+                                                <label>Total CBM Carton 1</label>
+                                                <input type="text" readonly id="add_carton1_total_cbm" class="form-control">
+                                                <input type="hidden" name="add_carton1_total_cbm" id="add_carton1_total_cbm_hidden">
+                                                </div>
+                                            </div>
+                                            </div>
+
+
+                                        </div><!-- row -->
+                                    </form>
+                                </div><!-- card-body -->
+                            </div><!-- card -->
+                        </div><!-- col -->
+
+                    </div><!--end row-->
+                </div> <!-- container-fluid -->
+
+        <!-- ============================================================== -->
+        <!-- End Page-content -->
+        <!-- ============================================================== -->                
+=======
 
 
 
 
                     
                 </div> <!-- container-fluid -->
+>>>>>>> 2e54e392af60789845e496a103274c7c421a9965
             </div><!-- End Page-content -->
 
             <footer class="footer">
@@ -987,6 +1411,10 @@ require_once __DIR__ . '/Backend/auth_check.php';
     <script src="assets/libs/feather-icons/feather.min.js"></script>
     <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="assets/js/plugins.js"></script>
+<<<<<<< HEAD
+    <script src="assets/js/calculate.js"></script>
+=======
+>>>>>>> 2e54e392af60789845e496a103274c7c421a9965
 
     <!-- prismjs plugin -->
     <script src="assets/libs/prismjs/prism.js"></script>

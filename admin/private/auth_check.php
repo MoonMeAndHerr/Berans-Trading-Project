@@ -7,15 +7,15 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Define absolute paths for redirects (adjust these if your URL base differs)
+$loginPage = '/beranstrading/admin/public/auth-signin-basic.php';
+$dashboardPage = '/beranstrading/admin/public/forms-elements.php';
+
 // Check for logged_out flag
 if (isset($_SESSION['logged_out'])) {
-    header("Location: auth-signin-basic.php");
+    header("Location: $loginPage");
     exit;
 }
-
-// Define important paths
-$loginPage = 'auth-signin-basic.php';
-$dashboardPage = 'forms-elements.php';
 
 // Fix config path
 $configPath = file_exists(__DIR__ . '/config.php') 
@@ -29,7 +29,7 @@ require_once $configPath;
 
 // Skip auth check for login page
 $currentPage = basename($_SERVER['PHP_SELF']);
-if ($currentPage === $loginPage) {
+if ($currentPage === basename($loginPage)) {
     return; // Don't check auth on login page
 }
 
@@ -58,7 +58,7 @@ if (!isset($_SESSION['staff_id'])) {
                 session_regenerate_id(true);
                 
                 // Redirect to dashboard if this was a remember-me login
-                if ($currentPage === $loginPage) {
+                if ($currentPage === basename($loginPage)) {
                     header("Location: $dashboardPage");
                     exit;
                 }
@@ -78,6 +78,4 @@ if (!isset($_SESSION['staff_id'])) {
         exit;
     }
 }
-
-// Session verification (existing code remains the same)
 ?>
