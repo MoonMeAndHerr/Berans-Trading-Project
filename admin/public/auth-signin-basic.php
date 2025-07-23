@@ -1,13 +1,9 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 session_start();
-<<<<<<< HEAD
 require_once __DIR__ . '/../private/config.php';
 require_once __DIR__ . '/../private/logger.php';
-=======
-require_once __DIR__ . '/Backend/config.php';
-require_once __DIR__ . '/Backend/logger.php';
->>>>>>> 2e54e392af60789845e496a103274c7c421a9965
-
 
 // Initialize variables
 $error = '';
@@ -31,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             logDebug("Attempting database query for user", ['username' => $username]);
             
-            $stmt = $pdo->prepare("SELECT * FROM Staff WHERE username = :username AND is_active = 1");
+            $stmt = $pdo->prepare("SELECT * FROM staff WHERE username = :username AND is_active = 1");
             $stmt->bindParam(':username', $username);
             $stmt->execute();
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -58,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $token = bin2hex(random_bytes(16));
                     $expires_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
                     
-                    $stmt = $pdo->prepare("INSERT INTO Sessions (staff_id, token, expires_at) VALUES (:staff_id, :token, :expires_at)");
+                    $stmt = $pdo->prepare("INSERT INTO sessions (staff_id, token, expires_at) VALUES (:staff_id, :token, :expires_at)");
                     $stmt->bindParam(':staff_id', $user['staff_id']);
                     $stmt->bindParam(':token', $token);
                     $stmt->bindParam(':expires_at', $expires_at);
@@ -67,18 +63,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     logDebug("Session token created in database", ['staff_id' => $user['staff_id'], 'token' => $token]);
 
                     // Update last login
-                    $stmt = $pdo->prepare("UPDATE Staff SET last_login = NOW() WHERE staff_id = :staff_id");
+                    $stmt = $pdo->prepare("UPDATE staff SET last_login = NOW() WHERE staff_id = :staff_id");
                     $stmt->bindParam(':staff_id', $user['staff_id']);
                     $stmt->execute();
 
                     logDebug("Last login updated", ['staff_id' => $user['staff_id']]);
 
                     // Redirect to dashboard
-<<<<<<< HEAD
-                    header('Location: ../public/forms-elements.php');  // relative path example
-=======
-                    header('Location: forms-elements.php');
->>>>>>> 2e54e392af60789845e496a103274c7c421a9965
+                    header('Location: ../public/dashboard-projects.php');  // relative path example
                     exit;
                 } else {
                     $error = 'Invalid password';
@@ -89,12 +81,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 logDebug("User not found or inactive", ['username' => $username]);
             }
         } catch (PDOException $e) {
-            $error = 'Database error';
-            logDebug("Database error during login", [
-                'error' => $e->getMessage(),
-                'username' => $username
-            ]);
-        }
+                $error = $e->getMessage();  // Show actual error message
+                logDebug("Database error during login", [
+                    'error' => $error,
+                    'username' => $username
+    ]);
+}
+
     }
 }
 
@@ -112,7 +105,7 @@ logDebug("Login attempt failed", [
     <head>
         
         <meta charset="utf-8" />
-        <title>Sign In | Velzon - Admin & Dashboard Template</title>
+        <title>Sign In | BeransTrading </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
         <meta content="Themesbrand" name="author" />
@@ -160,7 +153,7 @@ logDebug("Login attempt failed", [
                                                     <img src="assets/images/logo-light.png" alt="" height="20">
                                                 </a>
                                             </div>
-                                            <p class="mt-3 fs-15 fw-medium">Premium Admin & Dashboard Template</p>
+                                            <p class="mt-3 fs-15 fw-medium">BeransTrading, Your One Stop Supplies</p>
                                         </div>
                                     </div>
                                 </div>
@@ -224,7 +217,7 @@ logDebug("Login attempt failed", [
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="text-center">
-                                <p class="mb-0 text-muted">&copy; <script>document.write(new Date().getFullYear())</script> Velzon. Crafted with <i class="mdi mdi-heart text-danger"></i> by Themesbrand</p>
+                                <p class="mb-0 text-muted">&copy; <script>document.write(new Date().getFullYear())</script> BeransTrading . Crafted with <i class="mdi mdi-heart text-danger"></i> by Themesbrand</p>
                             </div>
                         </div>
                     </div>

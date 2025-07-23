@@ -55,7 +55,7 @@ if (isset($_COOKIE['remember_token'])) {
 // ====================== DATABASE SESSION CLEANUP ======================
 if (isset($pdo) && isset($sessionData['staff_id'])) {
     try {
-        $stmt = $pdo->prepare("DELETE FROM Sessions WHERE staff_id = :staff_id");
+        $stmt = $pdo->prepare("DELETE FROM sessions WHERE staff_id = :staff_id");
         $stmt->bindParam(':staff_id', $sessionData['staff_id']);
         $stmt->execute();
         

@@ -1,23 +1,20 @@
 <?php
-<<<<<<< HEAD
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require_once __DIR__ . '/../private/auth_check.php';
 require_once __DIR__ . '/../private/config.php'; // $pdo
 
-
 $successMsg = '';
 $errorMsg = '';
 
-// Show success message once after redirect
 if (isset($_SESSION['successMsg'])) {
     $successMsg = $_SESSION['successMsg'];
     unset($_SESSION['successMsg']);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Collect all inputs safely using null coalescing
+    // ===== Main fields =====
     $product_id       = intval($_POST['product_id'] ?? 0);
     $supplier_id      = intval($_POST['supplier_id'] ?? 0);
     $quantity         = floatval($_POST['quantity'] ?? 0);
@@ -33,9 +30,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $production_time  = trim($_POST['production_time'] ?? '');
     $conversion_rate  = floatval($_POST['conversion_rate'] ?? 0);
     $weight_carton    = floatval($_POST['weight_carton'] ?? 0);
-    $estimated_arrival= $_POST['estimated_arrival'] ?? null;
+    $estimated_arrival = $_POST['estimated_arrival'] ?? null;
+if ($estimated_arrival === '') {
+    $estimated_arrival = null;  // convert empty string to null
+}
 
-    // calculated values from hidden fields
+
+    // ===== Calculated fields =====
+    $price_rm          = floatval($_POST['price_rm'] ?? 0);
     $total_price_yen   = floatval($_POST['total_price_yen'] ?? 0);
     $total_price_rm    = floatval($_POST['total_price_rm'] ?? 0);
     $deposit_50_yen    = floatval($_POST['deposit_50_yen'] ?? 0);
@@ -44,38 +46,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $total_cbm         = floatval($_POST['total_cbm'] ?? 0);
     $vm_carton         = floatval($_POST['vm_carton'] ?? 0);
     $total_vm          = floatval($_POST['total_vm'] ?? 0);
-    $total_weight      = floatval($_POST['total_weight'] ?? 0); // ✅ from hidden
+    $total_weight      = floatval($_POST['total_weight'] ?? 0);
     $sg_tax            = floatval($_POST['sg_tax'] ?? 0);
-    $supplier_1st_yen  = floatval($_POST['supplier_1st_yen'] ?? 0); // ✅ from hidden
-    $supplier_2nd_yen  = floatval($_POST['supplier_2nd_yen'] ?? 0); // ✅ from hidden
-    $customer_1st_rm   = floatval($_POST['customer_1st_rm'] ?? 0);  // ✅ from hidden
-    $customer_2nd_rm   = floatval($_POST['customer_2nd_rm'] ?? 0);  // ✅ from hidden
+    $supplier_1st_yen  = floatval($_POST['supplier_1st_yen'] ?? 0);
+    $supplier_2nd_yen  = floatval($_POST['supplier_2nd_yen'] ?? 0);
+    $customer_1st_rm   = floatval($_POST['customer_1st_rm'] ?? 0);
+    $customer_2nd_rm   = floatval($_POST['customer_2nd_rm'] ?? 0);
+
+    // ===== Additional cartons =====
+    $addCartons = [];
+    for ($i = 1; $i <= 6; $i++) {
+        $addCartons[$i] = [
+            'width'     => floatval($_POST["add_carton{$i}_width"] ?? 0),
+            'height'    => floatval($_POST["add_carton{$i}_height"] ?? 0),
+            'length'    => floatval($_POST["add_carton{$i}_length"] ?? 0),
+            'pcs'       => intval($_POST["add_carton{$i}_pcs"] ?? 0),
+            'no'        => intval($_POST["add_carton{$i}_no"] ?? 0),
+            'total_cbm' => floatval($_POST["add_carton{$i}_total_cbm"] ?? 0),
+        ];
+    }
 
     try {
-        $stmt = $pdo->prepare("
-            INSERT INTO Price 
-            (
-                product_id, supplier_id, quantity, carton_width, carton_height, carton_length,
-                pcs_per_carton, no_of_carton, designlogo, price, shipping_price, additional_price,
-                production_time, conversion_rate,
+        // Build INSERT with additional carton fields
+        $sql = "
+            INSERT INTO price (
+                product_id, supplier_id, quantity,
+                carton_width, carton_height, carton_length, pcs_per_carton, no_of_carton,
+                designlogo, price, shipping_price, additional_price, production_time, conversion_rate,price_rm,
                 total_price_yen, total_price_rm, deposit_50_yen, deposit_50_rm,
                 cbm_carton, total_cbm, vm_carton, total_vm, total_weight, sg_tax,
                 supplier_1st_yen, supplier_2nd_yen, customer_1st_rm, customer_2nd_rm,
-                estimated_arrival
-            )
-            VALUES
-            (
-                :product_id, :supplier_id, :quantity, :carton_width, :carton_height, :carton_length,
-                :pcs_per_carton, :no_of_carton, :designlogo, :price, :shipping_price, :additional_price,
-                :production_time, :conversion_rate,
-                :total_price_yen, :total_price_rm, :deposit_50_yen, :deposit_50_rm,
+                estimated_arrival,
+                add_carton1_width, add_carton1_height, add_carton1_length, add_carton1_pcs, add_carton1_no, add_carton1_total_cbm,
+                add_carton2_width, add_carton2_height, add_carton2_length, add_carton2_pcs, add_carton2_no, add_carton2_total_cbm,
+                add_carton3_width, add_carton3_height, add_carton3_length, add_carton3_pcs, add_carton3_no, add_carton3_total_cbm,
+                add_carton4_width, add_carton4_height, add_carton4_length, add_carton4_pcs, add_carton4_no, add_carton4_total_cbm,
+                add_carton5_width, add_carton5_height, add_carton5_length, add_carton5_pcs, add_carton5_no, add_carton5_total_cbm,
+                add_carton6_width, add_carton6_height, add_carton6_length, add_carton6_pcs, add_carton6_no, add_carton6_total_cbm
+            ) VALUES (
+                :product_id, :supplier_id, :quantity,
+                :carton_width, :carton_height, :carton_length, :pcs_per_carton, :no_of_carton,
+                :designlogo, :price, :shipping_price, :additional_price, :production_time, :conversion_rate,
+                :price_rm, :total_price_yen, :total_price_rm, :deposit_50_yen, :deposit_50_rm,
                 :cbm_carton, :total_cbm, :vm_carton, :total_vm, :total_weight, :sg_tax,
                 :supplier_1st_yen, :supplier_2nd_yen, :customer_1st_rm, :customer_2nd_rm,
-                :estimated_arrival
+                :estimated_arrival,
+                :a1w,:a1h,:a1l,:a1p,:a1n,:a1c,
+                :a2w,:a2h,:a2l,:a2p,:a2n,:a2c,
+                :a3w,:a3h,:a3l,:a3p,:a3n,:a3c,
+                :a4w,:a4h,:a4l,:a4p,:a4n,:a4c,
+                :a5w,:a5h,:a5l,:a5p,:a5n,:a5c,
+                :a6w,:a6h,:a6l,:a6p,:a6n,:a6c
             )
-        ");
+        ";
+        $stmt = $pdo->prepare($sql);
 
-        $stmt->execute([
+        $bind = [
             ':product_id'       => $product_id,
             ':supplier_id'      => $supplier_id,
             ':quantity'         => $quantity,
@@ -90,6 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':additional_price' => $additional_price,
             ':production_time'  => $production_time,
             ':conversion_rate'  => $conversion_rate,
+            ':price_rm'         => $price_rm,         
             ':total_price_yen'  => $total_price_yen,
             ':total_price_rm'   => $total_price_rm,
             ':deposit_50_yen'   => $deposit_50_yen,
@@ -98,16 +125,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':total_cbm'        => $total_cbm,
             ':vm_carton'        => $vm_carton,
             ':total_vm'         => $total_vm,
-            ':total_weight'     => $total_weight,          // ✅ total_weight instead of weight_carton
+            ':total_weight'     => $total_weight,
             ':sg_tax'           => $sg_tax,
-            ':supplier_1st_yen' => $supplier_1st_yen,      // ✅
-            ':supplier_2nd_yen' => $supplier_2nd_yen,      // ✅
-            ':customer_1st_rm'  => $customer_1st_rm,       // ✅
-            ':customer_2nd_rm'  => $customer_2nd_rm,       // ✅
-            ':estimated_arrival'=> $estimated_arrival
-        ]);
+            ':supplier_1st_yen' => $supplier_1st_yen,
+            ':supplier_2nd_yen' => $supplier_2nd_yen,
+            ':customer_1st_rm'  => $customer_1st_rm,
+            ':customer_2nd_rm'  => $customer_2nd_rm,
+            ':estimated_arrival'=> $estimated_arrival,
+        ];
 
-        $_SESSION['successMsg'] = "✅ Price record saved successfully!";
+        // bind additional carton values
+        for ($i = 1; $i <= 6; $i++) {
+            $bind[":a{$i}w"] = $addCartons[$i]['width'];
+            $bind[":a{$i}h"] = $addCartons[$i]['height'];
+            $bind[":a{$i}l"] = $addCartons[$i]['length'];
+            $bind[":a{$i}p"] = $addCartons[$i]['pcs'];
+            $bind[":a{$i}n"] = $addCartons[$i]['no'];
+            $bind[":a{$i}c"] = $addCartons[$i]['total_cbm'];
+        }
+
+        $stmt->execute($bind);
+
+        $_SESSION['successMsg'] = "✅ Price record with additional cartons saved successfully!";
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     } catch (PDOException $e) {
@@ -118,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Fetch products
 $productOptions = [];
 try {
-    $stmt = $pdo->query("SELECT product_id, name, size_volume FROM Product WHERE deleted_at IS NULL AND is_active = 1");
+    $stmt = $pdo->query("SELECT product_id, name, size_volume FROM product WHERE deleted_at IS NULL AND is_active = 1");
     $productOptions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $errorMsg = "❌ Error fetching products: " . $e->getMessage();
@@ -127,36 +166,22 @@ try {
 // Fetch suppliers
 $supplierOptions = [];
 try {
-    $stmt = $pdo->query("SELECT supplier_id, supplier_name FROM Supplier WHERE deleted_at IS NULL");
+    $stmt = $pdo->query("SELECT supplier_id, supplier_name FROM supplier WHERE deleted_at IS NULL");
     $supplierOptions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $errorMsg = "❌ Error fetching suppliers: " . $e->getMessage();
 }
+
+
 ?>
 
-
-
-
-=======
-// At the very top of the file
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-require_once __DIR__ . '/Backend/auth_check.php';
-?>
-
->>>>>>> 2e54e392af60789845e496a103274c7c421a9965
 <!doctype html>
 <html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg">
 
 <head>
 
     <meta charset="utf-8" />
-<<<<<<< HEAD
     <title>Berans Trading</title>
-=======
-    <title>Basic Elements | Velzon - Admin & Dashboard Template</title>
->>>>>>> 2e54e392af60789845e496a103274c7c421a9965
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
@@ -330,7 +355,7 @@ require_once __DIR__ . '/Backend/auth_check.php';
                     $current_user = null;
                     if (isset($_SESSION['staff_id'])) {
                         try {
-                            $stmt = $pdo->prepare("SELECT staff_name, staff_designation FROM Staff WHERE staff_id = :staff_id");
+                            $stmt = $pdo->prepare("SELECT staff_name, staff_designation FROM staff WHERE staff_id = :staff_id");
                             $stmt->bindParam(':staff_id', $_SESSION['staff_id']);
                             $stmt->execute();
                             $current_user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -390,16 +415,10 @@ require_once __DIR__ . '/Backend/auth_check.php';
                         <a class="dropdown-item" href="auth-lockscreen-basic.html"><i
                                 class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span
                                 class="align-middle">Lock screen</span></a>
-<<<<<<< HEAD
                         <a class="dropdown-item" href="../private/logout.php">
                                 <i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i>
                                 <span class="align-middle" data-key="t-logout">Logout</span>
                         </a>
-=======
-                        <a class="dropdown-item" href="Backend/logout.php"><i
-                                class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span
-                                class="align-middle" data-key="t-logout">Logout</span></a>
->>>>>>> 2e54e392af60789845e496a103274c7c421a9965
                     </div>
                 </div>
             </div>
@@ -453,20 +472,7 @@ require_once __DIR__ . '/Backend/auth_check.php';
                             <div class="collapse menu-dropdown" id="sidebarDashboards">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
-                                        <a href="dashboard-analytics.html" class="nav-link" data-key="t-analytics"> Analytics
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="dashboard-crm.html" class="nav-link" data-key="t-crm"> CRM </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="index.html" class="nav-link" data-key="t-ecommerce"> Ecommerce </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="dashboard-crypto.html" class="nav-link" data-key="t-crypto"> Crypto </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="dashboard-projects.html" class="nav-link" data-key="t-projects"> Projects </a>
+                                        <a href="../public/dashboard-projects.php" class="nav-link" data-key="t-projects"> Projects </a>
                                     </li>
                                 </ul>
                             </div>
@@ -482,44 +488,7 @@ require_once __DIR__ . '/Backend/auth_check.php';
                             <div class="collapse menu-dropdown" id="sidebarForms">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
-                                        <a href="forms-elements.html" class="nav-link" data-key="t-basic-elements">Basic
-                                            Elements</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="forms-select.html" class="nav-link" data-key="t-form-select"> Form Select </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="forms-checkboxs-radios.html" class="nav-link"
-                                            data-key="t-checkboxs-radios">Checkboxs & Radios</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="forms-pickers.html" class="nav-link" data-key="t-pickers"> Pickers </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="forms-masks.html" class="nav-link" data-key="t-input-masks">Input Masks</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="forms-advanced.html" class="nav-link" data-key="t-advanced">Advanced</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="forms-range-sliders.html" class="nav-link" data-key="t-range-slider"> Range
-                                            Slider </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="forms-validation.html" class="nav-link" data-key="t-validation">Validation</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="forms-wizard.html" class="nav-link" data-key="t-wizard">Wizard</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="forms-editors.html" class="nav-link" data-key="t-editors">Editors</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="forms-file-uploads.html" class="nav-link" data-key="t-file-uploads">File
-                                            Uploads</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="forms-layouts.html" class="nav-link" data-key="t-form-layouts">Form Layouts</a>
+                                        <a href="../public/forms-elements.php" class="nav-link" data-key="t-basic-elements">Enter Price</a>
                                     </li>
                                 </ul>
                             </div>
@@ -563,7 +532,6 @@ require_once __DIR__ . '/Backend/auth_check.php';
                         </div>
                     </div>
 
-<<<<<<< HEAD
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
@@ -598,7 +566,7 @@ require_once __DIR__ . '/Backend/auth_check.php';
                                                 </select>
                                             </div>
 
-                                            <!-- Supplier -->
+                                            <!-- supplier -->
                                             <div class="col-md-6">
                                                 <label for="supplier_id" class="form-label">Supplier</label>
                                                 <select class="form-select" id="supplier_id" name="supplier_id" required>
@@ -786,40 +754,200 @@ require_once __DIR__ . '/Backend/auth_check.php';
                                                 <input type="text" class="form-control" id="customer_2nd" readonly>
                                                 <input type="hidden" name="customer_2nd_rm" id="customer_2nd_hidden">
                                             </div>
-                                             <div class="col-12 text-end mt-3">
-                                                <button type="submit" class="btn btn-primary">Save Price</button>
+
+                                            <div class="additional-carton" id="add-carton1">
+                                                <h5>Additional Carton 1</h5>
+                                                    <div class="row">
+                                                        <div class="col-md-2">
+                                                            <label>Carton Width (W)</label>
+                                                            <input type="number" step="0.01" name="add_carton1_width" id="add_carton1_width" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Carton Height (H)</label>
+                                                            <input type="number" step="0.01" name="add_carton1_height" id="add_carton1_height" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Carton Length (L)</label>
+                                                            <input type="number" step="0.01" name="add_carton1_length" id="add_carton1_length" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>PCS / Carton</label>
+                                                            <input type="number" name="add_carton1_pcs" id="add_carton1_pcs" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>No Of Carton</label>
+                                                            <input type="number" name="add_carton1_no" id="add_carton1_no" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Total CBM Carton 1</label>
+                                                            <input type="text" readonly id="add_carton1_total_cbm" class="form-control">
+                                                            <input type="hidden" name="add_carton1_total_cbm" id="add_carton1_total_cbm_hidden">
+                                                        </div>
+                                                    </div>
                                             </div>
 
                                             <div class="additional-carton" id="add-carton1">
-                                            <h5>Additional Carton 1</h5>
-                                            <div class="row">
-                                                <div class="col-md-2">
-                                                <label>Carton Width (W)</label>
-                                                <input type="number" step="0.01" name="add_carton1_width" id="add_carton1_width" class="form-control" value="0">
-                                                </div>
-                                                <div class="col-md-2">
-                                                <label>Carton Height (H)</label>
-                                                <input type="number" step="0.01" name="add_carton1_height" id="add_carton1_height" class="form-control" value="0">
-                                                </div>
-                                                <div class="col-md-2">
-                                                <label>Carton Length (L)</label>
-                                                <input type="number" step="0.01" name="add_carton1_length" id="add_carton1_length" class="form-control" value="0">
-                                                </div>
-                                                <div class="col-md-2">
-                                                <label>PCS / Carton</label>
-                                                <input type="number" name="add_carton1_pcs" id="add_carton1_pcs" class="form-control" value="0">
-                                                </div>
-                                                <div class="col-md-2">
-                                                <label>No Of Carton</label>
-                                                <input type="number" name="add_carton1_no" id="add_carton1_no" class="form-control" value="0">
-                                                </div>
-                                                <div class="col-md-2">
-                                                <label>Total CBM Carton 1</label>
-                                                <input type="text" readonly id="add_carton1_total_cbm" class="form-control">
-                                                <input type="hidden" name="add_carton1_total_cbm" id="add_carton1_total_cbm_hidden">
-                                                </div>
+                                                <h5>Additional Carton 2</h5>
+                                                    <div class="row">
+                                                        <div class="col-md-2">
+                                                            <label>Carton Width (W)</label>
+                                                            <input type="number" step="0.01" name="add_carton2_width" id="add_carton2_width" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Carton Height (H)</label>
+                                                            <input type="number" step="0.01" name="add_carton2_height" id="add_carton2_height" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Carton Length (L)</label>
+                                                            <input type="number" step="0.01" name="add_carton2_length" id="add_carton2_length" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>PCS / Carton</label>
+                                                            <input type="number" name="add_carton2_pcs" id="add_carton2_pcs" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>No Of Carton</label>
+                                                            <input type="number" name="add_carton2_no" id="add_carton2_no" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Total CBM Carton 2</label>
+                                                            <input type="text" readonly id="add_carton2_total_cbm" class="form-control">
+                                                            <input type="hidden" name="add_carton2_total_cbm" id="add_carton2_total_cbm_hidden">
+                                                        </div>
+                                                    </div>
                                             </div>
+
+                                        <div class="additional-carton" id="add-carton1">
+                                                <h5>Additional Carton 3 </h5>
+                                                    <div class="row">
+                                                        <div class="col-md-2">
+                                                            <label>Carton Width (W)</label>
+                                                            <input type="number" step="0.01" name="add_carton3_width" id="add_carton3_width" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Carton Height (H)</label>
+                                                            <input type="number" step="0.01" name="add_carton3_height" id="add_carton3_height" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Carton Length (L)</label>
+                                                            <input type="number" step="0.01" name="add_carton3_length" id="add_carton3_length" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>PCS / Carton</label>
+                                                            <input type="number" name="add_carton3_pcs" id="add_carton3_pcs" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>No Of Carton</label>
+                                                            <input type="number" name="add_carton3_no" id="add_carton3_no" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Total CBM Carton 3</label>
+                                                            <input type="text" readonly id="add_carton3_total_cbm" class="form-control">
+                                                            <input type="hidden" name="add_carton3_total_cbm" id="add_carton3_total_cbm_hidden">
+                                                        </div>
+                                                    </div>
                                             </div>
+
+                                            <!-- ✅ Additional Carton 4 -->
+                                            <div class="additional-carton" id="add-carton4">
+                                                <h5>Additional Carton 4</h5>
+                                                    <div class="row">
+                                                        <div class="col-md-2">
+                                                            <label>Carton Width (W)</label>
+                                                            <input type="number" step="0.01" name="add_carton4_width" id="add_carton4_width" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Carton Height (H)</label>
+                                                            <input type="number" step="0.01" name="add_carton4_height" id="add_carton4_height" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Carton Length (L)</label>
+                                                            <input type="number" step="0.01" name="add_carton4_length" id="add_carton4_length" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>PCS / Carton</label>
+                                                            <input type="number" name="add_carton4_pcs" id="add_carton4_pcs" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>No Of Carton</label>
+                                                            <input type="number" name="add_carton4_no" id="add_carton4_no" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Total CBM Carton 4</label>
+                                                            <input type="text" readonly id="add_carton4_total_cbm" class="form-control">
+                                                            <input type="hidden" name="add_carton4_total_cbm" id="add_carton4_total_cbm_hidden">
+                                                        </div>
+                                                    </div>
+                                            </div>
+
+                                            <!-- ✅ Additional Carton 5 -->
+                                            <div class="additional-carton" id="add-carton5">
+                                                <h5>Additional Carton 5</h5>
+                                                    <div class="row">
+                                                        <div class="col-md-2">
+                                                            <label>Carton Width (W)</label>
+                                                            <input type="number" step="0.01" name="add_carton5_width" id="add_carton5_width" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Carton Height (H)</label>
+                                                            <input type="number" step="0.01" name="add_carton5_height" id="add_carton5_height" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Carton Length (L)</label>
+                                                            <input type="number" step="0.01" name="add_carton5_length" id="add_carton5_length" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>PCS / Carton</label>
+                                                            <input type="number" name="add_carton5_pcs" id="add_carton5_pcs" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>No Of Carton</label>
+                                                            <input type="number" name="add_carton5_no" id="add_carton5_no" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Total CBM Carton 5</label>
+                                                            <input type="text" readonly id="add_carton5_total_cbm" class="form-control">
+                                                            <input type="hidden" name="add_carton5_total_cbm" id="add_carton5_total_cbm_hidden">
+                                                        </div>
+                                                    </div>
+                                            </div>
+
+                                            <!-- ✅ Additional Carton 6 -->
+                                            <div class="additional-carton" id="add-carton6">
+                                                <h5>Additional Carton 6</h5>
+                                                    <div class="row">
+                                                        <div class="col-md-2">
+                                                            <label>Carton Width (W)</label>
+                                                            <input type="number" step="0.01" name="add_carton6_width" id="add_carton6_width" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Carton Height (H)</label>
+                                                            <input type="number" step="0.01" name="add_carton6_height" id="add_carton6_height" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Carton Length (L)</label>
+                                                            <input type="number" step="0.01" name="add_carton6_length" id="add_carton6_length" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>PCS / Carton</label>
+                                                            <input type="number" name="add_carton6_pcs" id="add_carton6_pcs" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>No Of Carton</label>
+                                                            <input type="number" name="add_carton6_no" id="add_carton6_no" class="form-control" value="0">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label>Total CBM Carton 6</label>
+                                                            <input type="text" readonly id="add_carton6_total_cbm" class="form-control">
+                                                            <input type="hidden" name="add_carton6_total_cbm" id="add_carton6_total_cbm_hidden">
+                                                        </div>
+                                                    </div>
+                                            </div>
+
+                                            <div class="col-12 text-end mt-3">
+                                                <button type="submit" class="btn btn-primary">Save Price</button>
+                                            </div>                                                      
+
 
 
                                         </div><!-- row -->
@@ -834,14 +962,6 @@ require_once __DIR__ . '/Backend/auth_check.php';
         <!-- ============================================================== -->
         <!-- End Page-content -->
         <!-- ============================================================== -->                
-=======
-
-
-
-
-                    
-                </div> <!-- container-fluid -->
->>>>>>> 2e54e392af60789845e496a103274c7c421a9965
             </div><!-- End Page-content -->
 
             <footer class="footer">
@@ -1411,10 +1531,7 @@ require_once __DIR__ . '/Backend/auth_check.php';
     <script src="assets/libs/feather-icons/feather.min.js"></script>
     <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="assets/js/plugins.js"></script>
-<<<<<<< HEAD
     <script src="assets/js/calculate.js"></script>
-=======
->>>>>>> 2e54e392af60789845e496a103274c7c421a9965
 
     <!-- prismjs plugin -->
     <script src="assets/libs/prismjs/prism.js"></script>
