@@ -339,6 +339,7 @@ CREATE TABLE `staff` (
   `staff_id` int(11) NOT NULL,
   `company_id` int(11) DEFAULT NULL,
   `staff_name` varchar(100) NOT NULL,
+  `staff_profile_picture` varchar(255) NOT NULL,
   `staff_designation` varchar(50) DEFAULT NULL,
   `staff_about` text DEFAULT NULL,
   `staff_number` varchar(20) DEFAULT NULL,
