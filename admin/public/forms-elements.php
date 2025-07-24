@@ -50,6 +50,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $supplier_2nd_yen  = floatval($_POST['supplier_2nd_yen'] ?? 0);
     $customer_1st_rm   = floatval($_POST['customer_1st_rm'] ?? 0);
     $customer_2nd_rm   = floatval($_POST['customer_2nd_rm'] ?? 0);
+    $final_selling_total       = floatval($_POST['final_selling_total'] ?? 0);
+    $final_total_price         = floatval($_POST['final_total_price'] ?? 0);
+    $final_unit_price          = floatval($_POST['final_unit_price'] ?? 0);
+    $final_profit_per_unit_rm  = floatval($_POST['final_profit_per_unit_rm'] ?? 0);
+    $final_total_profit        = floatval($_POST['final_total_profit'] ?? 0);
+    $final_profit_percent      = floatval($_POST['final_profit_percent'] ?? 0);
+    $final_selling_unit        = floatval($_POST['final_selling_unit'] ?? 0);
+
 
     // ===== Shipping code from user input =====
     $shipping_code = trim($_POST['shipping_code'] ?? '');
@@ -74,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Insert main price record with additional carton fields
-        $sql = "
+            $sql = "
             INSERT INTO price (
                 product_id, supplier_id, quantity,
                 carton_width, carton_height, carton_length, pcs_per_carton, no_of_carton,
@@ -88,7 +96,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 add_carton3_width, add_carton3_height, add_carton3_length, add_carton3_pcs, add_carton3_no, add_carton3_total_cbm,
                 add_carton4_width, add_carton4_height, add_carton4_length, add_carton4_pcs, add_carton4_no, add_carton4_total_cbm,
                 add_carton5_width, add_carton5_height, add_carton5_length, add_carton5_pcs, add_carton5_no, add_carton5_total_cbm,
-                add_carton6_width, add_carton6_height, add_carton6_length, add_carton6_pcs, add_carton6_no, add_carton6_total_cbm
+                add_carton6_width, add_carton6_height, add_carton6_length, add_carton6_pcs, add_carton6_no, add_carton6_total_cbm,
+                final_selling_total, final_total_price, final_unit_price,
+                final_profit_per_unit_rm, final_total_profit, final_profit_percent, final_selling_unit
             ) VALUES (
                 :product_id, :supplier_id, :quantity,
                 :carton_width, :carton_height, :carton_length, :pcs_per_carton, :no_of_carton,
@@ -102,9 +112,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 :a3w,:a3h,:a3l,:a3p,:a3n,:a3c,
                 :a4w,:a4h,:a4l,:a4p,:a4n,:a4c,
                 :a5w,:a5h,:a5l,:a5p,:a5n,:a5c,
-                :a6w,:a6h,:a6l,:a6p,:a6n,:a6c
+                :a6w,:a6h,:a6l,:a6p,:a6n,:a6c,
+                :final_selling_total, :final_total_price, :final_unit_price,
+                :final_profit_per_unit_rm, :final_total_profit, :final_profit_percent, :final_selling_unit
             )
-        ";
+            ";
+
         $stmt = $pdo->prepare($sql);
 
         $bind = [
@@ -147,7 +160,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $bind[":a{$i}n"] = $addCartons[$i]['no'];
             $bind[":a{$i}c"] = $addCartons[$i]['total_cbm'];
         }
-
+            $bind[':final_selling_total']      = $final_selling_total;
+            $bind[':final_total_price']        = $final_total_price;
+            $bind[':final_unit_price']         = $final_unit_price;
+            $bind[':final_profit_per_unit_rm'] = $final_profit_per_unit_rm;
+            $bind[':final_total_profit']       = $final_total_profit;
+            $bind[':final_profit_percent']     = $final_profit_percent;
+            $bind[':final_selling_unit']       = $final_selling_unit;
         $stmt->execute($bind);
 
         // Get the newly inserted price_id
@@ -943,13 +962,100 @@ try {
                                                             </div>
                                                     </div>
                                             </div>
+
+                                            <!-- ✅ FINAL PRICING -->
+                                             <div class="card-header d-flex justify-content-center align-items-center">
+                                                <h2 class="card-title mb-0 text-center fw-bold" style="font-size: 2rem; width: 100%;">Final Price</h2>
+                                            </div>  
+ <div class="row g-3">
+
+  <!-- Final Total Price -->
+  <div class="col-md-6">
+    <label class="form-label">Final Total Price</label>
+    <div class="input-group">
+      <span class="input-group-text">RM</span>
+      <input type="text" class="form-control" id="final_total_price" readonly>
+      <input type="hidden" name="final_total_price" id="final_total_price_hidden">
+    </div>
+  </div>
+
+  <!-- Final Unit Price -->
+  <div class="col-md-6">
+    <label class="form-label">Final Unit Price</label>
+    <div class="input-group">
+      <span class="input-group-text">RM</span>
+      <input type="text" class="form-control" id="final_unit_price" readonly>
+      <input type="hidden" name="final_unit_price" id="final_unit_price_hidden">
+    </div>
+  </div>
+
+  <!-- Final Selling Total -->
+  <div class="col-md-6">
+    <label class="form-label">Final Selling Total</label>
+    <div class="input-group">
+      <span class="input-group-text">RM</span>
+      <input type="text" class="form-control" id="final_selling_total" readonly>
+      <input type="hidden" name="final_selling_total" id="final_selling_total_hidden">
+    </div>
+  </div>
+
+  <!-- Final Selling Unit -->
+  <div class="col-md-6">
+    <label class="form-label">Final Selling Unit</label>
+    <div class="input-group">
+      <span class="input-group-text">RM</span>
+      <input type="number" step="0.01" class="form-control" id="final_selling_unit" name="final_selling_unit">
+    </div>
+  </div>
+
+  <!-- Final Profit Per Unit RM -->
+  <div class="col-md-6">
+    <label class="form-label">Final Profit Per Unit</label>
+    <div class="input-group">
+      <span class="input-group-text">RM</span>
+      <input type="text" class="form-control" id="final_profit_per_unit" readonly>
+      <input type="hidden" name="final_profit_per_unit" id="final_profit_per_unit_hidden">
+    </div>
+  </div>
+
+  <!-- Final Total Profit -->
+  <div class="col-md-6">
+    <label class="form-label">Final Total Profit</label>
+    <div class="input-group">
+      <span class="input-group-text">RM</span>
+      <input type="text" class="form-control" id="final_total_profit" readonly>
+      <input type="hidden" name="final_total_profit" id="final_total_profit_hidden">
+    </div>
+  </div>
+
+  <!-- Final Profit (%) -->
+  <div class="col-md-6">
+    <label class="form-label">Final Profit (%)</label>
+    <div class="input-group">
+      <span class="input-group-text">%</span>
+      <input type="text" class="form-control" id="final_profit_percent" readonly>
+      <input type="hidden" name="final_profit_percent" id="final_profit_percent_hidden">
+    </div>
+  </div>
+
+  <!-- Zakat (10%) -->
+  <div class="col-md-6">
+    <label class="form-label">Zakat (10%)</label>
+    <div class="input-group">
+      <span class="input-group-text">RM</span>
+      <input type="text" class="form-control" id="zakat" readonly>
+      <input type="hidden" name="zakat" id="zakat_hidden">
+    </div>
+  </div>
+
+</div>
+                                                           
+                                            
+
+                                              <!-- ✅ CALCULATED RESULTS WITH HIDDEN FIELDS -->                                          
                                              <div class="card-header d-flex justify-content-center align-items-center">
                                                 <h2 class="card-title mb-0 text-center fw-bold" style="font-size: 2rem; width: 100%;">Calculated Price</h2>
                                             </div>     
-                                            
-                                            
-
-                                            <!-- ✅ CALCULATED RESULTS WITH HIDDEN FIELDS -->
                                             <div class="col-md-6">
                                                 <label class="form-label">Price</label>
                                                     <div class="input-group">
