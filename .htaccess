@@ -1,0 +1,15 @@
+# Enable URL rewriting
+RewriteEngine on
+
+# Removing File Extension of PHP for Clean URL
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [L]
+
+# Removing File Extension of HTML for Clean URL
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*)$ $1.html
+
+# Redirecting 404 Page
+ErrorDocument 404 /user/public/404-error.php

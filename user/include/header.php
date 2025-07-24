@@ -1,3 +1,9 @@
+<?php
+
+	require_once '../../global/main_configuration.php';
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -6,14 +12,14 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-		<title>Porto - Multipurpose Website Template</title>	
+		<title><?php echo WEB_NAME; ?> - <?php echo WEB_TAGLINE; ?></title>	
 
-		<meta name="keywords" content="WebSite Template" />
-		<meta name="description" content="Porto - Multipurpose Website Template">
-		<meta name="author" content="okler.net">
+		<meta name="keywords" content="CMS System" />
+		<meta name="description" content="<?php echo WEB_NAME; ?> - <?php echo WEB_TAGLINE; ?>">
+		<meta name="author" content="beranstrading.com">
 
 		<!-- Favicon -->
-		<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+		<link rel="shortcut icon" href="<?php echo "../../siteidentity". WEB_LOGO ?>" type="image/x-icon" />
 		<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 
 		<!-- Mobile Metas -->
