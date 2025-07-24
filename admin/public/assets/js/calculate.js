@@ -2,7 +2,93 @@ document.addEventListener('DOMContentLoaded', () => {
   // Helper: get float or 0
   const getFloat = (id) => parseFloat(document.getElementById(id)?.value) || 0;
 
-  // Main calculate
+  // Shipping prices data (simulate dynamic DB prices)
+  // These would normally be fetched or embedded dynamically, 
+  // but here hardcoded for demo based on your price_shipping table.
+  const priceData = {
+    // shipping_code: { price_per_cbm_normal, price_per_cbm_sensitive, sg_cbm_normal, sg_cbm_sensitive, price_kg_normal, price_kg_sensitive, sg_kg_normal, sg_kg_sensitive, ocool_cbm_normal, ocool_cbm_sensitive }
+    'M1':  { price_cbm: 380, sensitive_cbm: 380, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 17, sensitive_kg: 19, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
+    'M2':  { price_cbm: 380, sensitive_cbm: 380, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 17, sensitive_kg: 19, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
+    'S1':  { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 285, sg_sensitive_cbm: 285, price_kg: 0, sensitive_kg: 0, sg_kg: 24, sg_sensitive_kg: 24, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
+    'S2':  { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 285, sg_sensitive_cbm: 285, price_kg: 0, sensitive_kg: 0, sg_kg: 24, sg_sensitive_kg: 24, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
+    'OCSG1': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 255, ocool_sensitive_cbm: 0 },
+    'OCSG2': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 275 },
+    'M3a': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 17, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
+    'M3b': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 17, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
+    'M4a': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 19, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
+    'M4b': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 19, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
+    'S3a': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 24, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
+    'S3b': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 24, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
+    'S4a': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 24, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
+    'S4b': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 24, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
+  };
+
+  // Calculate shipping totals based on selected shipping_code and inputs
+  function calculateShippingTotals() {
+    const shippingCode = document.getElementById('shipping_code')?.value || '';
+    const cbm = getFloat('total_cbm');    // total CBM from cartons + additionals
+    const vm = getFloat('total_vm');      // total volume measure
+    const kg = getFloat('total_weight');  // total weight in kg
+
+    let price_total_sea_shipping = 0;
+    let price_total_air_shipping_vm = 0;
+    let price_total_air_shipping_kg = 0;
+
+    const priceEntry = priceData[shippingCode];
+    if (!priceEntry) {
+      // No valid shipping code selected or no data
+      updateShippingFields(0, 0, 0);
+      return;
+    }
+
+    // Determine calculation type by shipping code pattern
+    // Sea shipping (CBM based)
+    if (['M1', 'M2', 'S1', 'S2', 'OCSG1', 'OCSG2'].includes(shippingCode)) {
+      if (shippingCode === 'M1') price_total_sea_shipping = cbm * priceEntry.price_cbm;
+      else if (shippingCode === 'M2') price_total_sea_shipping = cbm * priceEntry.sensitive_cbm;
+      else if (shippingCode === 'S1') price_total_sea_shipping = cbm * priceEntry.sg_cbm;
+      else if (shippingCode === 'S2') price_total_sea_shipping = cbm * priceEntry.sg_sensitive_cbm;
+      else if (shippingCode === 'OCSG1') price_total_sea_shipping = cbm * priceEntry.ocool_cbm;
+      else if (shippingCode === 'OCSG2') price_total_sea_shipping = cbm * priceEntry.ocool_sensitive_cbm;
+    }
+
+    // Air shipping VM based
+    if (['M3a', 'M4a', 'S3a', 'S4a'].includes(shippingCode)) {
+      if (shippingCode === 'M3a') price_total_air_shipping_vm = vm * priceEntry.price_kg;
+      else if (shippingCode === 'M4a') price_total_air_shipping_vm = vm * priceEntry.sensitive_kg;
+      else if (shippingCode === 'S3a') price_total_air_shipping_vm = vm * priceEntry.sg_kg;
+      else if (shippingCode === 'S4a') price_total_air_shipping_vm = vm * priceEntry.sg_sensitive_kg;
+    }
+
+    // Air shipping KG based
+    if (['M3b', 'M4b', 'S3b', 'S4b'].includes(shippingCode)) {
+      if (shippingCode === 'M3b') price_total_air_shipping_kg = kg * priceEntry.price_kg;
+      else if (shippingCode === 'M4b') price_total_air_shipping_kg = kg * priceEntry.sensitive_kg;
+      else if (shippingCode === 'S3b') price_total_air_shipping_kg = kg * priceEntry.sg_kg;
+      else if (shippingCode === 'S4b') price_total_air_shipping_kg = kg * priceEntry.sg_sensitive_kg;
+    }
+
+    updateShippingFields(price_total_sea_shipping, price_total_air_shipping_vm, price_total_air_shipping_kg);
+  }
+
+  // Update visible + hidden shipping total fields
+  function updateShippingFields(sea, air_vm, air_kg) {
+    const seaEl = document.getElementById('price_total_sea_shipping');
+    const seaHidden = document.getElementById('price_total_sea_shipping_hidden');
+    const airVmEl = document.getElementById('price_total_air_shipping_vm');
+    const airVmHidden = document.getElementById('price_total_air_shipping_vm_hidden');
+    const airKgEl = document.getElementById('price_total_air_shipping_kg');
+    const airKgHidden = document.getElementById('price_total_air_shipping_kg_hidden');
+
+    if (seaEl) seaEl.value = sea.toFixed(2);
+    if (seaHidden) seaHidden.value = sea.toFixed(2);
+    if (airVmEl) airVmEl.value = air_vm.toFixed(2);
+    if (airVmHidden) airVmHidden.value = air_vm.toFixed(2);
+    if (airKgEl) airKgEl.value = air_kg.toFixed(2);
+    if (airKgHidden) airKgHidden.value = air_kg.toFixed(2);
+  }
+
+  // Main calculate function you provided
   function calculateMain() {
     const price_yen = getFloat('price');
     const conversion_rate = getFloat('conversion_rate') || 0.032;
@@ -28,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const supplier_1st_yen = total_price_yen / 2;
     const supplier_2nd_yen = total_price_yen / 2;
 
-    // ✅ Get all additional carton total_cbm
+    // Get additional cartons CBM
     const add_cbm_1 = getFloat('add_carton1_total_cbm');
     const add_cbm_2 = getFloat('add_carton2_total_cbm');
     const add_cbm_3 = getFloat('add_carton3_total_cbm');
@@ -36,7 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const add_cbm_5 = getFloat('add_carton5_total_cbm');
     const add_cbm_6 = getFloat('add_carton6_total_cbm');
 
-    // ✅ Total CBM formula: ((G7*C14)+C24+F24+F33+C33+C42+F42)*1.28
     const total_cbm_main = cbm_carton * no_of_carton;
     const total_cbm = (total_cbm_main + add_cbm_1 + add_cbm_2 + add_cbm_3 + add_cbm_4 + add_cbm_5 + add_cbm_6) * 1.28;
 
@@ -47,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
       {id: 'deposit_50_yen', value: deposit_50_yen.toFixed(6)},
       {id: 'deposit_50_rm', value: deposit_50_rm.toFixed(6)},
       {id: 'cbm_carton', value: cbm_carton.toFixed(6)},
-      {id: 'total_cbm', value: total_cbm.toFixed(6)}, // ✅ updated total cbm
+      {id: 'total_cbm', value: total_cbm.toFixed(6)},
       {id: 'vm_carton', value: vm_carton.toFixed(6)},
       {id: 'total_vm', value: total_vm.toFixed(6)},
       {id: 'total_weight', value: total_weight.toFixed(6)},
@@ -62,6 +147,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (visible) visible.value = value;
       if (hidden) hidden.value = value;
     });
+
+    // After main calculation, calculate shipping totals
+    calculateShippingTotals();
   }
 
   // Additional cartons calculation
@@ -91,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const mainInputs = [
     'price', 'conversion_rate', 'shipping_price', 'additional_price',
     'quantity', 'carton_width', 'carton_height', 'carton_length',
-    'no_of_carton', 'weight_carton'
+    'no_of_carton', 'weight_carton', 'shipping_code'  // Added shipping_code listener
   ];
 
   const additionalInputs = [];
@@ -110,5 +198,3 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial calculation
   calculateAll();
 });
-
-
