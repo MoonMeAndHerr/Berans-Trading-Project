@@ -186,7 +186,7 @@ require_once __DIR__ . '/Backend/auth_check.php';
                     $current_user = null;
                     if (isset($_SESSION['staff_id'])) {
                         try {
-                            $stmt = $pdo->prepare("SELECT staff_name, staff_designation FROM Staff WHERE staff_id = :staff_id");
+                            $stmt = $pdo->prepare("SELECT staff_name, staff_designation FROM staff WHERE staff_id = :staff_id");
                             $stmt->bindParam(':staff_id', $_SESSION['staff_id']);
                             $stmt->execute();
                             $current_user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -195,14 +195,14 @@ require_once __DIR__ . '/Backend/auth_check.php';
                             // echo "<pre>User Data: "; print_r($current_user); echo "</pre>";
                             
                             // Ensure we have at least empty strings if fields are NULL
-                            $current_user['staff_name'] = $current_user['staff_name'] ?? 'Staff Member';
+                            $current_user['staff_name'] = $current_user['staff_name'] ?? 'staff Member';
                             $current_user['staff_designation'] = $current_user['staff_designation'] ?? 'Employee';
                         } catch (PDOException $e) {
                             // Log the error for debugging
                             error_log("User data fetch error: " . $e->getMessage());
                             $current_user = [
                                 'staff_name' => 'User',
-                                'staff_designation' => 'Staff'
+                                'staff_designation' => 'staff'
                             ];
                         }
                     }
@@ -417,101 +417,9 @@ require_once __DIR__ . '/Backend/auth_check.php';
         <!-- ============================================================== -->
 
                     <div class="row">
-                        <div class="col-lg-12">
-                            <?php if (!empty($successMsg)): ?>
-                                <div class="alert alert-success"><?= htmlspecialchars($successMsg) ?></div>
-                            <?php elseif (!empty($errorMsg)): ?>
-                                <div class="alert alert-danger"><?= htmlspecialchars($errorMsg) ?></div>
-                            <?php endif; ?>
+                    </div><!--end row-->
 
-                            <div class="card">
-                                <div class="card-header align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Calculate Price</h4>
-                                </div>
-                                <div class="card-body">
-                                    <form method="POST" id="priceForm">
-                                        <div class="row g-3">
-
-                                            <!-- Product -->
-                                            <div class="col-md-6">
-                                                <label for="product_id" class="form-label">Product</label>
-                                                <select class="form-select" id="product_id" name="product_id" required>
-                                                    <option value="">Select product</option>
-                                                    <?php foreach ($productOptions as $p): ?>
-                                                        <option value="<?= $p['product_id'] ?>"><?= htmlspecialchars($p['name']) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-
-                                            <!-- Supplier -->
-                                            <div class="col-md-6">
-                                                <label for="supplier_id" class="form-label">Supplier</label>
-                                                <select class="form-select" id="supplier_id" name="supplier_id" required>
-                                                    <option value="">Select supplier</option>
-                                                    <?php foreach ($supplierOptions as $s): ?>
-                                                        <option value="<?= $s['supplier_id'] ?>"><?= htmlspecialchars($s['supplier_name']) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-
-                                            <!-- Quantity -->
-                                            <div class="col-md-4">
-                                                <label class="form-label">Quantity (pcs)</label>
-                                                <input type="number" class="form-control" name="quantity" id="quantity" value="1000">
-                                            </div>
-
-                                            <!-- Base Price -->
-                                            <div class="col-md-4">
-                                                <label class="form-label">Base Price (Yen)</label>
-                                                <input type="number" step="0.01" class="form-control" name="price" id="price" value="5.00">
-                                            </div>
-
-                                            <!-- Shipping -->
-                                            <div class="col-md-4">
-                                                <label class="form-label">Shipping (Yen)</label>
-                                                <input type="number" step="0.01" class="form-control" name="shipping_price" id="shipping_price" value="500">
-                                            </div>
-
-                                            <!-- Additional Price -->
-                                            <div class="col-md-4">
-                                                <label class="form-label">Additional (Yen)</label>
-                                                <input type="number" step="0.01" class="form-control" name="additional_price" id="additional_price" value="0">
-                                            </div>
-
-                                            <!-- Conversion Rate -->
-                                            <div class="col-md-4">
-                                                <label class="form-label">Conversion Rate (Yen to MYR)</label>
-                                                <input type="number" step="0.0001" class="form-control" name="conversion_rate" id="conversion_rate" value="0.032">
-                                            </div>
-
-                                            <!-- Results -->
-                                            <div class="col-md-6">
-                                                <label class="form-label">Total Price (Yen)</label>
-                                                <input type="text" class="form-control" id="total_price" readonly>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <label class="form-label">Unit Price (Yen per pcs)</label>
-                                                <input type="text" class="form-control" id="unit_price" readonly>
-                                            </div>
-
-                                            <div class="col-12 text-end mt-3">
-                                                <button type="button" class="btn btn-secondary" onclick="calculatePrice()">Calculate</button>
-                                                <button type="submit" class="btn btn-primary">Save Price</button>
-                                            </div>
-
-                                        </div><!-- row -->
-                                    </form>
-                                </div><!-- card-body -->
-                            </div><!-- card -->
-                        </div><!-- col -->
-                    <!--end row-->
-
-
-
-                    
-                    </div> <!-- container-fluid -->
-
+                </div> <!-- container-fluid -->
         <!-- ============================================================== -->
         <!-- End Page-content -->
         <!-- ============================================================== -->                
@@ -1089,61 +997,6 @@ require_once __DIR__ . '/Backend/auth_check.php';
     <script src="assets/libs/prismjs/prism.js"></script>
 
     <script src="assets/js/app.js"></script>
-    <script>
-// Sample JavaScript for calculations
-document.addEventListener('DOMContentLoaded', function() {
-    // Calculate number of cartons when quantity or pcsPerCarton changes
-    document.getElementById('quantity').addEventListener('input', calculateCartons);
-    document.getElementById('pcsPerCarton').addEventListener('input', calculateCartons);
-    
-    // Calculate total price when pricing fields change
-    document.getElementById('unitPrice').addEventListener('input', calculateTotals);
-    document.getElementById('shippingPrice').addEventListener('input', calculateTotals);
-    document.getElementById('additionalPrice').addEventListener('input', calculateTotals);
-    document.getElementById('quantity').addEventListener('input', calculateTotals);
-    
-    // Calculate volume when dimensions change
-    document.getElementById('cartonWidth').addEventListener('input', calculateVolume);
-    document.getElementById('cartonHeight').addEventListener('input', calculateVolume);
-    document.getElementById('cartonLength').addEventListener('input', calculateVolume);
-    document.getElementById('noOfCartons').addEventListener('input', calculateVolume);
-    
-    function calculateCartons() {
-        const quantity = parseFloat(document.getElementById('quantity').value) || 0;
-        const pcsPerCarton = parseFloat(document.getElementById('pcsPerCarton').value) || 1;
-        const noOfCartons = Math.ceil(quantity / pcsPerCarton);
-        document.getElementById('noOfCartons').value = noOfCartons;
-        calculateVolume();
-        calculateTotals();
-    }
-    
-    function calculateTotals() {
-        const quantity = parseFloat(document.getElementById('quantity').value) || 0;
-        const unitPrice = parseFloat(document.getElementById('unitPrice').value) || 0;
-        const shippingPrice = parseFloat(document.getElementById('shippingPrice').value) || 0;
-        const additionalPrice = parseFloat(document.getElementById('additionalPrice').value) || 0;
-        
-        const totalPrice = (quantity * unitPrice) + shippingPrice + additionalPrice;
-        const pricePerUnit = totalPrice / quantity;
-        
-        document.getElementById('totalPriceDisplay').textContent = totalPrice.toFixed(2);
-        document.getElementById('pricePerUnitDisplay').textContent = pricePerUnit.toFixed(2);
-    }
-    
-    function calculateVolume() {
-        const width = parseFloat(document.getElementById('cartonWidth').value) || 0;
-        const height = parseFloat(document.getElementById('cartonHeight').value) || 0;
-        const length = parseFloat(document.getElementById('cartonLength').value) || 0;
-        const cartons = parseFloat(document.getElementById('noOfCartons').value) || 0;
-        
-        const totalVolume = width * height * length * cartons;
-        document.getElementById('totalVolumeDisplay').textContent = totalVolume.toFixed(2);
-    }
-    
-    // In a real implementation, you would fetch products and suppliers from your API
-    // fetchProductsAndSuppliers();
-});
-</script>
 
 </body>
 
