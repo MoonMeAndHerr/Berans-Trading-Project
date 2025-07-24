@@ -40,8 +40,8 @@ if (!isset($_SESSION['staff_id'])) {
         $cookie_data = json_decode($_COOKIE['remember_token'], true);
         
         try {
-            $stmt = $pdo->prepare("SELECT s.* FROM Sessions se 
-                                  JOIN Staff s ON se.staff_id = s.staff_id
+            $stmt = $pdo->prepare("SELECT s.* FROM sessions se 
+                                  JOIN staff s ON se.staff_id = s.staff_id
                                   WHERE se.staff_id = :staff_id AND se.token = :token AND se.expires_at > NOW()");
             $stmt->bindParam(':staff_id', $cookie_data['staff_id']);
             $stmt->bindParam(':token', $cookie_data['token']);
