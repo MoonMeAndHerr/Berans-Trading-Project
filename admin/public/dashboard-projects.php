@@ -229,7 +229,7 @@ require_once('../private/auth_check.php');
                     <div class="dropdown-menu dropdown-menu-end">
                         <!-- item-->
                         <h6 class="dropdown-header">Welcome <?php echo htmlspecialchars($_SESSION['staff_name'] ?? 'User'); ?>!</h6>
-                        <a class="dropdown-item" href="pages-profile.html"><i
+                        <a class="dropdown-item" href="pages-profile.php"><i
                                 class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span
                                 class="align-middle">Profile</span></a>
                         <a class="dropdown-item" href="apps-tasks-kanban.html"><i
@@ -318,7 +318,7 @@ require_once('../private/auth_check.php');
                             <div class="collapse menu-dropdown" id="sidebarForms">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
-                                        <a href="../public/forms-elements.php" class="nav-link" data-key="t-basic-elements">Enter Price</a>
+                                        <a href="../public/forms-elements.php" class="nav-link" data-key="t-basic-elements">Set Pricing</a>
                                     </li>
                                 </ul>
                             </div>
