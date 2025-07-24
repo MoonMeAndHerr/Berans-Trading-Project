@@ -18,9 +18,9 @@ if (isset($_SESSION['logged_out'])) {
 }
 
 // Fix config path
-$configPath = file_exists(__DIR__ . '/config.php') 
-    ? __DIR__ . '/config.php' 
-    : __DIR__ . '/../config.php';
+$configPath = file_exists(__DIR__ . '/../../global/main_configuration.php')
+    ? __DIR__ . '/../../global/main_configuration.php'
+    : __DIR__ . '/../../global/main_configuration.php';
 
 if (!file_exists($configPath)) {
     die('Configuration file missing');
@@ -38,7 +38,7 @@ if (!isset($_SESSION['staff_id'])) {
     // Check for remember me cookie
     if (isset($_COOKIE['remember_token'])) {
         $cookie_data = json_decode($_COOKIE['remember_token'], true);
-        
+        $pdo=openDb();
         try {
             $stmt = $pdo->prepare("SELECT s.* FROM sessions se 
                                   JOIN staff s ON se.staff_id = s.staff_id
@@ -77,5 +77,7 @@ if (!isset($_SESSION['staff_id'])) {
         header("Location: $loginPage");
         exit;
     }
+
+    ClosenDb($pdo);
 }
 ?>

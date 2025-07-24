@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once __DIR__ . '/../private/config.php';
+require_once __DIR__ . '/../../global/main_configuration.php';  // Fixed path
 require_once __DIR__ . '/../private/logger.php';
 
 // Log logout attempt
@@ -53,8 +53,11 @@ if (isset($_COOKIE['remember_token'])) {
 }
 
 // ====================== DATABASE SESSION CLEANUP ======================
-if (isset($pdo) && isset($sessionData['staff_id'])) {
+if (isset($sessionData['staff_id'])) {
     try {
+        // Get new database connection
+        $pdo = openDB();
+        
         $stmt = $pdo->prepare("DELETE FROM sessions WHERE staff_id = :staff_id");
         $stmt->bindParam(':staff_id', $sessionData['staff_id']);
         $stmt->execute();
@@ -64,6 +67,9 @@ if (isset($pdo) && isset($sessionData['staff_id'])) {
             'staff_id' => $sessionData['staff_id'],
             'sessions_deleted' => $rowsAffected
         ]);
+        
+        // Close connection
+        closeDB($pdo);
     } catch (PDOException $e) {
         $errorMsg = "Logout error: " . $e->getMessage();
         error_log($errorMsg);
