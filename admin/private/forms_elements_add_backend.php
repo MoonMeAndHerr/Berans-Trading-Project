@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 add_carton5_width, add_carton5_height, add_carton5_length, add_carton5_pcs, add_carton5_no, add_carton5_total_cbm,
                 add_carton6_width, add_carton6_height, add_carton6_length, add_carton6_pcs, add_carton6_no, add_carton6_total_cbm,
                 final_selling_total, final_total_price, final_unit_price,
-                final_profit_per_unit_rm, final_total_profit, final_profit_percent, final_selling_unit
+                final_profit_per_unit_rm, final_total_profit, final_profit_percent, final_selling_unit, weight_carton
             ) VALUES (
                 :product_id, :supplier_id, :quantity,
                 :carton_width, :carton_height, :carton_length, :pcs_per_carton, :no_of_carton,
@@ -117,7 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 :a5w,:a5h,:a5l,:a5p,:a5n,:a5c,
                 :a6w,:a6h,:a6l,:a6p,:a6n,:a6c,
                 :final_selling_total, :final_total_price, :final_unit_price,
-                :final_profit_per_unit_rm, :final_total_profit, :final_profit_percent, :final_selling_unit
+                :final_profit_per_unit_rm, :final_total_profit, :final_profit_percent, :final_selling_unit,
+                :weight_carton
             )
             ";
 
@@ -153,6 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':customer_1st_rm'  => $customer_1st_rm,
             ':customer_2nd_rm'  => $customer_2nd_rm,
             ':estimated_arrival'=> $estimated_arrival,
+            ':weight_carton'    => $weight_carton, 
         ];
 
         for ($i = 1; $i <= 6; $i++) {

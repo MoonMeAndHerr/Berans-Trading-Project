@@ -1,10 +1,11 @@
 <?php
-// At the very top of the file
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 require_once __DIR__ . '/../../global/main_configuration.php';
+require_once __DIR__ . '/../private/auth_check.php';
 
 ?>
 

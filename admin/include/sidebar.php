@@ -60,8 +60,14 @@
                             <div class="collapse menu-dropdown" id="sidebarForms">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
-                                        <a href="../public/forms-elements.php" class="nav-link" data-key="t-basic-elements">Set Pricing</a>
-                                    </li>
+                                        <a href="../public/forms-supplier.php" class="nav-link" data-key="t-basic-elements">Supplier</a>
+                                    </li>                                      
+                                    <li class="nav-item">
+                                        <a href="../public/forms-elements-add.php" class="nav-link" data-key="t-basic-elements">Add Pricing</a>
+                                    </li>   
+                                     <li class="nav-item">
+                                        <a href="../public/forms-elements-update.php" class="nav-link" data-key="t-basic-elements">Update Pricing</a>
+                                    </li>                                                                  
                                 </ul>
                             </div>
                         </li>
