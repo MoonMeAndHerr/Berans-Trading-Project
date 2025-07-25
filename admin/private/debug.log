@@ -31,20 +31,6 @@
     "ip": "::1",
     "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"
 }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-[2025-07-24 22:46:42] Database session cleanup - {
-    "staff_id": "1",
-    "sessions_deleted": 1
-}
-[2025-07-24 22:46:42] Logout completed successfully - {
-    "staff_id": "1",
-    "username": "admin"
-}
-[2025-07-24 22:46:43] Login attempt failed - {
-=======
-=======
->>>>>>> Stashed changes
 [2025-07-25 15:46:05] Database session cleanup - {
     "staff_id": "1",
     "sessions_deleted": 3
@@ -110,43 +96,15 @@
     "username": "admin"
 }
 [2025-07-25 16:02:14] Login attempt failed - {
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     "username": "",
     "error": "",
     "ip": "::1"
 }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-[2025-07-24 22:46:50] Login attempt started - {
-=======
 [2025-07-25 16:02:19] Login attempt started - {
->>>>>>> Stashed changes
-=======
-[2025-07-25 16:02:19] Login attempt started - {
->>>>>>> Stashed changes
     "username": "admin",
     "ip": "::1",
     "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"
 }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-[2025-07-24 22:46:50] Attempting database query for user - {
-    "username": "admin"
-}
-[2025-07-24 22:46:50] User found in database - {
-    "staff_id": 1,
-    "username": "admin"
-}
-[2025-07-24 22:46:50] Password verification successful - {
-    "staff_id": 1
-}
-[2025-07-24 22:46:50] Session created - {
-=======
-=======
->>>>>>> Stashed changes
 [2025-07-25 16:02:19] Attempting database query for user - {
     "username": "admin"
 }
@@ -158,118 +116,10 @@
     "staff_id": 1
 }
 [2025-07-25 16:02:19] Session created - {
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     "staff_id": 1,
     "username": "admin",
     "role": "admin"
 }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-[2025-07-24 22:46:50] Session token created in database - {
-    "staff_id": "1",
-    "token": "e39ef76a6195608301b9734e834451ab"
-}
-[2025-07-24 22:46:50] Last login updated - {
-    "staff_id": "1"
-}
-[2025-07-25 05:08:17] Login attempt failed - {
-    "username": "",
-    "error": "",
-    "ip": "::1"
-}
-[2025-07-25 05:08:22] Login attempt failed - {
-    "username": "",
-    "error": "",
-    "ip": "::1"
-}
-[2025-07-25 05:09:25] Login attempt failed - {
-    "username": "",
-    "error": "",
-    "ip": "::1"
-}
-[2025-07-25 05:10:27] Logout initiated - {
-    "staff_id": null,
-    "username": null,
-    "ip": "::1",
-    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"
-}
-[2025-07-25 05:10:27] Logout completed successfully - {
-    "staff_id": null,
-    "username": null
-}
-[2025-07-25 05:10:28] Login attempt failed - {
-    "username": "",
-    "error": "",
-    "ip": "::1"
-}
-[2025-07-25 05:10:42] Login attempt failed - {
-    "username": "",
-    "error": "",
-    "ip": "::1"
-}
-[2025-07-25 05:11:38] Login attempt failed - {
-    "username": "",
-    "error": "",
-    "ip": "::1"
-}
-[2025-07-25 05:11:48] Login attempt failed - {
-    "username": "",
-    "error": "",
-    "ip": "::1"
-}
-[2025-07-25 05:12:18] Login attempt failed - {
-    "username": "",
-    "error": "",
-    "ip": "::1"
-}
-[2025-07-25 05:12:39] Login attempt failed - {
-    "username": "",
-    "error": "",
-    "ip": "::1"
-}
-[2025-07-25 05:12:42] Login attempt started - {
-    "username": "admin",
-    "ip": "::1",
-    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"
-}
-[2025-07-25 05:12:42] Attempting database query for user - {
-    "username": "admin"
-}
-[2025-07-25 05:12:42] User found in database - {
-    "staff_id": 1,
-    "username": "admin"
-}
-[2025-07-25 05:12:42] Password verification successful - {
-    "staff_id": 1
-}
-[2025-07-25 05:12:42] Session created - {
-    "staff_id": 1,
-    "username": "admin",
-    "role": "admin"
-}
-[2025-07-25 05:12:42] Session token created in database - {
-    "staff_id": "1",
-    "token": "a3d1d793f9cc7fd615cf68a64f24efde"
-}
-[2025-07-25 05:12:42] Last login updated - {
-    "staff_id": "1"
-}
-[2025-07-25 11:42:14] Login attempt failed - {
-    "username": "",
-    "error": "",
-    "ip": "::1"
-}
-[2025-07-25 11:42:15] Login attempt failed - {
-    "username": "",
-    "error": "",
-    "ip": "::1"
-}
-=======
-=======
->>>>>>> Stashed changes
 [2025-07-25 16:02:19] Session token created in database - {
     "staff_id": "1",
     "token": "8189ebc740b02e0dea837f9ea52d6140"
@@ -277,7 +127,3 @@
 [2025-07-25 16:02:19] Last login updated - {
     "staff_id": "1"
 }
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
