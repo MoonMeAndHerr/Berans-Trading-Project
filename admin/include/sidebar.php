@@ -60,6 +60,7 @@
                             <div class="collapse menu-dropdown" id="sidebarForms">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
+<<<<<<< HEAD
                                         <a href="../public/forms-supplier.php" class="nav-link" data-key="t-basic-elements">Supplier</a>
                                     </li>                                      
                                     <li class="nav-item">
@@ -68,6 +69,10 @@
                                      <li class="nav-item">
                                         <a href="../public/forms-elements-update.php" class="nav-link" data-key="t-basic-elements">Update Pricing</a>
                                     </li>                                                                  
+=======
+                                        <a href="../public/forms-elements.php" class="nav-link" data-key="t-basic-elements">Set Pricing</a>
+                                    </li>
+>>>>>>> 4a4c08832b13d9a9224dab3d45af38c452daa710
                                 </ul>
                             </div>
                         </li>
