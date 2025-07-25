@@ -1,5 +1,9 @@
 <?php
 
+	if (session_status() === PHP_SESSION_NONE) {
+		session_start();
+	}
+	
 	require_once '../../global/main_configuration.php';
 
 ?>
@@ -19,7 +23,7 @@
 		<meta name="author" content="beranstrading.com">
 
 		<!-- Favicon -->
-		<link rel="shortcut icon" href="<?php echo "../../siteidentity". WEB_LOGO ?>" type="image/x-icon" />
+		<link rel="shortcut icon" href="<?php echo "../../siteidentity/". WEB_LOGO ?>" type="image/x-icon" />
 		<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 
 		<!-- Mobile Metas -->
