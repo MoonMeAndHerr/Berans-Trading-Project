@@ -1,0 +1,97 @@
+                                            <div class="tab-pane" id="animation-profile" role="tabpanel">
+                                                <!-- ✅ Show error messages -->
+                                                <?php if (!empty($errors)): ?>
+                                                    <div class="alert alert-danger">
+                                                        <ul class="mb-0">
+                                                            <?php foreach ($errors as $e): ?>
+                                                                <li><?= htmlspecialchars($e) ?></li>
+                                                            <?php endforeach; ?>
+                                                        </ul>
+                                                    </div>s
+                                                <?php endif; ?><!-- end error messages -->
+
+                                                <!-- ✅ Show success message -->
+                                                <?php if ($success_update): ?>
+                                                    <div class="alert alert-success"><?= htmlspecialchars($success_update) ?></div>
+                                                <?php endif; ?>
+                                                <!-- end success message -->
+
+                                                <!-- ✅ Supplier dropdown -->
+                                                <div class="mb-3">
+                                                    <label for="supplierSelectUpdate" class="form-label">Choose Supplier</label>
+                                                    <select id="supplierSelectUpdate" class="form-select">
+                                                        <option value="">-- Select a supplier (optional) --</option>
+                                                        <?php foreach ($allSuppliers as $sup): ?>
+                                                            <option 
+                                                                value="<?= $sup['supplier_id'] ?>"
+                                                                data-name="<?= htmlspecialchars($sup['supplier_name'], ENT_QUOTES) ?>"
+                                                                data-contact="<?= htmlspecialchars($sup['supplier_contact_person'], ENT_QUOTES) ?>"
+                                                                data-phone="<?= htmlspecialchars($sup['phone'], ENT_QUOTES) ?>"
+                                                                data-email="<?= htmlspecialchars($sup['email'], ENT_QUOTES) ?>"
+                                                                data-address="<?= htmlspecialchars($sup['address'], ENT_QUOTES) ?>"
+                                                                data-notes="<?= htmlspecialchars($sup['notes'], ENT_QUOTES) ?>"
+                                                            >
+                                                                <?= htmlspecialchars($sup['supplier_name']) ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div><!-- end supplier dropdown -->
+
+                                                <!-- ✅ Update Form -->
+                                                <form id="updateForm" action="" method="POST">
+                                                    <div class="row">
+                                                        <input type="hidden" name="supplier_id" id="update_supplier_id">
+
+                                                        <!-- Supplier Name -->
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
+                                                            <input type="text" name="supplier_name" id="update_supplier_name" class="form-control">
+                                                        </div><!-- end supplier name -->
+
+                                                        <!-- Contact Person -->
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Contact Person</label>
+                                                                <input type="text" name="supplier_contact_person" id="update_supplier_contact" class="form-control">
+                                                            </div>
+                                                        </div><!-- end contact person -->
+
+                                                        <!-- Phone -->
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Phone</label>
+                                                                <input type="text" name="phone" id="update_supplier_phone" class="form-control">
+                                                            </div>
+                                                        </div><!-- end phone -->
+
+                                                        <!-- Email -->
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Email</label>
+                                                                <input type="email" name="email" id="update_supplier_email" class="form-control">
+                                                            </div>
+                                                        </div><!-- end email -->
+
+                                                        <!-- Address -->
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Address</label>
+                                                                <textarea name="address" id="update_supplier_address" class="form-control"></textarea>
+                                                            </div>
+                                                        </div><!-- end address -->
+
+                                                        <!-- Notes -->
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Notes</label>
+                                                                <textarea name="notes" id="update_supplier_notes" class="form-control"></textarea>
+                                                            </div>
+                                                        </div><!-- end notes -->
+
+                                                        <!-- Submit Button -->
+                                                        <div class="text-end">
+                                                            <button type="submit" class="btn btn-primary">Update Supplier</button>
+                                                        </div><!-- end submit button -->
+                                                    </div>
+                                                </form><!-- end update form -->                                            
+                                            </div>

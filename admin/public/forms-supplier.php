@@ -63,18 +63,31 @@
             <!-- ============================================================== -->
 
                         <div class="row">
-
                             <div class="col-xxl-6">
                                 <div class="card">
-                                    <div class="card-header align-items-center d-flex">
-                                        <h4 class="card-title mb-0 flex-grow-1">Add New Supplier</h4>
-                                    </div><!-- end card header -->
+                                    <div class="card-body">
+                                        <ul class="nav nav-pills animation-nav nav-justified gap-2 mb-3" role="tablist">
+                                            <li class="nav-item waves-effect waves-light">
+                                                <a class="nav-link active" data-bs-toggle="tab" href="#animation-home" role="tab">
+                                                    Add 
+                                                </a>
+                                            </li>
+                                            <li class="nav-item waves-effect waves-light">
+                                                <a class="nav-link" data-bs-toggle="tab" href="#animation-profile" role="tab">
+                                                    Update 
+                                                </a>
+                                            </li>
+                                            <li class="nav-item waves-effect waves-light">
+                                                <a class="nav-link" data-bs-toggle="tab" href="#animation-messages" role="tab">
+                                                    Delete   
+                                                </a>
+                                            </li>
+                                        </ul>
 
-                                            <div class="card-body">
-                                                <p class="text-muted">
-                                                    Please fill in the supplier information below. Fields marked with <span class="text-danger">*</span> are required.
-                                                </p>
+                                        <!------------- ADD PANE -------------->
 
+                                        <div class="tab-content text-muted">
+                                            <div class="tab-pane active" id="animation-home" role="tabpanel">
                                                 <!-- ✅ Show error messages -->
                                                 <?php if (!empty($errors)): ?>
                                                     <div class="alert alert-danger">
@@ -86,10 +99,22 @@
                                                     </div>
                                                 <?php endif; ?>
 
-                                                <!-- ✅ Show success message -->
+                                                <!-- ✅ Show Add success message -->
                                                 <?php if ($success_add): ?>
                                                     <div class="alert alert-success"><?= htmlspecialchars($success_add) ?></div>
                                                 <?php endif; ?>
+
+                                                <!-- ✅ Show Update success message -->
+                                                <?php if ($success_update): ?>
+                                                    <div class="alert alert-success"><?= htmlspecialchars($success_update) ?></div>
+                                                <?php endif; ?>
+                                                <!-- end success message -->
+
+                                                <!-- ✅ Show Delete Success -->
+                                                <?php if ($success_delete): ?>
+                                                    <div class="alert alert-danger"><?= htmlspecialchars($success_delete) ?></div>
+                                                <?php endif; ?>
+                                                <!-- end success message -->
 
                                                 <div class="live-preview">
                                                     <form action="" method="POST">
@@ -161,6 +186,238 @@
                                                         </div><!-- end row -->
                                                     </form>
                                                 </div>
+                                            </div>
+
+                                            <!------------- UPDATE PANE -------------->
+
+                                            <div class="tab-pane" id="animation-profile" role="tabpanel">
+                                                <!-- ✅ Show error messages -->
+                                                <?php if (!empty($errors)): ?>
+                                                    <div class="alert alert-danger">
+                                                        <ul class="mb-0">
+                                                            <?php foreach ($errors as $e): ?>
+                                                                <li><?= htmlspecialchars($e) ?></li>
+                                                            <?php endforeach; ?>
+                                                        </ul>
+                                                    </div>s
+                                                <?php endif; ?><!-- end error messages -->
+
+                                                <!-- ✅ Show Add success message -->
+                                                <?php if ($success_add): ?>
+                                                    <div class="alert alert-success"><?= htmlspecialchars($success_add) ?></div>
+                                                <?php endif; ?>
+
+                                                <!-- ✅ Show Update success message -->
+                                                <?php if ($success_update): ?>
+                                                    <div class="alert alert-success"><?= htmlspecialchars($success_update) ?></div>
+                                                <?php endif; ?>
+                                                <!-- end success message -->
+
+                                                <!-- ✅ Show Delete Success -->
+                                                <?php if ($success_delete): ?>
+                                                    <div class="alert alert-danger"><?= htmlspecialchars($success_delete) ?></div>
+                                                <?php endif; ?>
+                                                <!-- end success message -->
+
+                                                <!-- ✅ Supplier dropdown -->
+                                                <div class="mb-3">
+                                                    <label for="supplierSelectUpdate" class="form-label">Choose Supplier</label>
+                                                    <select id="supplierSelectUpdate" class="form-select">
+                                                        <option value="">-- Select a supplier (optional) --</option>
+                                                        <?php foreach ($allSuppliers as $sup): ?>
+                                                            <option 
+                                                                value="<?= $sup['supplier_id'] ?>"
+                                                                data-name="<?= htmlspecialchars($sup['supplier_name'], ENT_QUOTES) ?>"
+                                                                data-contact="<?= htmlspecialchars($sup['supplier_contact_person'], ENT_QUOTES) ?>"
+                                                                data-phone="<?= htmlspecialchars($sup['phone'], ENT_QUOTES) ?>"
+                                                                data-email="<?= htmlspecialchars($sup['email'], ENT_QUOTES) ?>"
+                                                                data-address="<?= htmlspecialchars($sup['address'], ENT_QUOTES) ?>"
+                                                                data-notes="<?= htmlspecialchars($sup['notes'], ENT_QUOTES) ?>"
+                                                            >
+                                                                <?= htmlspecialchars($sup['supplier_name']) ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div><!-- end supplier dropdown -->
+
+                                                <!-- ✅ Update Form -->
+                                                <form id="updateForm" action="" method="POST">
+                                                    <div class="row">
+                                                        <input type="hidden" name="supplier_id" id="update_supplier_id">
+
+                                                        <!-- Supplier Name -->
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
+                                                            <input type="text" name="supplier_name" id="update_supplier_name" class="form-control">
+                                                        </div><!-- end supplier name -->
+
+                                                        <!-- Contact Person -->
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Contact Person</label>
+                                                                <input type="text" name="supplier_contact_person" id="update_supplier_contact" class="form-control">
+                                                            </div>
+                                                        </div><!-- end contact person -->
+
+                                                        <!-- Phone -->
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Phone</label>
+                                                                <input type="text" name="phone" id="update_supplier_phone" class="form-control">
+                                                            </div>
+                                                        </div><!-- end phone -->
+
+                                                        <!-- Email -->
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Email</label>
+                                                                <input type="email" name="email" id="update_supplier_email" class="form-control">
+                                                            </div>
+                                                        </div><!-- end email -->
+
+                                                        <!-- Address -->
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Address</label>
+                                                                <textarea name="address" id="update_supplier_address" class="form-control"></textarea>
+                                                            </div>
+                                                        </div><!-- end address -->
+
+                                                        <!-- Notes -->
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Notes</label>
+                                                                <textarea name="notes" id="update_supplier_notes" class="form-control"></textarea>
+                                                            </div>
+                                                        </div><!-- end notes -->
+
+                                                        <!-- Submit Button -->
+                                                        <div class="text-end">
+                                                            <button type="submit" class="btn btn-primary">Update Supplier</button>
+                                                        </div><!-- end submit button -->
+                                                    </div>
+                                                </form><!-- end update form -->                                            
+                                            </div>
+
+
+                                            <!------------- DELETE PANE -------------->
+
+
+                                            <div class="tab-pane" id="animation-messages" role="tabpanel">
+                                                
+                                            <!-- ✅ Show errors -->
+                                            <?php if (!empty($errors)): ?>
+                                                <div class="alert alert-danger">
+                                                    <ul class="mb-0">
+                                                        <?php foreach ($errors as $error): ?>
+                                                            <li><?= htmlspecialchars($error) ?></li>
+                                                        <?php endforeach; ?>
+                                                    </ul>
+                                                </div>
+                                            <?php endif; ?>
+
+                                            <?php if (!empty($errors)): ?>
+                                                    <div class="alert alert-danger">
+                                                        <ul class="mb-0">
+                                                            <?php foreach ($errors as $e): ?>
+                                                                <li><?= htmlspecialchars($e) ?></li>
+                                                            <?php endforeach; ?>
+                                                        </ul>
+                                                    </div>s
+                                                <?php endif; ?><!-- end error messages -->
+
+                                                <!-- ✅ Show Add success message -->
+                                                <?php if ($success_add): ?>
+                                                    <div class="alert alert-success"><?= htmlspecialchars($success_add) ?></div>
+                                                <?php endif; ?>
+
+                                                <!-- ✅ Show Update success message -->
+                                                <?php if ($success_update): ?>
+                                                    <div class="alert alert-success"><?= htmlspecialchars($success_update) ?></div>
+                                                <?php endif; ?>
+                                                <!-- end success message -->
+
+                                                <!-- ✅ Show Delete Success -->
+                                                <?php if ($success_delete): ?>
+                                                    <div class="alert alert-danger"><?= htmlspecialchars($success_delete) ?></div>
+                                                <?php endif; ?>
+                                                <!-- end success message -->
+
+                                            <!-- ✅ Supplier dropdown -->
+                                            <div class="mb-3">
+                                                <label for="deleteSupplierSelect" class="form-label">Choose Supplier to Delete</label>
+                                                <select id="deleteSupplierSelect" class="form-select">
+                                                    <option value="">-- Select a supplier --</option>
+                                                    <?php foreach ($allSuppliers as $sup): ?>
+                                                        <option 
+                                                            value="<?= $sup['supplier_id'] ?>"
+                                                            data-name="<?= htmlspecialchars($sup['supplier_name'], ENT_QUOTES) ?>"
+                                                            data-contact="<?= htmlspecialchars($sup['supplier_contact_person'], ENT_QUOTES) ?>"
+                                                            data-phone="<?= htmlspecialchars($sup['phone'], ENT_QUOTES) ?>"
+                                                            data-email="<?= htmlspecialchars($sup['email'], ENT_QUOTES) ?>"
+                                                            data-address="<?= htmlspecialchars($sup['address'], ENT_QUOTES) ?>"
+                                                            data-notes="<?= htmlspecialchars($sup['notes'], ENT_QUOTES) ?>"
+                                                        >
+                                                            <?= htmlspecialchars($sup['supplier_name']) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+
+                                            <!-- ✅ Delete Form -->
+                                                <form action="" method="POST" onsubmit="return confirm('⚠️ Are you sure you want to delete this supplier?');">
+                                                    <div class="row">
+                                                        <input type="hidden" name="delete_supplier_id" id="delete_supplier_id">
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Supplier Name</label>
+                                                            <input type="text" id="delete_supplier_name" class="form-control" readonly>
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Contact Person</label>
+                                                                <input type="text" id="delete_supplier_contact" class="form-control" readonly>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Phone</label>
+                                                                <input type="text" id="delete_supplier_phone" class="form-control" readonly>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Email</label>
+                                                            <input type="text" id="delete_supplier_email" class="form-control" readonly>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Address</label>
+                                                            <textarea id="delete_supplier_address" class="form-control" rows="2" readonly></textarea>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Notes</label>
+                                                            <textarea id="delete_supplier_notes" class="form-control" rows="2" readonly></textarea>
+                                                        </div>
+
+                                                        <div class="text-end">
+                                                            <button type="submit" class="btn btn-danger">Delete Supplier</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                        <p class="text-muted">
+                                             Please fill in the supplier information below. Fields marked with <span class="text-danger">*</span> are required.
+                                        </p>
+
+
+
+
                                             </div><!-- end card body -->
                                         </div><!-- end card -->
                                     </div><!-- end col -->
@@ -226,200 +483,10 @@
                                         </div> <!-- end card-->
                                     </div> <!-- end col-->
 
-                                <div class="col-xxl-6">
-                                    <div class="card">
-                                        <!-- ✅ Card Header -->
-                                        <div class="card-header align-items-center d-flex">
-                                            <h4 class="card-title mb-0 flex-grow-1">Update Existing Supplier</h4>
-                                        </div><!-- end card header -->
-
-                                        <!-- ✅ Card Body -->
-                                        <div class="card-body">
-                                            <p class="text-muted">
-                                                Select an existing supplier to update their information, or modify details directly.
-                                            </p>
-
-                                            <!-- ✅ Show error messages -->
-                                            <?php if (!empty($errors)): ?>
-                                                <div class="alert alert-danger">
-                                                    <ul class="mb-0">
-                                                        <?php foreach ($errors as $e): ?>
-                                                            <li><?= htmlspecialchars($e) ?></li>
-                                                        <?php endforeach; ?>
-                                                    </ul>
-                                                </div>s
-                                            <?php endif; ?><!-- end error messages -->
-
-                                            <!-- ✅ Show success message -->
-                                            <?php if ($success_update): ?>
-                                                <div class="alert alert-success"><?= htmlspecialchars($success_update) ?></div>
-                                            <?php endif; ?>
-                                            <!-- end success message -->
-
-                                            <!-- ✅ Supplier dropdown -->
-                                            <div class="mb-3">
-                                                <label for="supplierSelectUpdate" class="form-label">Choose Supplier</label>
-                                                <select id="supplierSelectUpdate" class="form-select">
-                                                    <option value="">-- Select a supplier (optional) --</option>
-                                                    <?php foreach ($allSuppliers as $sup): ?>
-                                                        <option 
-                                                            value="<?= $sup['supplier_id'] ?>"
-                                                            data-name="<?= htmlspecialchars($sup['supplier_name'], ENT_QUOTES) ?>"
-                                                            data-contact="<?= htmlspecialchars($sup['supplier_contact_person'], ENT_QUOTES) ?>"
-                                                            data-phone="<?= htmlspecialchars($sup['phone'], ENT_QUOTES) ?>"
-                                                            data-email="<?= htmlspecialchars($sup['email'], ENT_QUOTES) ?>"
-                                                            data-address="<?= htmlspecialchars($sup['address'], ENT_QUOTES) ?>"
-                                                            data-notes="<?= htmlspecialchars($sup['notes'], ENT_QUOTES) ?>"
-                                                        >
-                                                            <?= htmlspecialchars($sup['supplier_name']) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div><!-- end supplier dropdown -->
-
-                                            <!-- ✅ Update Form -->
-                                            <form id="updateForm" action="" method="POST">
-                                                <input type="hidden" name="supplier_id" id="update_supplier_id">
-
-                                                <!-- Supplier Name -->
-                                                <div class="mb-3">
-                                                    <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
-                                                    <input type="text" name="supplier_name" id="update_supplier_name" class="form-control">
-                                                </div><!-- end supplier name -->
-
-                                                <!-- Contact Person -->
-                                                <div class="mb-3">
-                                                    <label class="form-label">Contact Person</label>
-                                                    <input type="text" name="supplier_contact_person" id="update_supplier_contact" class="form-control">
-                                                </div><!-- end contact person -->
-
-                                                <!-- Phone -->
-                                                <div class="mb-3">
-                                                    <label class="form-label">Phone</label>
-                                                    <input type="text" name="phone" id="update_supplier_phone" class="form-control">
-                                                </div><!-- end phone -->
-
-                                                <!-- Email -->
-                                                <div class="mb-3">
-                                                    <label class="form-label">Email</label>
-                                                    <input type="email" name="email" id="update_supplier_email" class="form-control">
-                                                </div><!-- end email -->
-
-                                                <!-- Address -->
-                                                <div class="mb-3">
-                                                    <label class="form-label">Address</label>
-                                                    <textarea name="address" id="update_supplier_address" class="form-control"></textarea>
-                                                </div><!-- end address -->
-
-                                                <!-- Notes -->
-                                                <div class="mb-3">
-                                                    <label class="form-label">Notes</label>
-                                                    <textarea name="notes" id="update_supplier_notes" class="form-control"></textarea>
-                                                </div><!-- end notes -->
-
-                                                <!-- Submit Button -->
-                                                <div class="text-end">
-                                                    <button type="submit" class="btn btn-primary">Update Supplier</button>
-                                                </div><!-- end submit button -->
-                                            </form><!-- end update form -->
-
-                                        </div><!-- end card body -->
-                                    </div><!-- end card -->
-                                </div><!-- end col -->
+                                
 
 
-                                <div class="col-xxl-6">
-                                    <div class="card border-danger">
-                                        <div class="card-header align-items-center d-flex bg-danger-subtle">
-                                            <h4 class="card-title mb-0 flex-grow-1 text-danger">Delete Supplier</h4>
-                                        </div><!-- end card header -->
 
-                                        <div class="card-body">
-                                            <p class="text-muted">
-                                                Select a supplier you wish to <strong>permanently delete</strong> from the database.
-                                            </p>
-
-                                            <!-- ✅ Show errors -->
-                                            <?php if (!empty($errors)): ?>
-                                                <div class="alert alert-danger">
-                                                    <ul class="mb-0">
-                                                        <?php foreach ($errors as $error): ?>
-                                                            <li><?= htmlspecialchars($error) ?></li>
-                                                        <?php endforeach; ?>
-                                                    </ul>
-                                                </div>
-                                            <?php endif; ?>
-
-                                            <!-- ✅ Show success -->
-                                            <?php if (!empty($_SESSION['success_message'])): ?>
-                                                <div class="alert alert-success">
-                                                    <?= htmlspecialchars($_SESSION['success_message']) ?>
-                                                    <?php unset($_SESSION['success_message']); ?>
-                                                </div>
-                                            <?php endif; ?>
-
-                                            <!-- ✅ Supplier dropdown -->
-                                            <div class="mb-3">
-                                                <label for="deleteSupplierSelect" class="form-label">Choose Supplier to Delete</label>
-                                                <select id="deleteSupplierSelect" class="form-select">
-                                                    <option value="">-- Select a supplier --</option>
-                                                    <?php foreach ($allSuppliers as $sup): ?>
-                                                        <option 
-                                                            value="<?= $sup['supplier_id'] ?>"
-                                                            data-name="<?= htmlspecialchars($sup['supplier_name'], ENT_QUOTES) ?>"
-                                                            data-contact="<?= htmlspecialchars($sup['supplier_contact_person'], ENT_QUOTES) ?>"
-                                                            data-phone="<?= htmlspecialchars($sup['phone'], ENT_QUOTES) ?>"
-                                                            data-email="<?= htmlspecialchars($sup['email'], ENT_QUOTES) ?>"
-                                                            data-address="<?= htmlspecialchars($sup['address'], ENT_QUOTES) ?>"
-                                                            data-notes="<?= htmlspecialchars($sup['notes'], ENT_QUOTES) ?>"
-                                                        >
-                                                            <?= htmlspecialchars($sup['supplier_name']) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-
-                                            <!-- ✅ Delete Form -->
-                                            <form action="" method="POST" onsubmit="return confirm('⚠️ Are you sure you want to delete this supplier?');">
-                                                <input type="hidden" name="delete_supplier_id" id="delete_supplier_id">
-
-                                                <div class="mb-3">
-                                                    <label class="form-label">Supplier Name</label>
-                                                    <input type="text" id="delete_supplier_name" class="form-control" readonly>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label">Contact Person</label>
-                                                    <input type="text" id="delete_supplier_contact" class="form-control" readonly>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label">Phone</label>
-                                                    <input type="text" id="delete_supplier_phone" class="form-control" readonly>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label">Email</label>
-                                                    <input type="text" id="delete_supplier_email" class="form-control" readonly>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label">Address</label>
-                                                    <textarea id="delete_supplier_address" class="form-control" rows="2" readonly></textarea>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label">Notes</label>
-                                                    <textarea id="delete_supplier_notes" class="form-control" rows="2" readonly></textarea>
-                                                </div>
-
-                                                <div class="text-end">
-                                                    <button type="submit" class="btn btn-danger">Delete Supplier</button>
-                                                </div>
-                                            </form>
-                                        </div><!-- end card body -->
-                                    </div><!-- end card -->
-                                </div><!-- end col -->
 
                         </div><!--end row-->
                     </div> <!-- container-fluid -->           
