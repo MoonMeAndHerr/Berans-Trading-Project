@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Include your DB config
 require_once __DIR__ . '/../../global/main_configuration.php';
+require_once __DIR__ . '/../private/auth_check.php';
 
 // Create new database connection
 $pdo = openDB(); // Use the function from your config file
