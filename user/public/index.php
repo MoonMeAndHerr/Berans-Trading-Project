@@ -5,6 +5,13 @@
 
 ?>
 
+<style>
+	.product-image {
+		width: 250px;         
+		height: 250px;       
+	}
+</style>
+
 			<div role="main" class="main">
 				<div class="owl-carousel owl-carousel-light owl-carousel-light-init-fadeIn owl-theme manual dots-inside dots-horizontal-center dots-light show-dots-hover show-dots-xs nav-inside nav-inside-plus nav-dark nav-md nav-font-size-md show-nav-hover mb-0" data-plugin-options="{'autoplayTimeout': 7000}" data-dynamic-height="['600px','600px','600px','550px','500px']" style="height: 600px;">
 					<div class="owl-stage-outer">
@@ -101,7 +108,7 @@
 									<div class="portfolio-item">
 										<span class="thumb-info thumb-info-lighten thumb-info-no-borders thumb-info-bottom-info thumb-info-centered-icons border-radius-0">
 											<span class="thumb-info-wrapper border-radius-0">
-												<img src="../../media/<?php echo $row['image_url']; ?>" class="img-fluid border-radius-0" alt="">
+												<img src="../../media/<?php echo $row['image_url']; ?>" class="img-fluid product-image border-radius-0" alt="">
 												<span class="thumb-info-title">
 													<span class="thumb-info-inner line-height-1 font-weight-bold text-dark position-relative top-3"><?php echo $row['name']; ?></span>
 													<span class="thumb-info-type"><?php echo $row['section_name']; ?></span>

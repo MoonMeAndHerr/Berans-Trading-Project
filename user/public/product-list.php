@@ -5,6 +5,12 @@
 
 ?>
 
+<style>
+.product-image {
+	width: 250px;         
+	height: 250px;       
+}
+</style>
 			<div role="main" class="main shop pt-4">
 
 				<div class="container">
@@ -69,8 +75,7 @@
 
 										<a href="product?id=<?php echo $row['product_id']; ?>">
 											<div class="product-thumb-info-image">
-												<img alt="" class="img-fluid" src="../../media/<?php echo $row['image_url']; ?>">
-
+												<img alt="" class="img-fluid product-image" src="../../media/<?php echo $row['image_url']; ?>">
 											</div>
 										</a>
 									</div>
