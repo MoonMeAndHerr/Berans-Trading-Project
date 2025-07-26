@@ -127,3 +127,81 @@
 [2025-07-25 16:02:19] Last login updated - {
     "staff_id": "1"
 }
+[2025-07-26 04:39:56] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-07-26 04:40:05] Login attempt started - {
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"
+}
+[2025-07-26 04:40:05] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-07-26 04:40:05] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-07-26 04:40:05] Password verification successful - {
+    "staff_id": 1
+}
+[2025-07-26 04:40:05] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-07-26 04:40:05] Session token created in database - {
+    "staff_id": "1",
+    "token": "d8db65674ddf076cdd79ad8d24295b44"
+}
+[2025-07-26 04:40:05] Last login updated - {
+    "staff_id": "1"
+}
+[2025-07-26 07:15:27] Logout initiated - {
+    "staff_id": "1",
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"
+}
+[2025-07-26 07:15:27] Database session cleanup - {
+    "staff_id": "1",
+    "sessions_deleted": 2
+}
+[2025-07-26 07:15:27] Logout completed successfully - {
+    "staff_id": "1",
+    "username": "admin"
+}
+[2025-07-26 07:15:28] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-07-26 07:15:33] Login attempt started - {
+    "username": "fahmio",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"
+}
+[2025-07-26 07:15:33] Attempting database query for user - {
+    "username": "fahmio"
+}
+[2025-07-26 07:15:33] User found in database - {
+    "staff_id": 34,
+    "username": "fahmio"
+}
+[2025-07-26 07:15:33] Password verification successful - {
+    "staff_id": 34
+}
+[2025-07-26 07:15:33] Session created - {
+    "staff_id": 34,
+    "username": "fahmio",
+    "role": "admin"
+}
+[2025-07-26 07:15:33] Session token created in database - {
+    "staff_id": "34",
+    "token": "f06c43274b834f9868bd7a74a67c0df1"
+}
+[2025-07-26 07:15:33] Last login updated - {
+    "staff_id": "34"
+}

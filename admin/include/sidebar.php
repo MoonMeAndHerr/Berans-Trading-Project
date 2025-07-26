@@ -52,7 +52,7 @@
 
 
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Pages</span></li>
-
+                        <li class="nav-item">
                             <a class="nav-link menu-link" href="#sidebarForms" data-bs-toggle="collapse" role="button"
                                 aria-expanded="false" aria-controls="sidebarForms">
                                 <i class="ri-file-list-3-line"></i> <span data-key="t-forms">Form</span>
@@ -71,6 +71,21 @@
                                 </ul>
                             </div>
                         </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="#sidebarTables" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="false" aria-controls="sidebarTables">
+                                    <i class="bx bx-user"></i> <span data-key="t-tables">Staff</span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarTables">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="staff-add.php" class="nav-link" data-key="t-basic-tables">Add Staff</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        
 
 
                     </ul>
