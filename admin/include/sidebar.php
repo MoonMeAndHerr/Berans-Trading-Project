@@ -1,5 +1,6 @@
-
-
+<script>
+  const currentUserRole = <?= json_encode($_SESSION['role'] ?? 'guest') ?>;
+</script>
 
         <!-- ========== App Menu ========== -->
         <div class="app-menu navbar-menu">
@@ -52,40 +53,76 @@
 
 
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Pages</span></li>
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarForms" data-bs-toggle="collapse" role="button"
-                                aria-expanded="false" aria-controls="sidebarForms">
-                                <i class="ri-file-list-3-line"></i> <span data-key="t-forms">Form</span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarForms">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="../public/forms-supplier.php" class="nav-link" data-key="t-basic-elements">Supplier</a>
-                                    </li>                                      
-                                    <li class="nav-item">
-                                        <a href="../public/forms-elements-add.php" class="nav-link" data-key="t-basic-elements">Add Pricing</a>
-                                    </li>   
-                                     <li class="nav-item">
-                                        <a href="../public/forms-elements-update.php" class="nav-link" data-key="t-basic-elements">Update Pricing</a>
-                                    </li>                                                                  
-                                </ul>
-                            </div>
-                        </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="#sidebarTables" data-bs-toggle="collapse" role="button"
-                                    aria-expanded="false" aria-controls="sidebarTables">
-                                    <i class="bx bx-user"></i> <span data-key="t-tables">Staff</span>
-                                </a>
-                                <div class="collapse menu-dropdown" id="sidebarTables">
-                                    <ul class="nav nav-sm flex-column">
-                                        <li class="nav-item">
-                                            <a href="staff-add.php" class="nav-link" data-key="t-basic-tables">Add Staff</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
                         
+                            <ul class="navbar-nav" id="navbar-nav">
+                                <!-- ===== Staff ===== -->
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="#sidebarTablesStaff" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="false" aria-controls="sidebarTablesStaff">
+                                        <i class="bx bx-user"></i>
+                                        <span data-key="t-tables">Staff</span>
+                                    </a>
+                                    <div class="collapse menu-dropdown" id="sidebarTablesStaff">
+                                        <ul class="nav nav-sm flex-column">
+                                            <li class="nav-item">
+                                            <a href="staff-add.php" 
+                                                class="nav-link" 
+                                                data-allowed-roles='["admin"]' 
+                                                data-key="t-basic-tables">
+                                                Add Staff
+                                            </a>
+                                            </li>
+                                            <!-- Add more staff links here if needed -->
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <!-- ===== Customer ===== -->
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="#sidebarTablesCustomer" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="false" aria-controls="sidebarTablesCustomer">
+                                        <i class="bx bx-comment-add"></i>
+                                        <span data-key="t-tables">Customer</span>
+                                    </a>
+                                    <div class="collapse menu-dropdown" id="sidebarTablesCustomer">
+                                        <ul class="nav nav-sm flex-column">
+                                            <li class="nav-item">
+                                            <a href="customer-add.php" 
+                                                class="nav-link" 
+                                                data-allowed-roles='["admin","manager"]' 
+                                                data-key="t-basic-tables">
+                                                Add Customer
+                                            </a>
+                                            </li>
+                                            <!-- Add more customer links here if needed -->
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <!-- ===== Form ===== -->
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="#sidebarFormsMenu" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="false" aria-controls="sidebarFormsMenu">
+                                        <i class="ri-file-list-3-line"></i>
+                                        <span data-key="t-forms">Form</span>
+                                    </a>
+                                    <div class="collapse menu-dropdown" id="sidebarFormsMenu">
+                                        <ul class="nav nav-sm flex-column">
+                                            <li class="nav-item">
+                                                <a href="../public/forms-supplier.php" class="nav-link" data-key="t-basic-elements">Supplier</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="../public/forms-elements-add.php" class="nav-link" data-key="t-basic-elements">Add Pricing</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="../public/forms-elements-update.php" class="nav-link" data-key="t-basic-elements">Update Pricing</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+
+
 
 
                     </ul>
@@ -96,3 +133,26 @@
         <!-- Left Sidebar End -->
         <!-- Vertical Overlay-->
         <div class="vertical-overlay"></div>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Find all sidebar nav links with data-allowed-roles attribute
+            const protectedLinks = document.querySelectorAll('a[data-allowed-roles]');
+
+            protectedLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const allowedRoles = JSON.parse(this.getAttribute('data-allowed-roles'));
+                if (!allowedRoles.includes(currentUserRole)) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Access Denied',
+                    text: 'You do not have permission to access this page.',
+                    confirmButtonText: 'OK'
+                });
+                }
+            });
+            });
+        });
+        </script>
