@@ -12,44 +12,13 @@
 						<div class="header-row">
 							<div class="header-column">
 								<div class="header-row">
-									<p class="mb-0 text-dark"><strong>Get in touch!</strong> <a href="tel:012345679" class="text-color-dark text-color-hover-primary">(123) 456-789</a></span><span class="d-none d-sm-inline-block ps-1"> | <a href="#">mail@domain.com</a></span></p>
-								</div>
-							</div>
-							<div class="header-column justify-content-end">
-								<div class="header-row">
-									<ul class="header-social-icons social-icons me-2">
-										<li class="social-icons-facebook"><a href="http://www.facebook.com/" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
-										<li class="social-icons-x"><a href="http://www.x.com/" target="_blank" title="X"><i class="fab fa-x-twitter"></i></a></li>
-										<li class="social-icons-linkedin"><a href="http://www.linkedin.com/" target="_blank" title="Linkedin"><i class="fab fa-linkedin-in"></i></a></li>
-									</ul>
-									<div class="header-nav-features">
-										<div class="header-nav-features-search-reveal-container">
-											<div class="header-nav-feature header-nav-features-search header-nav-features-search-reveal d-inline-flex">
-												<a href="#" class="header-nav-features-search-show-icon d-inline-flex text-decoration-none"><i class="fas fa-search header-nav-top-icon"></i></a>
-											</div>
-										</div>
-									</div>
+									<p class="mb-0 text-dark"><strong>Get in touch!</strong> <a href="tel:012345679" class="text-color-dark text-color-hover-primary"><?php echo COMPANY_CONTACT; ?></a></span><span class="d-none d-sm-inline-block ps-1"> | <a href="#"><?php echo COMPANY_EMAIL; ?></a></span></p>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="header-nav-features header-nav-features-no-border p-static">
-					<div class="header-nav-feature header-nav-features-search header-nav-features-search-reveal header-nav-features-search-reveal-big-search header-nav-features-search-reveal-big-search-full">
-						<div class="container">
-							<div class="row h-100 d-flex">
-								<div class="col h-100 d-flex">
-									<form role="search" class="d-flex h-100 w-100" action="page-search-results.html" method="get">
-										<div class="big-search-header input-group">
-											<input class="form-control text-1" id="headerSearch" name="q" type="search" value="" placeholder="Type and hit enter...">
-											<a href="#" class="header-nav-features-search-hide-icon"><i class="fas fa-times header-nav-top-icon"></i></a>
-										</div>
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+
 			</header>
 
 			<div role="main" class="main" style="min-height: calc(100vh - 393px);">
@@ -57,8 +26,8 @@
 					<div class="row mt-5">
 						<div class="col text-center">
 							<div class="logo">
-								<a href="index.html">
-									<img width="100" height="48" src="img/logo-default-slim.png" alt="Porto">
+								<a href="#">
+									<img width="100" height="60" src="../../siteidentity/<?php echo WEB_LOGO; ?>" alt="Porto">
 								</a>
 							</div>
 						</div>
@@ -93,7 +62,7 @@
 										</div>
 										<div class="feature-box-info">
 											<h4 class="text-4 text-uppercase mb-1 font-weight-bold">Whats this about?</h4>
-											<p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing metus elit. Quisque rutrum pellentesque imperdiet. Quisque rutrum pellentesque imperdiet.</p>
+											<p class="mb-4">We're currently performing scheduled maintenance to improve your browsing experience. This brief pause allows us to fine-tune features, update systems, and ensure everything runs smoother than ever.</p>
 										</div>
 									</div>
 								</div>
@@ -104,7 +73,7 @@
 										</div>
 										<div class="feature-box-info">
 											<h4 class="text-4 text-uppercase mb-1 font-weight-bold">Come back later</h4>
-											<p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque rutrum pellentesque imperdiet. Quisque rutrum pellentesque imperdiet. Nulla lacinia iaculis nulla.</p>
+											<p class="mb-4">We're sprucing things up — just like a fresh coat of paint on a shop window. Great things are coming soon, so hang tight and check back shortly. You won't want to miss what’s next!</p>
 										</div>
 									</div>
 								</div>
@@ -115,7 +84,9 @@
 										</div>
 										<div class="feature-box-info">
 											<h4 class="text-4 text-uppercase mb-1 font-weight-bold">Get in Touch</h4>
-											<p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque rutrum pellentesque imperdiet. Quisque rutrum pellentesque imperdiet. Nulla lacinia iaculis nulla.</p>
+											<p class="mb-4">Have a question, concern, or just want to say hi?
+											We're still here for you!
+											Reach out at <?php echo COMPANY_EMAIL; ?> or message us through contact page later. We’ll get back to you as soon as we can.</p>
 										</div>
 									</div>
 								</div>
@@ -127,6 +98,6 @@
 
 <?php
 
-	require_once('../include/footer.php');
+	require_once('../include/alt-footer.php');
 
 ?>

@@ -1,5 +1,9 @@
 <?php
 
+	if (session_status() === PHP_SESSION_NONE) {
+		session_start();
+	}
+	
 	require_once '../../global/main_configuration.php';
 
 ?>
@@ -19,7 +23,7 @@
 		<meta name="author" content="beranstrading.com">
 
 		<!-- Favicon -->
-		<link rel="shortcut icon" href="<?php echo "../../siteidentity". WEB_LOGO ?>" type="image/x-icon" />
+		<link rel="shortcut icon" href="<?php echo "../../siteidentity/". WEB_LOGO ?>" type="image/x-icon" />
 		<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 
 		<!-- Mobile Metas -->
@@ -36,6 +40,8 @@
 		<link rel="stylesheet" href="vendor/owl.carousel/assets/owl.carousel.min.css">
 		<link rel="stylesheet" href="vendor/owl.carousel/assets/owl.theme.default.min.css">
 		<link rel="stylesheet" href="vendor/magnific-popup/magnific-popup.min.css">
+		<link rel="stylesheet" href="vendor/bootstrap-star-rating/css/star-rating.min.css">
+		<link rel="stylesheet" href="vendor/bootstrap-star-rating/themes/krajee-fas/theme.min.css">
 
 		<!-- Theme CSS -->
 		<link rel="stylesheet" href="css/theme.css">

@@ -12,12 +12,12 @@
 					<div class="container">
 						<div class="row">
 							<div class="col-md-12 align-self-center p-static order-2 text-center">
-								<h1 class="font-weight-bold text-dark">Contact Us reCaptcha</h1>
+								<h1 class="font-weight-bold text-dark">Contact Us</h1>
 							</div>
 							<div class="col-md-12 align-self-center order-1">
 								<ul class="breadcrumb d-block text-center">
 									<li><a href="#">Home</a></li>
-									<li class="active">Pages</li>
+									<li class="active">Contact Us</li>
 								</ul>
 							</div>
 						</div>
@@ -32,15 +32,37 @@
 							<h2 class="font-weight-bold text-7 mt-2 mb-0">Contact Us</h2>
 							<p class="mb-4">Feel free to ask for details, don't save any questions!</p>
 
-							<form class="contact-form-recaptcha-v3" action="php/contact-form-recaptcha-v3.php" method="POST">
-								<div class="contact-form-success alert alert-success d-none mt-4">
-									<strong>Success!</strong> Your message has been sent to us.
+							<form class="contact-form-recaptcha-v3" action="../private/contact-us-form.php" method="POST">
+
+								<?php
+
+									if (isset($_SESSION['status']) && $_SESSION['status'] == "Success") {
+										
+								?>
+
+									<div class="alert alert-success" role="alert">
+									Email sent successfully! We will get back to you as soon as possible.
+									</div>
+
+								<?php
+
+									} elseif (isset($_SESSION['status']) && $_SESSION['status'] == "Failed") {
+
+								?>
+										
+								<div class="alert alert-danger" role="alert">
+									There was an error sending your email. Please try again later.
 								</div>
 
-								<div class="contact-form-error alert alert-danger d-none mt-4">
-									<strong>Error!</strong> There was an error sending your message.
-									<span class="mail-error-message text-1 d-block"></span>
-								</div>
+								<?php
+
+									}
+
+									unset($_SESSION['status']);
+
+									
+
+								?>
 
 								<div class="row">
 									<div class="form-group col-lg-6">
@@ -80,10 +102,10 @@
 								<h4 class="pt-5 mb-0 appear-animation" data-appear-animation="maskUp" data-appear-animation-delay="200" data-plugin-options="{'accY': -200}">Get in <strong>Touch</strong></h4>
 							</div>
 							<div class="overflow-hidden mb-3">
-								<p class="lead text-4 mb-0 appear-animation" data-appear-animation="maskUp" data-appear-animation-delay="400" data-plugin-options="{'accY': -200}">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eget leo at velit imperdiet varius.</p>
+								<p class="lead text-4 mb-0 appear-animation" data-appear-animation="maskUp" data-appear-animation-delay="400" data-plugin-options="{'accY': -200}">If no one listens to you, Berans Trading will</p>
 							</div>
 							<div class="overflow-hidden">
-								<p class="mb-0 appear-animation" data-appear-animation="maskUp" data-appear-animation-delay="600" data-plugin-options="{'accY': -200}">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eget leo at velit imperdiet varius.</p>
+								<p class="mb-0 appear-animation" data-appear-animation="maskUp" data-appear-animation-delay="600" data-plugin-options="{'accY': -200}">Have a question, need a quote, or looking for a specific item? We're here to help. Reach out to us via WhatsApp, email, or social media — and let Berans Trading supply what your business needs to grow.</p>
 							</div>
 
 						</div>
@@ -91,9 +113,9 @@
 
 							<h4 class="pt-5">Our <strong>Office</strong></h4>
 							<ul class="list list-icons list-icons-style-3 mt-2">
-								<li><i class="fas fa-map-marker-alt top-6"></i> <strong>Address:</strong> 1234 Street Name, City Name</li>
-								<li><i class="fas fa-phone top-6"></i> <strong>Phone:</strong> (123) 456-789</li>
-								<li><i class="fas fa-envelope top-6"></i> <strong>Email:</strong> <a href="mailto:mail@example.com">mail@example.com</a></li>
+								<li><i class="fas fa-map-marker-alt top-6"></i> <strong>Address:</strong> <?php echo COMPANY_ADDRESS; ?></li>
+								<li><i class="fas fa-phone top-6"></i> <strong>Phone:</strong> (+60) <?php echo COMPANY_CONTACT; ?></li>
+								<li><i class="fas fa-envelope top-6"></i> <strong>Email:</strong> <a href="mailto:<?php echo COMPANY_EMAIL; ?>"><?php echo COMPANY_EMAIL; ?></a></li>
 							</ul>
 
 						</div>
@@ -111,8 +133,7 @@
 
 				</div>
 
-				<!-- Google Maps - Go to the bottom of the page to change settings and map location. -->
-				<div id="googlemaps" class="google-map m-0 appear-animation" data-appear-animation="fadeIn" data-appear-animation-delay="300" style="height:450px;"></div>
+
 
 			</div>
 
@@ -122,62 +143,26 @@
 
 ?>
 
-	<script id="google-recaptcha-v3" src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY"></script>
-		<!-- Google Maps -->
-		<script>
+<script>
+document.getElementById("contactForm").addEventListener("submit", function (e) {
+    e.preventDefault();
 
-			/* 
-			Map Markers:
-			- Get an API Key: https://developers.google.com/maps/documentation/javascript/get-api-key
-			- Generate Map Id: https://console.cloud.google.com/google/maps-apis/studio/maps
-			- Use https://www.latlong.net/convert-address-to-lat-long.html to get Latitude and Longitude of a specific address
-			*/
-			(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
-				({key: "YOUR_API_KEY", v: "weekly"});
+    const form = e.target;
+    const formData = new FormData(form);
 
-			async function initMap() {
-				const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-				const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
-					"marker",
-				);
-				const map = new Map(document.getElementById("googlemaps"), {
-					zoom: 14,
-					center: { lat: -37.817240, lng: 144.955820 },
-					mapId: "YOUR_MAP_API_ID",
-				});
-				const markers = [
-					{
-						position: { lat: -37.817240, lng: 144.955820 },
-						title: "Office 1<br>Melbourne, 121 King St, Australia<br>Phone: 123-456-1234",
-					}
-				];
+    fetch("contact.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById("responseMessage").innerHTML = data;
+        form.reset();
+    })
+    .catch(error => {
+        document.getElementById("responseMessage").innerHTML = "Something went wrong.";
+        console.error(error);
+    });
+});
+</script>
 
-				const infoWindow = new InfoWindow();
-
-				markers.forEach(({ position, title }, i) => {
-					const pin = new PinElement({
-						background: "#e36159",
-						borderColor: "#e36159",
-						glyphColor: "#FFF",
-					});
-					const marker = new AdvancedMarkerElement({
-						position,
-						map,
-						title: `${title}`,
-						content: pin.element,
-					});
-
-					marker.addListener("click", ({ domEvent, latLng }) => {
-						const { target } = domEvent;
-
-						infoWindow.close();
-						infoWindow.setContent(marker.title);
-						infoWindow.open(marker.map, marker);
-					});
-				});	
-
-			}
-
-			initMap();	
-
-		</script>

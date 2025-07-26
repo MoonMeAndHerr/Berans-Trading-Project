@@ -33,7 +33,7 @@ function closeDB(&$pdo) {
 
 $pdo = openDB();
 
-$sql = "SELECT `company_name`, `company_logo`, `company_tagline`, `bank_name`, `bank_account_name`, `bank_account_number`, `address`, `contact` 
+$sql = "SELECT `company_name`, `company_logo`, `company_tagline`, `bank_name`, `bank_account_name`, `bank_account_number`, `address`, `contact`, `email` 
 FROM `company` 
 WHERE `company_id` = 1";
 $stmt = $pdo->query($sql);
@@ -48,6 +48,7 @@ while ($row = $stmt->fetch()) {
     $bank_account_number = $row['bank_account_number'];
     $address = $row['address'];
     $contact = $row['contact'];
+    $email = $row['email'];
 
 }
 
@@ -66,6 +67,7 @@ define('COMPANY_ACCOUNT_NAME', $bank_account_name); # Define the company account
 define('COMPANY_ACCOUNT_NUMBER', $bank_account_number); # Define the company account number
 define('COMPANY_ADDRESS', $address); # Define the company address
 define('COMPANY_CONTACT', $contact); # Define the company contact information
+define('COMPANY_EMAIL', $email); # Define the company email address
 
 #======================= Global Variable Configuration Starts =======================#
 
