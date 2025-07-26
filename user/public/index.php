@@ -79,7 +79,7 @@
 							</div>
 							<div class="col-lg-4">
 								<div class="get-started text-start text-lg-end">
-									<a href="#" class="btn btn-primary btn-lg text-3 font-weight-semibold px-4 py-3">Get Your Quote Now!</a>
+									<a href="https://wa.me/+60<?php echo COMPANY_CONTACT;?>?text=Hello,%20I'm%20interested%20in%20your%20services. Can you provide me with more details?" class="btn btn-primary btn-lg text-3 font-weight-semibold px-4 py-3">Get Your Quote Now!</a>
 								</div>
 							</div>
 						</div>

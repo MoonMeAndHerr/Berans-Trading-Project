@@ -83,12 +83,11 @@
 									<li class="mb-0">Reorder Level: <strong class="text-color-dark"><?php echo $row['reorder_level']; ?></strong></li>
 								</ul>
 
-								<form enctype="multipart/form-data" method="post" class="cart" action="#">
-
 									<hr>
+									<a href="https://wa.me/+60<?php echo COMPANY_CONTACT;?>?text=Hello,%20I'm%20interested%20in%20your%20product called <?php echo $row['name']; ?>. Can you provide me with more details?">
 									<button type="submit" class="btn btn-dark btn-modern text-uppercase bg-color-hover-primary border-color-hover-primary">Get Your Quote Now!</button>
+									</a>
 									<hr>
-								</form>
 
 							</div>
 
