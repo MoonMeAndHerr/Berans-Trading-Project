@@ -15,6 +15,7 @@ $pdo = openDB();
 $errors  = [];
 $success_add = '';
 $success_update = '';
+$success_delete = '';
 
 // ✅ Prepare variables for form data (for update form)
 $supplier_name  = '';
@@ -24,8 +25,33 @@ $email          = '';
 $address        = '';
 $notes          = '';
 
+// ✅ Handle delete form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_supplier_id'])) {
+    $delete_id = (int)$_POST['delete_supplier_id'];
+
+    try {
+        // Optional: check if supplier exists
+        $check = $pdo->prepare("SELECT supplier_id FROM Supplier WHERE supplier_id = ?");
+        $check->execute([$delete_id]);
+        if ($check->rowCount() > 0) {
+            // Perform delete
+            $stmt = $pdo->prepare("DELETE FROM Supplier WHERE supplier_id = ?");
+            $stmt->execute([$delete_id]);
+
+            // Redirect with success for delete
+            $_SESSION['success_delete'] = "🗑️ Supplier deleted successfully!";
+            header('Location: ' . $_SERVER['PHP_SELF']);
+            exit();
+        } else {
+            $errors[] = "Supplier not found, cannot delete.";
+        }
+    } catch (PDOException $e) {
+        $errors[] = "Database error during deletion: " . $e->getMessage();
+    }
+}
+
 // ✅ Handle form submission (Insert or Update)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_supplier_id'])) {
     // Check if update or add form based on supplier_id in POST
     $is_update = !empty($_POST['supplier_id']);
 
@@ -103,6 +129,10 @@ if (isset($_SESSION['success_update'])) {
     $success_update = $_SESSION['success_update'];
     unset($_SESSION['success_update']);
 }
+if (isset($_SESSION['success_delete'])) {
+    $success_delete = $_SESSION['success_delete'];
+    unset($_SESSION['success_delete']);
+}
 
 // ✅ If editing (GET with supplier_id), fetch supplier data for update form
 if ($supplier_id) {
@@ -162,31 +192,6 @@ try {
 } catch (PDOException $e) {
     $lastAddedDate = null;
 }
-
-// ✅ Handle delete form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_supplier_id'])) {
-    $delete_id = (int)$_POST['delete_supplier_id'];
-
-    try {
-        // First, optional: check if supplier exists
-        $check = $pdo->prepare("SELECT supplier_id FROM Supplier WHERE supplier_id = ?");
-        $check->execute([$delete_id]);
-        if ($check->rowCount() > 0) {
-            // Perform delete
-            $stmt = $pdo->prepare("DELETE FROM Supplier WHERE supplier_id = ?");
-            $stmt->execute([$delete_id]);
-
-            $_SESSION['success_message'] = "🗑️ Supplier deleted successfully!";
-            header('Location: ' . $_SERVER['PHP_SELF']);
-            exit();
-        } else {
-            $errors[] = "Supplier not found, cannot delete.";
-        }
-    } catch (PDOException $e) {
-        $errors[] = "Database error during deletion: " . $e->getMessage();
-    }
-}
-
 
 // ✅ Fetch supplier count and last created_at
 $supplierCount   = 0;
