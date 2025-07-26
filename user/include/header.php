@@ -40,6 +40,8 @@
 		<link rel="stylesheet" href="vendor/owl.carousel/assets/owl.carousel.min.css">
 		<link rel="stylesheet" href="vendor/owl.carousel/assets/owl.theme.default.min.css">
 		<link rel="stylesheet" href="vendor/magnific-popup/magnific-popup.min.css">
+		<link rel="stylesheet" href="vendor/bootstrap-star-rating/css/star-rating.min.css">
+		<link rel="stylesheet" href="vendor/bootstrap-star-rating/themes/krajee-fas/theme.min.css">
 
 		<!-- Theme CSS -->
 		<link rel="stylesheet" href="css/theme.css">

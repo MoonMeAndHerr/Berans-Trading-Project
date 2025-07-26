@@ -28,6 +28,7 @@
 
 		<!-- Circle Flip Slideshow Script -->
 		<script src="vendor/circle-flip-slideshow/js/jquery.flipshow.min.js"></script>
+
 		<!-- Current Page Views -->
 		<script src="js/views/view.home.js"></script>
 
@@ -36,6 +37,9 @@
 
 		<!-- Theme Initialization Files -->
 		<script src="js/theme.init.js"></script>
+
+		<!-- Examples -->
+		<script src="js/examples/examples.gallery.js"></script>	
 
 	</body>
 </html>

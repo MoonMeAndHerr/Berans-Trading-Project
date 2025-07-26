@@ -18,16 +18,18 @@
 
 									$pdo = openDB();
 									$rule = $_GET['sectionid'];
-									$sql = "SELECT * FROM product INNER JOIN section on product.section_id = section.section_id WHERE product.section_id = $rule ";
-									$stmt = $pdo->query($sql);
+									$sql = "SELECT * FROM product INNER JOIN section on product.section_id = section.section_id WHERE product.section_id = :rule ";
+									$stmt = $pdo->prepare($sql);
+									$stmt->execute(['rule' => $rule]);
 									closeDB($pdo);
 
 								} elseif(isset($_GET['categoryid'])) {
 
 									$pdo = openDB();
 									$rule = $_GET['categoryid'];
-									$sql = "SELECT * FROM product INNER JOIN section on product.section_id = section.section_id WHERE product.category_id = $rule ";
-									$stmt = $pdo->query($sql);
+									$sql = "SELECT * FROM product INNER JOIN section on product.section_id = section.section_id WHERE product.category_id = :rule ";
+									$stmt = $pdo->prepare($sql);
+									$stmt->execute(['rule' => $rule]);
 									closeDB($pdo);
 
 									
@@ -35,8 +37,9 @@
 
 									$pdo = openDB();
 									$rule = $_GET['subcategoryid'];
-									$sql = "SELECT * FROM product INNER JOIN section on product.section_id = section.section_id WHERE product.subcategory_id = $rule ";
-									$stmt = $pdo->query($sql);
+									$sql = "SELECT * FROM product INNER JOIN section on product.section_id = section.section_id WHERE product.subcategory_id = :rule ";
+									$stmt = $pdo->prepare($sql);
+									$stmt->execute(['rule' => $rule]);
 									closeDB($pdo);
 
 								} else {
@@ -94,13 +97,11 @@
 
 						</div>
 					</div>
-
 				</div>
-
 			</div>
 
 <?php
 
-	require_once('../include/footer.php');
+	require_once('../include/alt-footer.php');
 
 ?>
