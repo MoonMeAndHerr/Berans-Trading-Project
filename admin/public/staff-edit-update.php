@@ -82,9 +82,12 @@
 
                                     <!-- ✅ Single form for update -->
                                     <form method="post" action="">
+
+                                        <input type="hidden" name="staff_id" value="<?= htmlspecialchars($staff['staff_id']) ?>">
+
                                         <div class="mb-3">
                                             <label for="staff_number" class="form-label">Staff Number</label>
-                                            <input type="text" class="form-control" id="staff_number" name="staff_number" value="<?= htmlspecialchars($staff['staff_number']) ?>" readonly>
+                                            <input type="text" class="form-control" id="staff_number" name="staff_number" value="<?= htmlspecialchars($staff['staff_number']) ?>" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
                                         </div>
 
                                         <div class="mb-3">
@@ -116,7 +119,7 @@
                                             <label for="role" class="form-label">Role</label>
                                             <select class="form-select" id="role" name="role" required>
                                                 <?php
-                                                $roles = ['admin', 'manager', 'sales', 'warehouse'];
+                                                $roles = ['admin', 'manager', 'sales', 'warehouse','staff'];
                                                 foreach ($roles as $roleOption) {
                                                     $selected = ($staff['role'] === $roleOption) ? 'selected' : '';
                                                     echo "<option value=\"$roleOption\" $selected>" . ucfirst($roleOption) . "</option>";

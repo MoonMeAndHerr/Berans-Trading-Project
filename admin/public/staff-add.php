@@ -105,8 +105,7 @@
                             <td><?= htmlspecialchars(ucfirst($staff['role'])) ?></td>
                             <td><?= htmlspecialchars($staff['company_name'] ?: '-') ?></td>
                             <td>
-                                <a href="staff-edit-update.php?staff_number=<?= urlencode($staff['staff_number']) ?>" class="btn btn-sm btn-primary">Edit</a>
-
+                                <a href="staff-edit-update.php?staff_id=<?= urlencode($staff['staff_id']) ?>" class="btn btn-sm btn-primary">Edit</a>
                             </td>
                             </tr>
                             <?php endforeach; ?>
@@ -198,14 +197,9 @@
                                             <!-- Staff Number -->
                                             <div class="col-lg-6">
                                                 <div class="form-floating">
-                                                    <input type="text" 
-                                                        class="form-control" 
-                                                        id="staff_number" 
-                                                        name="staff_number" 
-                                                        placeholder="Staff Number" 
-                                                        value="<?= htmlspecialchars($staff_number ?? '') ?>" 
-                                                        readonly>
-                                                    <label for="staff_number">Staff Number</label>
+                                                    <input type="number" class="form-control" id="staff_number" 
+                                                    name="staff_number" placeholder="Staff Phone Number" value="<?= htmlspecialchars($staff_number ?? '') ?>" required>
+                                                    <label for="staff_number">Staff Phone Number</label>
                                                 </div>
                                             </div>
 
@@ -243,6 +237,7 @@
                                                         <option value="manager">Manager</option>
                                                         <option value="sales">Sales</option>
                                                         <option value="warehouse">Warehouse</option>
+                                                        <option value="staff">Staff</option> 
                                                     </select>
                                                     <label for="role">Role</label>
                                                 </div>

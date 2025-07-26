@@ -12,35 +12,39 @@ $success = '';
 // Open DB connection
 $pdo = openDB();
 
-// Get staff_id from GET
-$staffNumber = $_GET['staff_number'] ?? null;
+// Get staff_id from GET or POST (depending on request method)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $staffId = isset($_POST['staff_id']) ? (int)$_POST['staff_id'] : null;
+} else {
+    $staffId = isset($_GET['staff_id']) ? (int)$_GET['staff_id'] : null;
+}
 
-if (!$staffNumber) {
+if (!$staffId) {
     die('No staff selected.');
 }
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // ✅ If DELETE button is pressed
+    // If DELETE button is pressed
     if (isset($_POST['delete_staff']) && $_POST['delete_staff'] === '1') {
         try {
-            $stmt = $pdo->prepare("DELETE FROM Staff WHERE staff_number = :staff_number");
-            $stmt->execute([':staff_number' => $staffNumber]);
+            $stmt = $pdo->prepare("DELETE FROM Staff WHERE staff_id = :staff_id");
+            $stmt->execute([':staff_id' => $staffId]);
 
             $_SESSION['successDelete'] = '✅ Staff deleted successfully!';
             header('Location: staff-add.php');
             exit;
         } catch (PDOException $e) {
             $_SESSION['errors'] = ['Error deleting staff: ' . $e->getMessage()];
-            header('Location: ' . $_SERVER['PHP_SELF'] . '?staff_number=' . urlencode($staffNumber));
+            header('Location: ' . $_SERVER['PHP_SELF'] . '?staff_id=' . urlencode($staffId));
             exit;
         }
     }
 
-    // ✅ Otherwise, it’s an UPDATE
+    // Otherwise, it’s an UPDATE
     else {
-        // ---- Sanitize inputs ----
+        // Sanitize inputs
         $staff_name        = trim($_POST['staff_name'] ?? '');
         $staff_designation = trim($_POST['staff_designation'] ?? '');
         $staff_about       = trim($_POST['staff_about'] ?? '');
@@ -49,15 +53,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $role              = $_POST['role'] ?? '';
         $company_id        = $_POST['company_id'] !== '' ? (int)$_POST['company_id'] : null;
         $password          = $_POST['password'] ?? '';
+        $new_staff_number  = trim($_POST['staff_number'] ?? '');
 
-        // ---- Validate ----
+        // Validate inputs
         if ($staff_name === '') $errors[] = 'Staff name is required.';
         if ($email === '')      $errors[] = 'Email is required.';
-        if (!in_array($role, ['admin','manager','sales','warehouse'], true)) {
+        if ($new_staff_number === '') $errors[] = 'Staff number is required.';
+        if (!in_array($role, ['admin','manager','sales','warehouse','staff'], true)) {
             $errors[] = 'Invalid role selected.';
         }
 
-        // ---- Update ----
+        // Update if no errors
         if (empty($errors)) {
             try {
                 $sql = "UPDATE Staff SET 
@@ -67,7 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             username = :username,
                             email = :email,
                             role = :role,
-                            company_id = :company_id";
+                            company_id = :company_id,
+                            staff_number = :new_staff_number";
 
                 $params = [
                     ':staff_name'        => $staff_name,
@@ -77,7 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':email'             => $email,
                     ':role'              => $role,
                     ':company_id'        => $company_id,
-                    ':staff_number'      => $staffNumber,
+                    ':new_staff_number'  => $new_staff_number,
+                    ':staff_id'          => $staffId,
                 ];
 
                 if ($password !== '') {
@@ -86,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $params[':password_hash'] = $password_hash;
                 }
 
-                $sql .= " WHERE staff_number = :staff_number";
+                $sql .= " WHERE staff_id = :staff_id";
 
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute($params);
@@ -101,8 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch staff info for form prefill
 try {
-    $stmt = $pdo->prepare("SELECT * FROM Staff WHERE staff_number = ?");
-    $stmt->execute([$staffNumber]);
+    $stmt = $pdo->prepare("SELECT * FROM Staff WHERE staff_id = ?");
+    $stmt->execute([$staffId]);
     $staff = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$staff) {
@@ -119,5 +127,4 @@ try {
 } catch (PDOException $e) {
     $companies = [];
 }
-
 ?>

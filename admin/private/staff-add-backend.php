@@ -32,8 +32,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($staff_name === '')       $errors[] = 'Staff name is required.';
     if ($email === '')            $errors[] = 'Email is required.';
     if ($password === '')         $errors[] = 'Password is required.';
-    if (!in_array($role, ['admin', 'manager', 'sales', 'warehouse'], true)) {
+
+    // ✅ allow staff role
+    if (!in_array($role, ['admin', 'manager', 'sales', 'warehouse', 'staff'], true)) {
         $errors[] = 'Invalid role selected.';
+    }
+
+    // ✅ phone number must be digits only
+    if ($staff_number === '') {
+        $errors[] = 'Staff phone number is required.';
+    } elseif (!ctype_digit($staff_number)) {
+        $errors[] = 'Staff phone number must contain digits only.';
     }
 
     if (empty($errors)) {
@@ -63,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         } catch (PDOException $e) {
             $_SESSION['errors'] = $e->getCode() == 23000
-                ? ['Email, username, or staff number already exists.']
+                ? ['Email, username, or staff phone number already exists.']
                 : ['Database error: ' . $e->getMessage()];
             header('Location: ' . $_SERVER['PHP_SELF']);
             exit;
@@ -81,18 +90,6 @@ try {
     $companies = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $companies = [];
-    // Optionally log error here
-}
-
-// Generate next staff_number with 'EMP' prefix
-try {
-    $stmt = $pdo->query("SELECT staff_number FROM Staff WHERE staff_number LIKE 'EMP%' ORDER BY staff_id DESC LIMIT 1");
-    $lastEmp = $stmt->fetchColumn();
-
-    $num = $lastEmp ? (int)substr($lastEmp, 3) + 1 : 1;
-    $staff_number = 'EMP' . str_pad($num, 3, '0', STR_PAD_LEFT);
-} catch (PDOException $e) {
-    $errors[] = 'Failed to generate employee number: ' . $e->getMessage();
 }
 
 // Pagination setup
@@ -100,13 +97,11 @@ $limit = 6;
 $page = max(1, (int)($_GET['page'] ?? 1));
 $offset = ($page - 1) * $limit;
 
-// Get total staff count
 $totalStmt = $pdo->query("SELECT COUNT(*) FROM Staff");
 $totalRows = (int)$totalStmt->fetchColumn();
 $totalPages = (int)ceil($totalRows / $limit);
 
-// Fetch limited staff list with company names
-$sql = "SELECT s.staff_number, s.staff_name, s.staff_designation, s.username, s.email, s.role, c.company_name
+$sql = "SELECT s.staff_id, s.staff_number, s.staff_name, s.staff_designation, s.username, s.email, s.role, c.company_name
         FROM Staff s
         LEFT JOIN Company c ON s.company_id = c.company_id
         ORDER BY s.staff_id ASC
@@ -116,5 +111,4 @@ $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $staffList = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 ?>

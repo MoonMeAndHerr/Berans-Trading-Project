@@ -12,7 +12,7 @@ $loginPage = '/beranstrading/admin/public/auth-signin-basic.php';
 $dashboardPage = '/beranstrading/admin/public/dashboard-projects.php';
 
 // Inactivity timeout (seconds)
-$inactivityLimit = 60;
+$inactivityLimit = 600;
 
 if (isset($_SESSION['LAST_ACTIVITY'])) {
     $elapsed = time() - $_SESSION['LAST_ACTIVITY'];

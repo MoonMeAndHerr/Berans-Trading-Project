@@ -209,176 +209,167 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             <!-- Start right Content here -->
             <!-- ============================================================== -->
 
-<div class="row">
-    <div class="col-xxl-4">
-        <div class="card">
-            <div class="card-header align-items-center d-flex">
-                <h4 class="card-title mb-0 flex-grow-1">Add New Customer</h4>
-            </div><!-- end card header -->
+                            <div class="row">
+                                <div class="col-xxl-4">
+                                    <div class="card">
+                                        <div class="card-header align-items-center d-flex">
+                                            <h4 class="card-title mb-0 flex-grow-1">Add New Customer</h4>
+                                        </div><!-- end card header -->
 
-            <div class="card-body">
-                <p class="text-muted">
-                    Please complete the customer information form below. Each field helps us maintain accurate records, so ensure all required details are entered correctly. 
-                </p>
-                <!-- ✅ Display messages -->
-                <?php if (!empty($errors)): ?>
-                    <div class="alert alert-danger">
-                        <ul><?php foreach ($errors as $err) echo '<li>' . htmlspecialchars($err) . '</li>'; ?></ul>
-                    </div>
-                <?php endif; ?>
-                <?php if (!empty($success)): ?>
-                    <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-                <?php endif; ?>
+                                        <div class="card-body">
+                                            <p class="text-muted">
+                                                Please complete the customer information form below. Each field helps us maintain accurate records, so ensure all required details are entered correctly. 
+                                            </p>
+                                            <!-- ✅ Display messages -->
+                                            <?php if (!empty($errors)): ?>
+                                                <div class="alert alert-danger">
+                                                    <ul><?php foreach ($errors as $err) echo '<li>' . htmlspecialchars($err) . '</li>'; ?></ul>
+                                                </div>
+                                            <?php endif; ?>
+                                            <?php if (!empty($success)): ?>
+                                                <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+                                            <?php endif; ?>
 
-                <div class="live-preview">
-                    <form method="post" action="">
-                        <!-- Customer Name -->
-                        <div class="row mb-3">
-                            <label for="customer_name" class="col-lg-3 col-form-label">Customer Name<span class="text-danger">*</span></label>
-                            <div class="col-lg-9">
-                                <input type="text" class="form-control" id="customer_name" name="customer_name"
-                                       value="<?= isset($_POST['customer_name']) ? htmlspecialchars($_POST['customer_name']) : '' ?>"
-                                       placeholder="Enter customer name" required>
+                                            <div class="live-preview">
+                                                <form method="post" action="">
+                                                    <!-- Customer Name -->
+                                                    <div class="row mb-3">
+                                                        <label for="customer_name" class="col-lg-3 col-form-label">Customer Name<span class="text-danger">*</span></label>
+                                                        <div class="col-lg-9">
+                                                            <input type="text" class="form-control" id="customer_name" name="customer_name"
+                                                                value="<?= isset($_POST['customer_name']) ? htmlspecialchars($_POST['customer_name']) : '' ?>"
+                                                                placeholder="Enter customer name" required>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Customer Phone -->
+                                                    <div class="row mb-3">
+                                                        <label for="customer_phone" class="col-lg-3 col-form-label">Phone</label>
+                                                        <div class="col-lg-9">
+                                                            <input type="text" class="form-control" id="customer_phone" name="customer_phone"
+                                                                value="<?= isset($_POST['customer_phone']) ? htmlspecialchars($_POST['customer_phone']) : '' ?>"
+                                                                placeholder="Enter phone number">
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Customer Address -->
+                                                    <div class="row mb-3">
+                                                        <label for="customer_address" class="col-lg-3 col-form-label">Address</label>
+                                                        <div class="col-lg-9">
+                                                            <textarea class="form-control" id="customer_address" name="customer_address" rows="3"
+                                                                    placeholder="Enter address"><?= isset($_POST['customer_address']) ? htmlspecialchars($_POST['customer_address']) : '' ?></textarea>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Customer Company -->
+                                                    <div class="row mb-3">
+                                                        <label for="customer_company_name" class="col-lg-3 col-form-label">Company Name</label>
+                                                        <div class="col-lg-9">
+                                                            <input type="text" class="form-control" id="customer_company_name" name="customer_company_name"
+                                                                value="<?= isset($_POST['customer_company_name']) ? htmlspecialchars($_POST['customer_company_name']) : '' ?>"
+                                                                placeholder="Enter company name">
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Customer Designation -->
+                                                    <div class="row mb-3">
+                                                        <label for="customer_designation" class="col-lg-3 col-form-label">Designation</label>
+                                                        <div class="col-lg-9">
+                                                            <input type="text" class="form-control" id="customer_designation" name="customer_designation"
+                                                                value="<?= isset($_POST['customer_designation']) ? htmlspecialchars($_POST['customer_designation']) : '' ?>"
+                                                                placeholder="Enter designation">
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Submit Button -->
+                                                    <div class="text-end">
+                                                        <button type="submit" class="btn btn-primary">Add Customer</button>
+                                                    </div>
+                                                </form>
+                                            </div><!-- end live-preview -->
+                                        </div><!-- end card-body -->
+                                    </div><!-- end card -->
+                                </div><!-- end col -->
+
+
+
+
+                            <div class="col-xl-8">
+                                <div class="card">
+                                    <div class="card-header align-items-center d-flex">
+                                        <h4 class="card-title mb-0 flex-grow-1">Customer List</h4>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <p class="text-muted">This table shows all customers currently stored in the database.</p>
+
+                                        <!-- ✅ Live search -->
+                                        <div class="mb-3 d-flex">
+                                            <input
+                                                type="search"
+                                                id="searchInput"
+                                                class="form-control me-2"
+                                                placeholder="Search customers by name, company, or phone"
+                                                value="<?= htmlspecialchars($search) ?>"
+                                                oninput="liveSearch()"
+                                            >
+                                        </div>
+
+                                        <div class="live-preview">
+                                            <div class="table-responsive">
+                                                <table class="table align-middle table-nowrap mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Customer Name</th>
+                                                            <th>Phone</th>
+                                                            <th>Company</th>
+                                                            <th>Designation</th>
+                                                            <th>Address</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="customerTableBody">
+                                                        <?php if (!empty($customers)): ?>
+                                                            <?php foreach ($customers as $customer): ?>
+                                                                <tr>
+                                                                    <td><?= htmlspecialchars($customer['customer_name']) ?></td>
+                                                                    <td><?= htmlspecialchars($customer['customer_phone'] ?? '-') ?></td>
+                                                                    <td><?= htmlspecialchars($customer['customer_company_name'] ?? '-') ?></td>
+                                                                    <td><?= htmlspecialchars($customer['customer_designation'] ?? '-') ?></td>
+                                                                    <td><?= nl2br(htmlspecialchars($customer['customer_address'] ?? '-')) ?></td>
+                                                                    <td><a href="customer-edit-update.php?id=<?= urlencode($customer['customer_id']) ?>" class="btn btn-sm btn-primary">Edit</a></td>
+                                                                </tr>
+                                                            <?php endforeach; ?>
+                                                        <?php else: ?>
+                                                            <tr><td colspan="6" class="text-center">No customers found.</td></tr>
+                                                        <?php endif; ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- ✅ Pagination -->
+                                        <nav aria-label="Page navigation example" class="mt-3">
+                                            <ul class="pagination justify-content-center">
+                                                <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
+                                                    <a class="page-link" href="?<?= http_build_query(['search' => $search, 'page' => max(1, $page - 1)]) ?>">Previous</a>
+                                                </li>
+                                                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                                    <li class="page-item <?= ($page === $i) ? 'active' : '' ?>">
+                                                        <a class="page-link" href="?<?= http_build_query(['search' => $search, 'page' => $i]) ?>"><?= $i ?></a>
+                                                    </li>
+                                                <?php endfor; ?>
+                                                <li class="page-item <?= ($page >= $totalPages) ? 'disabled' : '' ?>">
+                                                    <a class="page-link" href="?<?= http_build_query(['search' => $search, 'page' => min($totalPages, $page + 1)]) ?>">Next</a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-
-                        <!-- Customer Phone -->
-                        <div class="row mb-3">
-                            <label for="customer_phone" class="col-lg-3 col-form-label">Phone</label>
-                            <div class="col-lg-9">
-                                <input type="text" class="form-control" id="customer_phone" name="customer_phone"
-                                       value="<?= isset($_POST['customer_phone']) ? htmlspecialchars($_POST['customer_phone']) : '' ?>"
-                                       placeholder="Enter phone number">
-                            </div>
-                        </div>
-
-                        <!-- Customer Address -->
-                        <div class="row mb-3">
-                            <label for="customer_address" class="col-lg-3 col-form-label">Address</label>
-                            <div class="col-lg-9">
-                                <textarea class="form-control" id="customer_address" name="customer_address" rows="3"
-                                          placeholder="Enter address"><?= isset($_POST['customer_address']) ? htmlspecialchars($_POST['customer_address']) : '' ?></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Customer Company -->
-                        <div class="row mb-3">
-                            <label for="customer_company_name" class="col-lg-3 col-form-label">Company Name</label>
-                            <div class="col-lg-9">
-                                <input type="text" class="form-control" id="customer_company_name" name="customer_company_name"
-                                       value="<?= isset($_POST['customer_company_name']) ? htmlspecialchars($_POST['customer_company_name']) : '' ?>"
-                                       placeholder="Enter company name">
-                            </div>
-                        </div>
-
-                        <!-- Customer Designation -->
-                        <div class="row mb-3">
-                            <label for="customer_designation" class="col-lg-3 col-form-label">Designation</label>
-                            <div class="col-lg-9">
-                                <input type="text" class="form-control" id="customer_designation" name="customer_designation"
-                                       value="<?= isset($_POST['customer_designation']) ? htmlspecialchars($_POST['customer_designation']) : '' ?>"
-                                       placeholder="Enter designation">
-                            </div>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-primary">Add Customer</button>
-                        </div>
-                    </form>
-                </div><!-- end live-preview -->
-            </div><!-- end card-body -->
-        </div><!-- end card -->
-    </div><!-- end col -->
 
 
-
-
-<div class="col-xl-8">
-    <div class="card">
-        <div class="card-header align-items-center d-flex">
-            <h4 class="card-title mb-0 flex-grow-1">Customer List</h4>
-        </div>
-
-        <div class="card-body">
-            <p class="text-muted">This table shows all customers currently stored in the database.</p>
-
-            <!-- ✅ Live search -->
-            <div class="mb-3 d-flex">
-                <input
-                    type="search"
-                    id="searchInput"
-                    class="form-control me-2"
-                    placeholder="Search customers by name, company, or phone"
-                    value="<?= htmlspecialchars($search) ?>"
-                    oninput="liveSearch()"
-                >
-            </div>
-
-            <div class="live-preview">
-                <div class="table-responsive">
-                    <table class="table align-middle table-nowrap mb-0">
-                        <thead>
-                            <tr>
-                                <th>Customer Name</th>
-                                <th>Phone</th>
-                                <th>Company</th>
-                                <th>Designation</th>
-                                <th>Address</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="customerTableBody">
-                            <?php if (!empty($customers)): ?>
-                                <?php foreach ($customers as $customer): ?>
-                                    <tr>
-                                        <td><?= htmlspecialchars($customer['customer_name']) ?></td>
-                                        <td><?= htmlspecialchars($customer['customer_phone'] ?? '-') ?></td>
-                                        <td><?= htmlspecialchars($customer['customer_company_name'] ?? '-') ?></td>
-                                        <td><?= htmlspecialchars($customer['customer_designation'] ?? '-') ?></td>
-                                        <td><?= nl2br(htmlspecialchars($customer['customer_address'] ?? '-')) ?></td>
-                                        <td><a href="customer-edit-update.php?id=<?= urlencode($customer['customer_id']) ?>" class="btn btn-sm btn-primary">Edit</a></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <tr><td colspan="6" class="text-center">No customers found.</td></tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ✅ Pagination -->
-            <nav aria-label="Page navigation example" class="mt-3">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                        <a class="page-link" href="?<?= http_build_query(['search' => $search, 'page' => max(1, $page - 1)]) ?>">Previous</a>
-                    </li>
-                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                        <li class="page-item <?= ($page === $i) ? 'active' : '' ?>">
-                            <a class="page-link" href="?<?= http_build_query(['search' => $search, 'page' => $i]) ?>"><?= $i ?></a>
-                        </li>
-                    <?php endfor; ?>
-                    <li class="page-item <?= ($page >= $totalPages) ? 'disabled' : '' ?>">
-                        <a class="page-link" href="?<?= http_build_query(['search' => $search, 'page' => min($totalPages, $page + 1)]) ?>">Next</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-</div>
-
-
-
-
-
-
-
-
-
-</div><!-- end row -->
-
-
+                        </div><!-- end row -->
                     </div> <!-- container-fluid -->           
                 </div><!-- End Page-content -->
             <?php include __DIR__ . '/../include/footer.php';?>
