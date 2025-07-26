@@ -117,9 +117,9 @@
 										<div class="header-nav-feature header-nav-features-search d-inline-flex">
 											<a href="#" class="header-nav-features-toggle text-decoration-none" data-focus="headerSearch" aria-label="Search"><i class="fas fa-search header-nav-top-icon"></i></a>
 											<div class="header-nav-features-dropdown header-nav-features-dropdown-mobile-fixed" id="headerTopSearchDropdown">
-												<form role="search" action="page-search-results.html" method="get">
+												<form role="search" action="search-result" method="POST">
 													<div class="simple-search input-group">
-														<input class="form-control text-1" id="headerSearch" name="q" type="search" value="" placeholder="Search...">
+														<input class="form-control text-1" id="headerSearch" name="keyword" type="search" value="" placeholder="Search...">
 														<button class="btn" type="submit" aria-label="Search">
 															<i class="fas fa-search header-nav-top-icon text-color-dark"></i>
 														</button>

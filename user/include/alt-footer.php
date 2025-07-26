@@ -8,7 +8,7 @@
 								<div class="col-md-12">
 									<div class="ms-3 text-center text-md-end">
 										<h5 class="text-3 mb-0 text-color-light">Contact Us</h5>
-										<p class="text-4 mb-0"><i class="fab fa-whatsapp text-color-primary top-1 p-relative"></i><span class="ps-1"><a href="#" class="text-color-hover-light"><?php echo COMPANY_CONTACT; ?></a></span></p>
+										<p class="text-4 mb-0"><i class="fab fa-whatsapp text-color-primary top-1 p-relative"></i><span class="ps-1"><a href="https://wa.me/+60<?php echo COMPANY_CONTACT;?>?text=Hello,%20I'm%20interested%20in%20your%20services. Can you provide me with more details?" class="text-color-hover-light"><?php echo COMPANY_CONTACT; ?></a></span></p>
 									</div>
 								</div>
 							</div>

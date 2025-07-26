@@ -1,7 +1,7 @@
 <?php
 
 	require_once('../include/header.php');
-	require_once('../include/navbar.php');
+	require_once('../include/alt-navbar.php');
 
 ?>
 

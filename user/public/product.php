@@ -1,7 +1,7 @@
 <?php
 
 	require_once('../include/header.php');
-	require_once('../include/navbar.php');
+	require_once('../include/alt-navbar.php');
 
 	$pdo = openDB();
 	if(isset($_GET['id']) && is_numeric($_GET['id'])) {
