@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // If DELETE button is pressed
     if (isset($_POST['delete_staff']) && $_POST['delete_staff'] === '1') {
         try {
-            $stmt = $pdo->prepare("DELETE FROM Staff WHERE staff_id = :staff_id");
+            $stmt = $pdo->prepare("DELETE FROM staff WHERE staff_id = :staff_id");
             $stmt->execute([':staff_id' => $staffId]);
 
             $_SESSION['successDelete'] = '✅ Staff deleted successfully!';
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Update if no errors
         if (empty($errors)) {
             try {
-                $sql = "UPDATE Staff SET 
+                $sql = "UPDATE staff SET 
                             staff_name = :staff_name,
                             staff_designation = :staff_designation,
                             staff_about = :staff_about,
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch staff info for form prefill
 try {
-    $stmt = $pdo->prepare("SELECT * FROM Staff WHERE staff_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM staff WHERE staff_id = ?");
     $stmt->execute([$staffId]);
     $staff = $stmt->fetch(PDO::FETCH_ASSOC);
 

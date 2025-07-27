@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo = openDB();
 
-            $insertSQL = "INSERT INTO Customer (
+            $insertSQL = "INSERT INTO customer (
                 customer_name,
                 customer_phone,
                 customer_address,
@@ -91,7 +91,7 @@ if ($search !== '') {
 }
 
 // ✅ Count total matching records
-$countSQL = "SELECT COUNT(*) FROM Customer $whereSQL";
+$countSQL = "SELECT COUNT(*) FROM customer $whereSQL";
 $countStmt = $pdo->prepare($countSQL);
 $countStmt->execute($params);
 $totalRecords = (int)$countStmt->fetchColumn();
@@ -104,7 +104,7 @@ if ($page > $totalPages) {
 $offset = ($page - 1) * $limit;
 
 // ✅ Fetch paginated data
-$dataSQL = "SELECT * FROM Customer $whereSQL ORDER BY customer_id DESC LIMIT :limit OFFSET :offset";
+$dataSQL = "SELECT * FROM customer $whereSQL ORDER BY customer_id DESC LIMIT :limit OFFSET :offset";
 $selectStmt = $pdo->prepare($dataSQL);
 
 // Bind search params

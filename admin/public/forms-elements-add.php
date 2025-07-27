@@ -384,57 +384,84 @@
                                             </div>               
 
                                             <div class="row g-3">
-                                                    <div class="col-12">
-                                                        <label class="form-label">Shipping Method</label>
-                                                            <select class="form-select" id="shipping_code" name="shipping_code" required>
-                                                                <option value="">-- Select Shipping Code --</option>
-                                                                <option value="M1">M1 - Sea Normal Goods</option>
-                                                                <option value="M2">M2 - Sea Sensitive Goods</option>
-                                                                <option value="S1">S1 - SG Sea Normal Goods</option>
-                                                                <option value="S2">S2 - SG Sea Sensitive Goods</option>
-                                                                <option value="OCSG1">OCSG1 - OCOOL SG Sea Normal Goods</option>
-                                                                <option value="OCSG2">OCSG2 - OCOOL SG Sea Sensitive Goods</option>
-                                                                <option value="M3a">M3a - Air VM Normal Goods</option>
-                                                                <option value="M3b">M3b - Air KG Normal Goods</option>
-                                                                <option value="M4a">M4a - Air VM Sensitive Goods</option>
-                                                                <option value="M4b">M4b - Air KG Sensitive Goods</option>
-                                                                <option value="S3a">S3a - SG Air VM Normal Goods</option>
-                                                                <option value="S3b">S3b - SG Air KG Normal Goods</option>
-                                                                <option value="S4a">S4a - SG Air VM Sensitive Goods</option>
-                                                                <option value="S4b">S4b - SG Air KG Sensitive Goods</option>
-                                                            </select>
-                                                    </div>
+                                                <div class="col-12">
+                                                    <label class="form-label">Shipping Method</label>
+                                                    <select class="form-select" id="shipping_code" name="shipping_code" required>
+                                                        <option value="">-- Select Shipping Code --</option>
+                                                        <?php foreach ($shippingPrices as $option): ?>
+                                                            <option value="<?= htmlspecialchars($option['shipping_code']) ?>">
+                                                                <?= htmlspecialchars($option['shipping_code']) ?> - 
+                                                                <?php
+                                                                // Generate descriptive label
+                                                                if (strpos($option['shipping_code'], 'M1') === 0) {
+                                                                    echo 'Sea Normal Goods (RM ' . number_format($option['price_cbm_normal_goods'], 2) . '/CBM)';
+                                                                } elseif (strpos($option['shipping_code'], 'M2') === 0) {
+                                                                    echo 'Sea Sensitive Goods (RM ' . number_format($option['price_cbm_sensitive_goods'], 2) . '/CBM)';
+                                                                } elseif (strpos($option['shipping_code'], 'S1') === 0) {
+                                                                    echo 'SG Sea Normal Goods (RM ' . number_format($option['sg_price_cbm_normal_goods'], 2) . '/CBM)';
+                                                                } elseif (strpos($option['shipping_code'], 'S2') === 0) {
+                                                                    echo 'SG Sea Sensitive Goods (RM ' . number_format($option['sg_price_cbm_sensitive_goods'], 2) . '/CBM)';
+                                                                } elseif (strpos($option['shipping_code'], 'OCSG1') === 0) {
+                                                                    echo 'OCOOL SG Sea Normal Goods (RM ' . number_format($option['ocool_sg_price_cbm_normal_goods'], 2) . '/CBM)';
+                                                                } elseif (strpos($option['shipping_code'], 'OCSG2') === 0) {
+                                                                    echo 'OCOOL SG Sensitive Goods (RM ' . number_format($option['ocool_sg_price_cbm_sensitive_goods'], 2) . '/CBM)';
+                                                                } elseif (strpos($option['shipping_code'], 'M3a') === 0) {
+                                                                    echo 'Air VM Normal Goods (RM ' . number_format($option['price_kg_normal_goods'], 2) . '/KG)';
+                                                                } elseif (strpos($option['shipping_code'], 'M3b') === 0) {
+                                                                    echo 'Air KG Normal Goods (RM ' . number_format($option['price_kg_normal_goods'], 2) . '/KG)';
+                                                                } elseif (strpos($option['shipping_code'], 'M4a') === 0) {
+                                                                    echo 'Air VM Sensitive Goods (RM ' . number_format($option['price_kg_sensitive_goods'], 2) . '/KG)';
+                                                                } elseif (strpos($option['shipping_code'], 'M4b') === 0) {
+                                                                    echo 'Air KG Sensitive Goods (RM ' . number_format($option['price_kg_sensitive_goods'], 2) . '/KG)';
+                                                                } elseif (strpos($option['shipping_code'], 'S3a') === 0) {
+                                                                    echo 'SG Air VM Normal Goods (RM ' . number_format($option['sg_price_kg_normal_goods'], 2) . '/KG)';
+                                                                } elseif (strpos($option['shipping_code'], 'S3b') === 0) {
+                                                                    echo 'SG Air KG Normal Goods (RM ' . number_format($option['sg_price_kg_normal_goods'], 2) . '/KG)';
+                                                                } elseif (strpos($option['shipping_code'], 'S4a') === 0) {
+                                                                    echo 'SG Air VM Sensitive Goods (RM ' . number_format($option['sg_price_kg_sensitive_goods'], 2) . '/KG)';
+                                                                } elseif (strpos($option['shipping_code'], 'S4b') === 0) {
+                                                                    echo 'SG Air KG Sensitive Goods (RM ' . number_format($option['sg_price_kg_sensitive_goods'], 2) . '/KG)';
+                                                                } else {
+                                                                    echo 'Custom Shipping';
+                                                                }
+                                                                ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
 
-                                                    <!-- Shipping Costs - Simple 3-column layout -->
-                                                    <div class="col-md-4">
-                                                        <label class="form-label">Sea Shipping (RM)</label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text">RM</span>
-                                                                    <input type="text" class="form-control" id="price_total_sea_shipping" readonly>
-                                                                    <input type="hidden" name="price_total_sea_shipping" id="price_total_sea_shipping_hidden">
-                                                            </div>
+                                                <!-- Shipping Costs - Simple 3-column layout -->
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Sea Shipping (RM)</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">RM</span>
+                                                        <input type="text" class="form-control" id="price_total_sea_shipping" readonly>
+                                                        <input type="hidden" name="price_total_sea_shipping" id="price_total_sea_shipping_hidden">
                                                     </div>
-                                                    
-                                                    <div class="col-md-4">
-                                                        <label class="form-label">Air Shipping VM (RM)</label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">RM</span>
-                                                                <input type="text" class="form-control" id="price_total_air_shipping_vm" readonly>
-                                                                <input type="hidden" name="price_total_air_shipping_vm" id="price_total_air_shipping_vm_hidden">
-                                                        </div>
+                                                </div>
+                                                
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Air Shipping VM (RM)</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">RM</span>
+                                                        <input type="text" class="form-control" id="price_total_air_shipping_vm" readonly>
+                                                        <input type="hidden" name="price_total_air_shipping_vm" id="price_total_air_shipping_vm_hidden">
                                                     </div>
-                                                    
-                                                    <div class="col-md-4">
-                                                        <label class="form-label">Air Shipping KG (RM)</label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text">RM</span>
-                                                                    <input type="text" class="form-control" id="price_total_air_shipping_kg" readonly>
-                                                                    <input type="hidden" name="price_total_air_shipping_kg" id="price_total_air_shipping_kg_hidden">
-                                                            </div>
+                                                </div>
+                                                
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Air Shipping KG (RM)</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">RM</span>
+                                                        <input type="text" class="form-control" id="price_total_air_shipping_kg" readonly>
+                                                        <input type="hidden" name="price_total_air_shipping_kg" id="price_total_air_shipping_kg_hidden">
                                                     </div>
+                                                </div>
                                             </div>
+                                        
 
                                             <!-- ✅ FINAL PRICING -->
+                                             
                                              <div class="card-header d-flex justify-content-center align-items-center">
                                                 <h2 class="card-title mb-0 text-center fw-bold" style="font-size: 2rem; width: 100%;">Final Price</h2>
                                             </div>  
@@ -524,9 +551,11 @@
                                             
 
                                               <!-- ✅ CALCULATED RESULTS WITH HIDDEN FIELDS -->                                          
-                                             <div class="card-header d-flex justify-content-center align-items-center">
-                                                <h2 class="card-title mb-0 text-center fw-bold" style="font-size: 2rem; width: 100%;">Calculated Price</h2>
-                                            </div>     
+                                        <div class="card-header d-flex justify-content-center align-items-center">
+                                            <h2 class="card-title mb-0 text-center fw-bold" style="font-size: 2rem; width: 100%;">Calculated Price</h2>
+                                        </div>   
+                                            
+                                        <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="form-label">Price</label>
                                                     <div class="input-group">
@@ -656,7 +685,8 @@
                                             
                                             <div class="col-12 text-end mt-3">
                                                 <button type="submit" class="btn btn-primary">Save Price</button>
-                                            </div>                                                      
+                                            </div>    
+                                        </div>                                                  
 
 
 

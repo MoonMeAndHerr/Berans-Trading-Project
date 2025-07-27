@@ -2,23 +2,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // Helper: get float or 0
   const getFloat = (id) => parseFloat(document.getElementById(id)?.value) || 0;
 
-  // Shipping prices data (simulate dynamic DB prices)
-  const priceData = {
-    'M1':  { price_cbm: 380, sensitive_cbm: 380, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 17, sensitive_kg: 19, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'M2':  { price_cbm: 380, sensitive_cbm: 380, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 17, sensitive_kg: 19, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'S1':  { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 285, sg_sensitive_cbm: 285, price_kg: 0, sensitive_kg: 0, sg_kg: 24, sg_sensitive_kg: 24, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'S2':  { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 285, sg_sensitive_cbm: 285, price_kg: 0, sensitive_kg: 0, sg_kg: 24, sg_sensitive_kg: 24, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'OCSG1': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 255, ocool_sensitive_cbm: 0 },
-    'OCSG2': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 275 },
-    'M3a': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 17, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'M3b': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 17, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'M4a': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 19, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'M4b': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 19, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'S3a': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 24, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'S3b': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 24, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'S4a': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 24, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'S4b': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 24, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-  };
+  // Convert database shipping prices to usable format
+  const priceData = {};
+  if (typeof dbShippingPrices !== 'undefined') {
+    dbShippingPrices.forEach(row => {
+      priceData[row.shipping_code] = {
+        price_cbm: row.price_cbm_normal_goods,
+        sensitive_cbm: row.price_cbm_sensitive_goods,
+        sg_cbm: row.sg_price_cbm_normal_goods,
+        sg_sensitive_cbm: row.sg_price_cbm_sensitive_goods,
+        price_kg: row.price_kg_normal_goods,
+        sensitive_kg: row.price_kg_sensitive_goods,
+        sg_kg: row.sg_price_kg_normal_goods,
+        sg_sensitive_kg: row.sg_price_kg_sensitive_goods,
+        ocool_cbm: row.ocool_sg_price_cbm_normal_goods,
+        ocool_sensitive_cbm: row.ocool_sg_price_cbm_sensitive_goods
+      };
+    });
+  }
 
   // Calculate shipping totals based on selected shipping_code and inputs
   function calculateShippingTotals() {
@@ -85,116 +86,115 @@ document.addEventListener('DOMContentLoaded', () => {
     if (airKgHidden) airKgHidden.value = air_kg.toFixed(2);
   }
 
-  // Main calculate function you provided
-function calculateMain() {
-  const price_yen = getFloat('price');
-  const conversion_rate = getFloat('conversion_rate') || 0.032;
-  const shipping_price_yen = getFloat('shipping_price');
-  const additional_price_yen = getFloat('additional_price');
-  const quantity = getFloat('quantity');
-  const carton_width = getFloat('carton_width');
-  const carton_height = getFloat('carton_height');
-  const carton_length = getFloat('carton_length');
-  const no_of_carton = getFloat('no_of_carton');
-  const weight_carton = getFloat('weight_carton');
+  // Main calculate function
+  function calculateMain() {
+    const price_yen = getFloat('price');
+    const conversion_rate = getFloat('conversion_rate') || 0.032;
+    const shipping_price_yen = getFloat('shipping_price');
+    const additional_price_yen = getFloat('additional_price');
+    const quantity = getFloat('quantity');
+    const carton_width = getFloat('carton_width');
+    const carton_height = getFloat('carton_height');
+    const carton_length = getFloat('carton_length');
+    const no_of_carton = getFloat('no_of_carton');
+    const weight_carton = getFloat('weight_carton');
 
-  const total_price_yen = (price_yen * quantity) + shipping_price_yen + additional_price_yen;
-  const price_rm = price_yen / conversion_rate;
-  const total_price_rm = total_price_yen / conversion_rate;
-  const deposit_50_yen = total_price_yen / 2;
-  const deposit_50_rm = deposit_50_yen / conversion_rate;
-  const cbm_carton = (carton_width * carton_height * carton_length) / 1000000;
-  const vm_carton = (carton_width * carton_height * carton_length) / 5000;
-  const total_vm = vm_carton * no_of_carton;
-  const total_weight = weight_carton * no_of_carton;
-  const sg_tax = (total_price_rm / 100) * 9;
-  const supplier_1st_yen = total_price_yen / 2;
-  const supplier_2nd_yen = total_price_yen / 2;
+    const total_price_yen = (price_yen * quantity) + shipping_price_yen + additional_price_yen;
+    const price_rm = price_yen / conversion_rate;
+    const total_price_rm = total_price_yen / conversion_rate;
+    const deposit_50_yen = total_price_yen / 2;
+    const deposit_50_rm = deposit_50_yen / conversion_rate;
+    const cbm_carton = (carton_width * carton_height * carton_length) / 1000000;
+    const vm_carton = (carton_width * carton_height * carton_length) / 5000;
+    const total_vm = vm_carton * no_of_carton;
+    const total_weight = weight_carton * no_of_carton;
+    const sg_tax = (total_price_rm / 100) * 9;
+    const supplier_1st_yen = total_price_yen / 2;
+    const supplier_2nd_yen = total_price_yen / 2;
 
-  // Get additional cartons CBM
-  const add_cbm_1 = getFloat('add_carton1_total_cbm');
-  const add_cbm_2 = getFloat('add_carton2_total_cbm');
-  const add_cbm_3 = getFloat('add_carton3_total_cbm');
-  const add_cbm_4 = getFloat('add_carton4_total_cbm');
-  const add_cbm_5 = getFloat('add_carton5_total_cbm');
-  const add_cbm_6 = getFloat('add_carton6_total_cbm');
+    // Get additional cartons CBM
+    const add_cbm_1 = getFloat('add_carton1_total_cbm');
+    const add_cbm_2 = getFloat('add_carton2_total_cbm');
+    const add_cbm_3 = getFloat('add_carton3_total_cbm');
+    const add_cbm_4 = getFloat('add_carton4_total_cbm');
+    const add_cbm_5 = getFloat('add_carton5_total_cbm');
+    const add_cbm_6 = getFloat('add_carton6_total_cbm');
 
-  const total_cbm_main = cbm_carton * no_of_carton;
-  const total_cbm = (total_cbm_main + add_cbm_1 + add_cbm_2 + add_cbm_3 + add_cbm_4 + add_cbm_5 + add_cbm_6) * 1.28;
+    const total_cbm_main = cbm_carton * no_of_carton;
+    const total_cbm = (total_cbm_main + add_cbm_1 + add_cbm_2 + add_cbm_3 + add_cbm_4 + add_cbm_5 + add_cbm_6) * 1.28;
 
-  const fields = [
-    {id: 'price_rm', value: price_rm.toFixed(6)},
-    {id: 'total_price_yen', value: total_price_yen.toFixed(6)},
-    {id: 'total_price_rm', value: total_price_rm.toFixed(6)},
-    {id: 'deposit_50_yen', value: deposit_50_yen.toFixed(6)},
-    {id: 'deposit_50_rm', value: deposit_50_rm.toFixed(6)},
-    {id: 'cbm_carton', value: cbm_carton.toFixed(6)},
-    {id: 'total_cbm', value: total_cbm.toFixed(6)},
-    {id: 'vm_carton', value: vm_carton.toFixed(6)},
-    {id: 'total_vm', value: total_vm.toFixed(6)},
-    {id: 'total_weight', value: total_weight.toFixed(6)},
-    {id: 'sg_tax', value: sg_tax.toFixed(6)},
-    {id: 'supplier_1st', value: supplier_1st_yen.toFixed(6)},
-    {id: 'supplier_2nd', value: supplier_2nd_yen.toFixed(6)},
-  ];
+    const fields = [
+      {id: 'price_rm', value: price_rm.toFixed(6)},
+      {id: 'total_price_yen', value: total_price_yen.toFixed(6)},
+      {id: 'total_price_rm', value: total_price_rm.toFixed(6)},
+      {id: 'deposit_50_yen', value: deposit_50_yen.toFixed(6)},
+      {id: 'deposit_50_rm', value: deposit_50_rm.toFixed(6)},
+      {id: 'cbm_carton', value: cbm_carton.toFixed(6)},
+      {id: 'total_cbm', value: total_cbm.toFixed(6)},
+      {id: 'vm_carton', value: vm_carton.toFixed(6)},
+      {id: 'total_vm', value: total_vm.toFixed(6)},
+      {id: 'total_weight', value: total_weight.toFixed(6)},
+      {id: 'sg_tax', value: sg_tax.toFixed(6)},
+      {id: 'supplier_1st', value: supplier_1st_yen.toFixed(6)},
+      {id: 'supplier_2nd', value: supplier_2nd_yen.toFixed(6)},
+    ];
 
-  fields.forEach(({id, value}) => {
-    const visible = document.getElementById(id);
-    const hidden = document.getElementById(id + '_hidden');
-    if (visible) visible.value = value;
-    if (hidden) hidden.value = value;
-  });
+    fields.forEach(({id, value}) => {
+      const visible = document.getElementById(id);
+      const hidden = document.getElementById(id + '_hidden');
+      if (visible) visible.value = value;
+      if (hidden) hidden.value = value;
+    });
 
-  // After main calculation, calculate shipping totals
-  calculateShippingTotals();
+    // After main calculation, calculate shipping totals
+    calculateShippingTotals();
 
-  // ===== NEW: Final Selling Unit & Profit Calculations =====
-  const finalSellingUnitInput = document.getElementById('final_selling_unit');
-  const finalSellingUnit = parseFloat(finalSellingUnitInput?.value) || 0;
+    // Final Selling Unit & Profit Calculations
+    const finalSellingUnitInput = document.getElementById('final_selling_unit');
+    const finalSellingUnit = parseFloat(finalSellingUnitInput?.value) || 0;
 
-  // Final total price = total_price_rm + shipping totals + sg_tax
-  const priceTotalSea = getFloat('price_total_sea_shipping');
-  const priceTotalAirVM = getFloat('price_total_air_shipping_vm');
-  const priceTotalAirKG = getFloat('price_total_air_shipping_kg');
-  const sgTaxValue = getFloat('sg_tax');
-  const finalTotalPrice = total_price_rm + priceTotalSea + priceTotalAirVM + priceTotalAirKG + sgTaxValue;
+    // Final total price = total_price_rm + shipping totals + sg_tax
+    const priceTotalSea = getFloat('price_total_sea_shipping');
+    const priceTotalAirVM = getFloat('price_total_air_shipping_vm');
+    const priceTotalAirKG = getFloat('price_total_air_shipping_kg');
+    const sgTaxValue = getFloat('sg_tax');
+    const finalTotalPrice = total_price_rm + priceTotalSea + priceTotalAirVM + priceTotalAirKG + sgTaxValue;
 
-  // Final unit price = final total price / quantity
-  const finalUnitPrice = quantity > 0 ? (finalTotalPrice / quantity) : 0;
+    // Final unit price = final total price / quantity
+    const finalUnitPrice = quantity > 0 ? (finalTotalPrice / quantity) : 0;
 
-  const updateField = (id, val) => {
-    const el = document.getElementById(id);
-    const hidden = document.getElementById(id + '_hidden');
-    if (el) el.value = val.toFixed(2);
-    if (hidden) hidden.value = val.toFixed(2);
-  };
+    const updateField = (id, val) => {
+      const el = document.getElementById(id);
+      const hidden = document.getElementById(id + '_hidden');
+      if (el) el.value = val.toFixed(2);
+      if (hidden) hidden.value = val.toFixed(2);
+    };
 
-  // Always update these two
-  updateField('final_total_price', finalTotalPrice);
-  updateField('final_unit_price', finalUnitPrice);
+    // Always update these two
+    updateField('final_total_price', finalTotalPrice);
+    updateField('final_unit_price', finalUnitPrice);
 
-  if (finalSellingUnit > 0) {
-    const finalSellingTotal = finalSellingUnit * quantity;
-    const finalProfitPerUnit = finalSellingUnit - finalUnitPrice;
-    const finalTotalProfit = finalSellingTotal - finalTotalPrice;
-    const finalProfitPercent = finalTotalPrice > 0 ? (finalTotalProfit / finalTotalPrice) * 100 : 0;
-    const zakatValue = finalTotalProfit * 0.10;
+    if (finalSellingUnit > 0) {
+      const finalSellingTotal = finalSellingUnit * quantity;
+      const finalProfitPerUnit = finalSellingUnit - finalUnitPrice;
+      const finalTotalProfit = finalSellingTotal - finalTotalPrice;
+      const finalProfitPercent = finalTotalPrice > 0 ? (finalTotalProfit / finalTotalPrice) * 100 : 0;
+      const zakatValue = finalTotalProfit * 0.10;
 
-    updateField('final_selling_total', finalSellingTotal);
-    updateField('final_profit_per_unit', finalProfitPerUnit);
-    updateField('final_total_profit', finalTotalProfit);
-    updateField('final_profit_percent', finalProfitPercent);
-    updateField('zakat', zakatValue);
-  } else {
-    // Clear profit-related fields if no finalSellingUnit input
-    updateField('final_selling_total', 0);
-    updateField('final_profit_per_unit', 0);
-    updateField('final_total_profit', 0);
-    updateField('final_profit_percent', 0);
-    updateField('zakat', 0);
+      updateField('final_selling_total', finalSellingTotal);
+      updateField('final_profit_per_unit', finalProfitPerUnit);
+      updateField('final_total_profit', finalTotalProfit);
+      updateField('final_profit_percent', finalProfitPercent);
+      updateField('zakat', zakatValue);
+    } else {
+      // Clear profit-related fields if no finalSellingUnit input
+      updateField('final_selling_total', 0);
+      updateField('final_profit_per_unit', 0);
+      updateField('final_total_profit', 0);
+      updateField('final_profit_percent', 0);
+      updateField('zakat', 0);
+    }
   }
-}
-
 
   // Additional cartons calculation
   function calculateAdditionalCartons() {
@@ -223,7 +223,7 @@ function calculateMain() {
   const mainInputs = [
     'price', 'conversion_rate', 'shipping_price', 'additional_price',
     'quantity', 'carton_width', 'carton_height', 'carton_length',
-    'no_of_carton', 'weight_carton', 'shipping_code', 'final_selling_unit' // Added final_selling_unit here
+    'no_of_carton', 'weight_carton', 'shipping_code', 'final_selling_unit'
   ];
 
   const additionalInputs = [];

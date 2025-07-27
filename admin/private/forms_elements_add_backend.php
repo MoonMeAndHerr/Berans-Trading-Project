@@ -16,6 +16,15 @@ if (isset($_SESSION['successMsg'])) {
     unset($_SESSION['successMsg']);
 }
 
+// Fetch all shipping prices from DB to pass to JavaScript
+$shippingPrices = [];
+try {
+    $stmt = $pdo->query("SELECT * FROM price_shipping");
+    $shippingPrices = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $errorMsg = "❌ Error fetching shipping prices: " . $e->getMessage();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ===== Main fields =====
     $product_id       = intval($_POST['product_id'] ?? 0);
@@ -34,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $weight_carton    = floatval($_POST['weight_carton'] ?? 0);
     $estimated_arrival = $_POST['estimated_arrival'] ?? null;
     if ($estimated_arrival === '') {
-        $estimated_arrival = null;  // convert empty string to null
+        $estimated_arrival = null;
     }
 
     // ===== Calculated fields =====
@@ -61,11 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $final_profit_percent      = floatval($_POST['final_profit_percent'] ?? 0);
     $final_selling_unit        = floatval($_POST['final_selling_unit'] ?? 0);
 
-
     // ===== Shipping code from user input =====
     $shipping_code = trim($_POST['shipping_code'] ?? '');
 
-    // ===== Shipping totals (calculated in JS, passed as hidden inputs) =====
+    // ===== Shipping totals =====
     $price_total_sea_shipping    = floatval($_POST['price_total_sea_shipping'] ?? 0);
     $price_total_air_shipping_vm = floatval($_POST['price_total_air_shipping_vm'] ?? 0);
     $price_total_air_shipping_kg = floatval($_POST['price_total_air_shipping_kg'] ?? 0);
@@ -84,43 +92,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        // Insert main price record with additional carton fields
-            $sql = "
-            INSERT INTO price (
-                product_id, supplier_id, quantity,
-                carton_width, carton_height, carton_length, pcs_per_carton, no_of_carton,
-                designlogo, price, shipping_price, additional_price, conversion_rate, price_rm,
-                total_price_yen, total_price_rm, deposit_50_yen, deposit_50_rm,
-                cbm_carton, total_cbm, vm_carton, total_vm, total_weight, sg_tax,
-                supplier_1st_yen, supplier_2nd_yen, customer_1st_rm, customer_2nd_rm,
-                estimated_arrival,
-                add_carton1_width, add_carton1_height, add_carton1_length, add_carton1_pcs, add_carton1_no, add_carton1_total_cbm,
-                add_carton2_width, add_carton2_height, add_carton2_length, add_carton2_pcs, add_carton2_no, add_carton2_total_cbm,
-                add_carton3_width, add_carton3_height, add_carton3_length, add_carton3_pcs, add_carton3_no, add_carton3_total_cbm,
-                add_carton4_width, add_carton4_height, add_carton4_length, add_carton4_pcs, add_carton4_no, add_carton4_total_cbm,
-                add_carton5_width, add_carton5_height, add_carton5_length, add_carton5_pcs, add_carton5_no, add_carton5_total_cbm,
-                add_carton6_width, add_carton6_height, add_carton6_length, add_carton6_pcs, add_carton6_no, add_carton6_total_cbm,
-                final_selling_total, final_total_price, final_unit_price,
-                final_profit_per_unit_rm, final_total_profit, final_profit_percent, final_selling_unit, weight_carton
-            ) VALUES (
-                :product_id, :supplier_id, :quantity,
-                :carton_width, :carton_height, :carton_length, :pcs_per_carton, :no_of_carton,
-                :designlogo, :price, :shipping_price, :additional_price, :conversion_rate, :price_rm,
-                :total_price_yen, :total_price_rm, :deposit_50_yen, :deposit_50_rm,
-                :cbm_carton, :total_cbm, :vm_carton, :total_vm, :total_weight, :sg_tax,
-                :supplier_1st_yen, :supplier_2nd_yen, :customer_1st_rm, :customer_2nd_rm,
-                :estimated_arrival,
-                :a1w,:a1h,:a1l,:a1p,:a1n,:a1c,
-                :a2w,:a2h,:a2l,:a2p,:a2n,:a2c,
-                :a3w,:a3h,:a3l,:a3p,:a3n,:a3c,
-                :a4w,:a4h,:a4l,:a4p,:a4n,:a4c,
-                :a5w,:a5h,:a5l,:a5p,:a5n,:a5c,
-                :a6w,:a6h,:a6l,:a6p,:a6n,:a6c,
-                :final_selling_total, :final_total_price, :final_unit_price,
-                :final_profit_per_unit_rm, :final_total_profit, :final_profit_percent, :final_selling_unit,
-                :weight_carton
-            )
-            ";
+        // Insert main price record
+        $sql = "
+        INSERT INTO price (
+            product_id, supplier_id, quantity,
+            carton_width, carton_height, carton_length, pcs_per_carton, no_of_carton,
+            designlogo, price, shipping_price, additional_price, conversion_rate, price_rm,
+            total_price_yen, total_price_rm, deposit_50_yen, deposit_50_rm,
+            cbm_carton, total_cbm, vm_carton, total_vm, total_weight, sg_tax,
+            supplier_1st_yen, supplier_2nd_yen, customer_1st_rm, customer_2nd_rm,
+            estimated_arrival,
+            add_carton1_width, add_carton1_height, add_carton1_length, add_carton1_pcs, add_carton1_no, add_carton1_total_cbm,
+            add_carton2_width, add_carton2_height, add_carton2_length, add_carton2_pcs, add_carton2_no, add_carton2_total_cbm,
+            add_carton3_width, add_carton3_height, add_carton3_length, add_carton3_pcs, add_carton3_no, add_carton3_total_cbm,
+            add_carton4_width, add_carton4_height, add_carton4_length, add_carton4_pcs, add_carton4_no, add_carton4_total_cbm,
+            add_carton5_width, add_carton5_height, add_carton5_length, add_carton5_pcs, add_carton5_no, add_carton5_total_cbm,
+            add_carton6_width, add_carton6_height, add_carton6_length, add_carton6_pcs, add_carton6_no, add_carton6_total_cbm,
+            final_selling_total, final_total_price, final_unit_price,
+            final_profit_per_unit_rm, final_total_profit, final_profit_percent, final_selling_unit, weight_carton
+        ) VALUES (
+            :product_id, :supplier_id, :quantity,
+            :carton_width, :carton_height, :carton_length, :pcs_per_carton, :no_of_carton,
+            :designlogo, :price, :shipping_price, :additional_price, :conversion_rate, :price_rm,
+            :total_price_yen, :total_price_rm, :deposit_50_yen, :deposit_50_rm,
+            :cbm_carton, :total_cbm, :vm_carton, :total_vm, :total_weight, :sg_tax,
+            :supplier_1st_yen, :supplier_2nd_yen, :customer_1st_rm, :customer_2nd_rm,
+            :estimated_arrival,
+            :a1w,:a1h,:a1l,:a1p,:a1n,:a1c,
+            :a2w,:a2h,:a2l,:a2p,:a2n,:a2c,
+            :a3w,:a3h,:a3l,:a3p,:a3n,:a3c,
+            :a4w,:a4h,:a4l,:a4p,:a4n,:a4c,
+            :a5w,:a5h,:a5l,:a5p,:a5n,:a5c,
+            :a6w,:a6h,:a6l,:a6p,:a6n,:a6c,
+            :final_selling_total, :final_total_price, :final_unit_price,
+            :final_profit_per_unit_rm, :final_total_profit, :final_profit_percent, :final_selling_unit,
+            :weight_carton
+        )";
 
         $stmt = $pdo->prepare($sql);
 
@@ -165,13 +172,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $bind[":a{$i}n"] = $addCartons[$i]['no'];
             $bind[":a{$i}c"] = $addCartons[$i]['total_cbm'];
         }
-            $bind[':final_selling_total']      = $final_selling_total;
-            $bind[':final_total_price']        = $final_total_price;
-            $bind[':final_unit_price']         = $final_unit_price;
-            $bind[':final_profit_per_unit_rm'] = $final_profit_per_unit_rm;
-            $bind[':final_total_profit']       = $final_total_profit;
-            $bind[':final_profit_percent']     = $final_profit_percent;
-            $bind[':final_selling_unit']       = $final_selling_unit;
+        
+        $bind[':final_selling_total']      = $final_selling_total;
+        $bind[':final_total_price']        = $final_total_price;
+        $bind[':final_unit_price']         = $final_unit_price;
+        $bind[':final_profit_per_unit_rm'] = $final_profit_per_unit_rm;
+        $bind[':final_total_profit']       = $final_total_profit;
+        $bind[':final_profit_percent']     = $final_profit_percent;
+        $bind[':final_selling_unit']       = $final_selling_unit;
+        
         $stmt->execute($bind);
 
         // Get the newly inserted price_id
@@ -237,4 +246,6 @@ try {
 
 closeDB($pdo);
 
+// Pass shipping prices to JavaScript
+echo "<script>const dbShippingPrices = " . json_encode($shippingPrices) . ";</script>";
 ?>

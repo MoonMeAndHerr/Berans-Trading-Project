@@ -31,11 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_supplier_id'])
 
     try {
         // Optional: check if supplier exists
-        $check = $pdo->prepare("SELECT supplier_id FROM Supplier WHERE supplier_id = ?");
+        $check = $pdo->prepare("SELECT supplier_id FROM supplier WHERE supplier_id = ?");
         $check->execute([$delete_id]);
         if ($check->rowCount() > 0) {
             // Perform delete
-            $stmt = $pdo->prepare("DELETE FROM Supplier WHERE supplier_id = ?");
+            $stmt = $pdo->prepare("DELETE FROM supplier WHERE supplier_id = ?");
             $stmt->execute([$delete_id]);
 
             // Redirect with success for delete
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_supplier_id']
                 $supplier_id = $_POST['supplier_id'];
                 // Update query
                 $stmt = $pdo->prepare("
-                    UPDATE Supplier 
+                    UPDATE supplier 
                     SET supplier_name=?, supplier_contact_person=?, phone=?, email=?, address=?, notes=? 
                     WHERE supplier_id=?");
                 $stmt->execute([
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_supplier_id']
             } else {
                 // Insert query
                 $stmt = $pdo->prepare("
-                    INSERT INTO Supplier (supplier_name, supplier_contact_person, phone, email, address, notes) 
+                    INSERT INTO supplier (supplier_name, supplier_contact_person, phone, email, address, notes) 
                     VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $supplier_name,
@@ -137,7 +137,7 @@ if (isset($_SESSION['success_delete'])) {
 // ✅ If editing (GET with supplier_id), fetch supplier data for update form
 if ($supplier_id) {
     try {
-        $stmt = $pdo->prepare("SELECT * FROM Supplier WHERE supplier_id = ?");
+        $stmt = $pdo->prepare("SELECT * FROM supplier WHERE supplier_id = ?");
         $stmt->execute([$supplier_id]);
         $supplier = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -175,7 +175,7 @@ $allSuppliers = [];
 try {
     $stmt = $pdo->query("
         SELECT supplier_id, supplier_name, supplier_contact_person, phone, email, address, notes 
-        FROM Supplier ORDER BY supplier_name ASC");
+        FROM supplier ORDER BY supplier_name ASC");
     $allSuppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $allSuppliers = [];
@@ -197,11 +197,11 @@ try {
 $supplierCount   = 0;
 $lastSupplierDate = null;
 try {
-    $stmt = $pdo->query("SELECT COUNT(*) AS total FROM Supplier");
+    $stmt = $pdo->query("SELECT COUNT(*) AS total FROM supplier");
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     $supplierCount = $row['total'] ?? 0;
 
-    $stmt2 = $pdo->query("SELECT created_at FROM Supplier ORDER BY created_at DESC LIMIT 1");
+    $stmt2 = $pdo->query("SELECT created_at FROM supplier ORDER BY created_at DESC LIMIT 1");
     $row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
     $lastSupplierDate = $row2['created_at'] ?? null;
 } catch (PDOException $e) {
