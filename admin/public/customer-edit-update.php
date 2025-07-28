@@ -22,7 +22,7 @@ if (!$customerId || !is_numeric($customerId)) {
 
 // Fetch existing customer data
 try {
-    $stmt = $pdo->prepare("SELECT * FROM customer WHERE customer_id = :id AND deleted_at IS NULL");
+    $stmt = $pdo->prepare("SELECT * FROM Customer WHERE customer_id = :id AND deleted_at IS NULL");
     $stmt->execute([':id' => $customerId]);
     $customer = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete_customer']) && $_POST['delete_customer'] === '1') {
         // Soft delete: set deleted_at to current timestamp
         try {
-            $stmt = $pdo->prepare("UPDATE customer SET deleted_at = NOW() WHERE customer_id = :id");
+            $stmt = $pdo->prepare("UPDATE Customer SET deleted_at = NOW() WHERE customer_id = :id");
             $stmt->execute([':id' => $customerId]);
 
             $_SESSION['success'] = '✅ Customer deleted successfully.';
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($errors)) {
             try {
-                $stmt = $pdo->prepare("UPDATE customer SET 
+                $stmt = $pdo->prepare("UPDATE Customer SET 
                     customer_name = :customer_name,
                     customer_phone = :customer_phone,
                     customer_address = :customer_address,
