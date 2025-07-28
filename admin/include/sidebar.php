@@ -7,7 +7,7 @@
             <!-- LOGO -->
             <div class="navbar-brand-box">
                 <!-- Dark Logo-->
-                <a href="index" class="logo logo-dark">
+                <a href="index.html" class="logo logo-dark">
                     <span class="logo-sm">
                         <img src="assets/images/logo-sm.png" alt="" height="22">
                     </span>
@@ -53,6 +53,7 @@
 
 
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Pages</span></li>
+                        
                             <ul class="navbar-nav" id="navbar-nav">
                                 <!-- ===== Staff ===== -->
                                 <li class="nav-item">
@@ -98,85 +99,51 @@
                                     </div>
                                 </li>
 
-                                <!-- ===== Product ===== -->
+                                 <!-- ===== Suppplier ===== -->
                                 <li class="nav-item">
-                                    <a class="nav-link menu-link" href="#sidebarProduct" data-bs-toggle="collapse" role="button"
-                                    aria-expanded="false" aria-controls="sidebarProduct">
-                                        <i class="ri-shopping-cart-fill"></i>
-                                        <span data-key="t-tables">Product</span>
+                                    <a class="nav-link menu-link" href="#sidebarTablesSupplier" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="false" aria-controls="sidebarTablesSupplier">
+                                        <i class="bx bx-comment-add"></i>
+                                        <span data-key="t-tables">Supplier</span>
                                     </a>
-                                    <div class="collapse menu-dropdown" id="sidebarProduct">
+                                    <div class="collapse menu-dropdown" id="sidebarTablesSupplier">
                                         <ul class="nav nav-sm flex-column">
                                             <li class="nav-item">
-                                            <a href="all-product" 
+                                            <a href="forms-supplier.php" 
                                                 class="nav-link" 
                                                 data-allowed-roles='["admin","manager"]' 
                                                 data-key="t-basic-tables">
-                                                View All Products
+                                                Add Supplier
                                             </a>
                                             </li>
-                                            <li class="nav-item">
-                                            <a href="manage-product" 
-                                                class="nav-link" 
-                                                data-allowed-roles='["admin","manager"]' 
-                                                data-key="t-basic-tables">
-                                                Manage Product
-                                            </a>
-                                            </li>
-                                            <!-- Add more customer links here if needed -->
                                         </ul>
                                     </div>
                                 </li>
 
-
-                                <!-- ===== Form ===== -->
+                                <!-- ===== Pricing ===== -->
                                 <li class="nav-item">
-                                    <a class="nav-link menu-link" href="#sidebarFormsMenu" data-bs-toggle="collapse" role="button"
-                                    aria-expanded="false" aria-controls="sidebarFormsMenu">
+                                    <a class="nav-link menu-link" href="#sidebarTablesPricing" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="false" aria-controls="sidebarTablesPricing">
                                         <i class="ri-file-list-3-line"></i>
-                                        <span data-key="t-forms">Form</span>
+                                        <span data-key="t-tables">Pricing</span>
                                     </a>
-                                    <div class="collapse menu-dropdown" id="sidebarFormsMenu">
+                                    <div class="collapse menu-dropdown" id="sidebarTablesPricing">
                                         <ul class="nav nav-sm flex-column">
                                             <li class="nav-item">
-                                                <a href="../public/forms-supplier.php" class="nav-link" data-key="t-basic-elements">Supplier</a>
+                                                <a href="forms-price-add.php" class="nav-link" data-key="t-basic-elements">Add Pricing</a>
                                             </li>
                                             <li class="nav-item">
-                                                <a href="../public/forms-elements-add.php" class="nav-link" data-key="t-basic-elements">Add Pricing</a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a href="../public/forms-elements-update.php" class="nav-link" data-key="t-basic-elements">Update Pricing</a>
+                                                <a href="forms-price-update.php" class="nav-link" data-key="t-basic-elements">Update Pricing</a>
                                             </li>
                                         </ul>
                                     </div>
                                 </li>
                             </ul>
 
-                        <li class="menu-title"><span data-key="t-menu">Security and Automation</span></li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="website-backup">
-                                    <i class="ri-pages-fill"></i> <span data-key="t-widgets">Website Backup</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="database-backup">
-                                    <i class="ri-database-2-line"></i> <span data-key="t-widgets">Database Backup</span>
-                                </a>
-                            </li>
-                        
-
-                        <li class="menu-title"><span data-key="t-menu">Miscellaneous</span></li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="siteidentity">
-                                    <i class="ri-file-user-line"></i> <span data-key="t-widgets">Site Identity</span>
-                                </a>
-                            </li>
 
 
 
-
-
-
+                    </ul>
                 </div>
                 <!-- Sidebar -->
             </div>

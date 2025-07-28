@@ -98,6 +98,7 @@ $roleAccessMap = [
     'customer-edit-update.php'  => ['admin', 'manager'],
     'staff-add.php'             => ['admin', 'manager'],
     'staff-edit-update.php'     => ['admin', 'manager'],
+    
     // Add other page => roles entries here
 ];
 
