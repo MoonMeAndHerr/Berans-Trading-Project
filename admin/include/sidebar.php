@@ -7,7 +7,7 @@
             <!-- LOGO -->
             <div class="navbar-brand-box">
                 <!-- Dark Logo-->
-                <a href="index.html" class="logo logo-dark">
+                <a href="index" class="logo logo-dark">
                     <span class="logo-sm">
                         <img src="assets/images/logo-sm.png" alt="" height="22">
                     </span>
@@ -53,7 +53,6 @@
 
 
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Pages</span></li>
-                        
                             <ul class="navbar-nav" id="navbar-nav">
                                 <!-- ===== Staff ===== -->
                                 <li class="nav-item">
@@ -122,10 +121,30 @@
                                 </li>
                             </ul>
 
+                        <li class="menu-title"><span data-key="t-menu">Security and Automation</span></li>
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="#sidebarSiteIdentity" data-bs-toggle="collapse" role="button"
+                                aria-expanded="false" aria-controls="sidebarDashboards">
+                                <i class="ri-pages-fill"></i> <span data-key="t-dashboards">Website Backup</span>
+                            </a>
+                            <a class="nav-link menu-link" href="#sidebarSiteIdentity" data-bs-toggle="collapse" role="button"
+                                aria-expanded="false" aria-controls="sidebarDashboards">
+                                <i class="ri-database-2-line"></i> <span data-key="t-dashboards">Database Backup</span>
+                            </a>
+                        </li> 
+
+                        <li class="menu-title"><span data-key="t-menu">Miscellaneous</span></li>
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="#sidebarSiteIdentity" data-bs-toggle="collapse" role="button"
+                                aria-expanded="false" aria-controls="sidebarDashboards">
+                                <i class=" ri-file-user-line"></i> <span data-key="t-dashboards">Site Identity</span>
+                            </a>
+                        </li> 
 
 
 
-                    </ul>
+
+
                 </div>
                 <!-- Sidebar -->
             </div>

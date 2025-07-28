@@ -170,7 +170,7 @@
                     closeDB($pdo);
                     ?>
 
-<!-- Your dropdown button -->
+                    <!-- Your dropdown button -->
                     <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">
                         <span class="d-flex align-items-center">
