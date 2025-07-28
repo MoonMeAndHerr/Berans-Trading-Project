@@ -98,6 +98,37 @@
                                     </div>
                                 </li>
 
+                                <!-- ===== Product ===== -->
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="#sidebarProduct" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="false" aria-controls="sidebarProduct">
+                                        <i class="ri-shopping-cart-fill"></i>
+                                        <span data-key="t-tables">Product</span>
+                                    </a>
+                                    <div class="collapse menu-dropdown" id="sidebarProduct">
+                                        <ul class="nav nav-sm flex-column">
+                                            <li class="nav-item">
+                                            <a href="all-product" 
+                                                class="nav-link" 
+                                                data-allowed-roles='["admin","manager"]' 
+                                                data-key="t-basic-tables">
+                                                View All Products
+                                            </a>
+                                            </li>
+                                            <li class="nav-item">
+                                            <a href="manage-product" 
+                                                class="nav-link" 
+                                                data-allowed-roles='["admin","manager"]' 
+                                                data-key="t-basic-tables">
+                                                Manage Product
+                                            </a>
+                                            </li>
+                                            <!-- Add more customer links here if needed -->
+                                        </ul>
+                                    </div>
+                                </li>
+
+
                                 <!-- ===== Form ===== -->
                                 <li class="nav-item">
                                     <a class="nav-link menu-link" href="#sidebarFormsMenu" data-bs-toggle="collapse" role="button"
@@ -122,24 +153,25 @@
                             </ul>
 
                         <li class="menu-title"><span data-key="t-menu">Security and Automation</span></li>
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarSiteIdentity" data-bs-toggle="collapse" role="button"
-                                aria-expanded="false" aria-controls="sidebarDashboards">
-                                <i class="ri-pages-fill"></i> <span data-key="t-dashboards">Website Backup</span>
-                            </a>
-                            <a class="nav-link menu-link" href="#sidebarSiteIdentity" data-bs-toggle="collapse" role="button"
-                                aria-expanded="false" aria-controls="sidebarDashboards">
-                                <i class="ri-database-2-line"></i> <span data-key="t-dashboards">Database Backup</span>
-                            </a>
-                        </li> 
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="website-backup">
+                                    <i class="ri-pages-fill"></i> <span data-key="t-widgets">Website Backup</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="database-backup">
+                                    <i class="ri-database-2-line"></i> <span data-key="t-widgets">Database Backup</span>
+                                </a>
+                            </li>
+                        
 
                         <li class="menu-title"><span data-key="t-menu">Miscellaneous</span></li>
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarSiteIdentity" data-bs-toggle="collapse" role="button"
-                                aria-expanded="false" aria-controls="sidebarDashboards">
-                                <i class=" ri-file-user-line"></i> <span data-key="t-dashboards">Site Identity</span>
-                            </a>
-                        </li> 
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="siteidentity">
+                                    <i class="ri-file-user-line"></i> <span data-key="t-widgets">Site Identity</span>
+                                </a>
+                            </li>
+
 
 
 
