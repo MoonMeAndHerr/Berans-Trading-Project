@@ -1,0 +1,200 @@
+                        <form method="post" action="" id="priceUpdateForm">
+                                <input type="hidden" name="product_id" value="<?= htmlspecialchars($priceData['product_id'] ?? '') ?>">
+
+                                <!-- Enter Product Price Details -->
+                                <div class="row mb-4">
+                                    <div class="col-lg-12">
+                                        <div class="card">
+                                            <div class="card-header d-flex align-items-center">
+                                                <h4 class="card-title mb-0 flex-grow-1">Enter Product Price Details</h4>
+                                            </div>
+
+                                        <?php if (!empty($successMsg)): ?>
+                                            <div class="alert alert-success mt-2" role="alert">
+                                                <?= htmlspecialchars($successMsg) ?>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <div class="card-body">
+                                            <div class="row g-3">
+
+                                                <!-- Price ID Dropdown (trigger submit on change) -->
+                                                <div class="col-sm-6">
+                                                    <label for="price_id" class="form-label">Product (Name, Size & Price ID)</label>
+                                                    <select name="price_id" id="price_id" class="form-select" onchange="this.form.submit()">
+                                                        <option value="">-- Select Product --</option>
+                                                        <?php foreach ($priceList as $p): ?>
+                                                            <?php
+                                                                $prodName = '';
+                                                                $prodSize = '';
+                                                                foreach ($productOptions as $prod) {
+                                                                    if ($prod['product_id'] == $p['product_id']) {
+                                                                        $prodName = $prod['name'];
+                                                                        $prodSize = $prod['size_volume'];
+                                                                        break;
+                                                                    }
+                                                                }
+                                                                $optionLabel = ($prodName !== '' || $prodSize !== '')
+                                                                    ? $prodName . ' ' . $prodSize . ' ( ID : ' . $p['price_id'] . ' )'
+                                                                    : 'Unknown Product ( ID : ' . $p['price_id'] . ' )';
+                                                            ?>
+                                                            <option value="<?= htmlspecialchars($p['price_id']) ?>"
+                                                                <?= (isset($priceData['price_id']) && $priceData['price_id'] == $p['price_id']) ? 'selected' : '' ?>>
+                                                                <?= htmlspecialchars($optionLabel) ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+
+
+
+                                                <!-- Supplier Dropdown -->
+                                                <div class="col-sm-6">
+                                                    <label for="supplier_id" class="form-label">Supplier</label>
+                                                    <select name="supplier_id" id="supplier_id" class="form-select" required>
+                                                        <option value="">-- Select Supplier --</option>
+                                                        <?php foreach ($supplierOptions as $sup): ?>
+                                                            <option value="<?= htmlspecialchars($sup['supplier_id']) ?>"
+                                                                <?= (isset($priceData['supplier_id']) && $priceData['supplier_id'] == $sup['supplier_id']) ? 'selected' : '' ?>>
+                                                                <?= htmlspecialchars($sup['supplier_name']) ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+
+                                                <!-- Minimum Order Quantity -->
+                                                <div class="col-sm-6">
+                                                    <label for="quantity" class="form-label">Minimum Order Quantity</label>
+                                                    <input type="number" step="1" name="quantity" id="quantity" class="form-control" 
+                                                        value="<?= htmlspecialchars($priceData['quantity'] ?? '') ?>" required>
+                                                </div>
+
+                                                <!-- Carton Width -->
+                                                <div class="col-sm-4">
+                                                    <label for="carton_width" class="form-label">Carton Width (cm)</label>
+                                                    <input type="number" step="0.01" name="carton_width" id="carton_width" class="form-control" 
+                                                        value="<?= htmlspecialchars($priceData['carton_width'] ?? '') ?>" required>
+                                                </div>
+
+                                                <!-- Carton Height -->
+                                                <div class="col-sm-4">
+                                                    <label for="carton_height" class="form-label">Carton Height (cm)</label>
+                                                    <input type="number" step="0.01" name="carton_height" id="carton_height" class="form-control" 
+                                                        value="<?= htmlspecialchars($priceData['carton_height'] ?? '') ?>" required>
+                                                </div>
+
+                                                <!-- Carton Length -->
+                                                <div class="col-sm-4">
+                                                    <label for="carton_length" class="form-label">Carton Length (cm)</label>
+                                                    <input type="number" step="0.01" name="carton_length" id="carton_length" class="form-control" 
+                                                        value="<?= htmlspecialchars($priceData['carton_length'] ?? '') ?>" required>
+                                                </div>
+
+                                                <!-- PCS per Carton -->
+                                                <div class="col-sm-6">
+                                                    <label for="pcs_per_carton" class="form-label">PCS per Carton</label>
+                                                    <input type="number" step="1" name="pcs_per_carton" id="pcs_per_carton" class="form-control" 
+                                                        value="<?= htmlspecialchars($priceData['pcs_per_carton'] ?? '') ?>" required>
+                                                </div>
+
+                                                <!-- Number of Carton -->
+                                                <div class="col-sm-6">
+                                                    <label for="no_of_carton" class="form-label">Number of Carton</label>
+                                                    <input type="number" step="1" name="no_of_carton" id="no_of_carton" class="form-control" 
+                                                        value="<?= htmlspecialchars($priceData['no_of_carton'] ?? '') ?>" required>
+                                                </div>
+
+                                                <!-- Design & Logo Details -->
+                                                <div class="col-sm-12">
+                                                    <label for="designlogo" class="form-label">Design & Logo Details</label>
+                                                    <input type="text" name="designlogo" id="designlogo" class="form-control" 
+                                                        value="<?= htmlspecialchars($priceData['designlogo'] ?? '') ?>">
+                                                </div>
+
+                                                <!-- Price (Yen) -->
+                                                <div class="col-sm-4">
+                                                    <label for="price" class="form-label">Price (Yen)</label>
+                                                    <input type="number" step="0.000001" name="price" id="price" class="form-control"
+                                                        value="<?= htmlspecialchars($priceData['price'] ?? '') ?>" required>
+                                                </div>
+
+                                                <!-- Shipping Price (Yen) -->
+                                                <div class="col-sm-4">
+                                                    <label for="shipping_price" class="form-label">Shipping Price (Yen)</label>
+                                                    <input type="number" step="0.000001" name="shipping_price" id="shipping_price" class="form-control" 
+                                                        value="<?= htmlspecialchars($priceData['shipping_price'] ?? '') ?>" required>
+                                                </div>
+
+                                                <!-- Additional Price (Yen) -->
+                                                <div class="col-sm-4">
+                                                    <label for="additional_price" class="form-label">Additional Price (Yen)</label>
+                                                    <input type="number" step="0.000001" name="additional_price" id="additional_price" class="form-control" 
+                                                        value="<?= htmlspecialchars($priceData['additional_price'] ?? '') ?>" required>
+                                                </div>
+
+                                                <!-- Weight per Carton (kg) -->
+                                                <div class="col-sm-6">
+                                                    <label for="weight_carton" class="form-label">Weight per Carton (kg)</label>
+                                                    <input type="number" step="0.01" name="weight_carton" id="weight_carton" class="form-control" 
+                                                        value="<?= htmlspecialchars($priceData['weight_carton'] ?? '') ?>" required>
+                                                </div>
+
+                                                <!-- Conversion Rate (Yen to MYR) -->
+                                                <div class="col-sm-6">
+                                                    <label for="conversion_rate" class="form-label">Conversion Rate (Yen to MYR)</label>
+                                                    <input type="number" step="0.0001" name="conversion_rate" id="conversion_rate" class="form-control" 
+                                                        value="<?= htmlspecialchars($priceData['conversion_rate'] ?? '') ?>" required>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                                <!-- Enter Additional Carton -->
+                            <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <!-- EXISTING CODE -->
+                                </div>
+                            </div>
+                            </div>
+
+                                <!-- Enter Calculated Price -->
+                            <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <!-- EXISTING CODE -->
+                                </div>
+                            </div>
+                            </div>
+
+                                <!-- Shipping Method -->
+                            <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <!-- EXISTING CODE -->
+                                </div>
+                            </div>
+                            </div>
+
+                            <!-- Final Price -->
+                            <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <!-- EXISTING CODE -->
+                                </div>
+                            </div>
+                            </div>
+
+
+
+                                <!-- Submit button -->
+                                <div class="row mb-4">
+                                    <div class="col text-center">
+                                        <button type="submit" class="btn btn-primary">Update Price</button>
+                                    </div>
+                                </div>
+
+                            </form>
