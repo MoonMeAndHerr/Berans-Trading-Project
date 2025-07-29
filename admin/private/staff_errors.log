@@ -1,3 +1,11 @@
 [27-Jul-2025 05:54:11 Europe/Berlin] Staff creation error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'mohdfahmi1122@gmail.com' for key 'email'
 [27-Jul-2025 05:57:31 Europe/Berlin] Staff creation error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'Test123' for key 'username'
 [27-Jul-2025 06:00:24 Europe/Berlin] Staff creation error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'test123' for key 'username'
+[29-Jul-2025 06:07:50 Europe/Berlin] PHP Warning:  Undefined array key "company_id" in C:\xampp\htdocs\beranstrading\admin\private\staff-add-backend.php on line 57
+[29-Jul-2025 06:07:50 Europe/Berlin] PHP Warning:  Undefined array key "company_id" in C:\xampp\htdocs\beranstrading\admin\private\staff-add-backend.php on line 57
+[29-Jul-2025 06:11:13 Europe/Berlin] PHP Warning:  Undefined array key "company_id" in C:\xampp\htdocs\beranstrading\admin\private\staff-add-backend.php on line 57
+[29-Jul-2025 06:11:13 Europe/Berlin] PHP Warning:  Undefined array key "company_id" in C:\xampp\htdocs\beranstrading\admin\private\staff-add-backend.php on line 57
+[29-Jul-2025 06:15:27 Europe/Berlin] PHP Warning:  Undefined array key "company_id" in C:\xampp\htdocs\beranstrading\admin\private\staff-add-backend.php on line 57
+[29-Jul-2025 06:15:27 Europe/Berlin] PHP Warning:  Undefined array key "company_id" in C:\xampp\htdocs\beranstrading\admin\private\staff-add-backend.php on line 57
+[29-Jul-2025 06:15:30 Europe/Berlin] PHP Warning:  Undefined array key "company_id" in C:\xampp\htdocs\beranstrading\admin\private\staff-add-backend.php on line 57
+[29-Jul-2025 06:15:30 Europe/Berlin] PHP Warning:  Undefined array key "company_id" in C:\xampp\htdocs\beranstrading\admin\private\staff-add-backend.php on line 57

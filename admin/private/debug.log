@@ -1399,3 +1399,112 @@
     "error": "",
     "ip": "::1"
 }
+[2025-07-29 05:58:43] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-07-29 05:59:00] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-07-29 06:06:13] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-07-29 06:06:18] Login attempt started - {
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"
+}
+[2025-07-29 06:06:18] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-07-29 06:06:18] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-07-29 06:06:18] Password verification successful - {
+    "staff_id": 1
+}
+[2025-07-29 06:06:18] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-07-29 06:06:18] Session token created in database - {
+    "staff_id": "1",
+    "token": "9c7808aedb1ffcdb8550368321c2094b"
+}
+[2025-07-29 06:06:18] Last login updated - {
+    "staff_id": "1"
+}
+[2025-07-29 06:14:39] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-07-29 06:19:26] Logout initiated - {
+    "staff_id": "1",
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"
+}
+[2025-07-29 06:19:26] Database session cleanup - {
+    "staff_id": "1",
+    "sessions_deleted": 2
+}
+[2025-07-29 06:19:26] Logout completed successfully - {
+    "staff_id": "1",
+    "username": "admin"
+}
+[2025-07-29 06:19:27] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-07-29 06:19:30] Login attempt started - {
+    "username": "staff",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"
+}
+[2025-07-29 06:19:30] Attempting database query for user - {
+    "username": "staff"
+}
+[2025-07-29 06:19:30] User not found or inactive - {
+    "username": "staff"
+}
+[2025-07-29 06:19:30] Login attempt failed - {
+    "username": "staff",
+    "error": "User not found or inactive",
+    "ip": "::1"
+}
+[2025-07-29 06:19:33] Login attempt started - {
+    "username": "test123",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"
+}
+[2025-07-29 06:19:33] Attempting database query for user - {
+    "username": "test123"
+}
+[2025-07-29 06:19:33] User found in database - {
+    "staff_id": 45,
+    "username": "test123"
+}
+[2025-07-29 06:19:33] Password verification successful - {
+    "staff_id": 45
+}
+[2025-07-29 06:19:33] Session created - {
+    "staff_id": 45,
+    "username": "test123",
+    "role": "staff"
+}
+[2025-07-29 06:19:33] Session token created in database - {
+    "staff_id": "45",
+    "token": "e0ac9f441ffbe6bd7be86bcf9662f488"
+}
+[2025-07-29 06:19:33] Last login updated - {
+    "staff_id": "45"
+}
