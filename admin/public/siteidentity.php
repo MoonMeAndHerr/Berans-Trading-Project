@@ -1,4 +1,5 @@
-<?php include __DIR__ . '/../private/staff-add-backend.php';?>
+<?php include __DIR__ . '/../private/sideidentity_backend.php';?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 <!doctype html>
@@ -157,14 +158,6 @@
                                                     <label for="email">Company Email</label>
                                                 </div>
                                             </div>
-
-
-
-                                            
-
-
-
-
                                             <!-- Submit -->
                                             <div class="col-lg-12">
                                                 <div class="text-end">
@@ -217,17 +210,19 @@
     <script src="assets/libs/prismjs/prism.js"></script>
 
     <script src="assets/js/app.js"></script>
-    <script>
-document.getElementById('staffSearch').addEventListener('input', function () {
-  const filter = this.value.toLowerCase();
-  const rows = document.querySelectorAll('#staffTable tbody tr');
-
-  rows.forEach(row => {
-    const text = row.textContent.toLowerCase();
-    row.style.display = text.includes(filter) ? '' : 'none';
-  });
-});
-</script>
+    <?php if (!empty($_SESSION['custom_sa_success'])): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Site identity updated successfully.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            });
+        </script>
+        <?php unset($_SESSION['custom_sa_success']); ?>
+    <?php endif; ?>
 
 
 </body>

@@ -138,6 +138,21 @@
                                         </ul>
                                     </div>
                                 </li>
+
+                                 <li class="nav-item">
+                                    <a class="nav-link menu-link" href="#sidebarTablesCompany" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="false" aria-controls="sidebarTablesCompany">
+                                        <i class="ri-file-list-3-line"></i>
+                                        <span data-key="t-tables">Company</span>
+                                    </a>
+                                    <div class="collapse menu-dropdown" id="sidebarTablesCompany">
+                                        <ul class="nav nav-sm flex-column">
+                                            <li class="nav-item">
+                                                <a href="siteidentity.php" class="nav-link" data-key="t-basic-elements">Change Side Identity</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
                             </ul>
 
 
