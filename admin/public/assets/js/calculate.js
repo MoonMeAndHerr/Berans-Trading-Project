@@ -2,23 +2,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // Helper: get float or 0
   const getFloat = (id) => parseFloat(document.getElementById(id)?.value) || 0;
 
-  // Shipping prices data (simulate dynamic DB prices)
-  const priceData = {
-    'M1':  { price_cbm: 380, sensitive_cbm: 380, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 17, sensitive_kg: 19, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'M2':  { price_cbm: 380, sensitive_cbm: 380, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 17, sensitive_kg: 19, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'S1':  { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 285, sg_sensitive_cbm: 285, price_kg: 0, sensitive_kg: 0, sg_kg: 24, sg_sensitive_kg: 24, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'S2':  { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 285, sg_sensitive_cbm: 285, price_kg: 0, sensitive_kg: 0, sg_kg: 24, sg_sensitive_kg: 24, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'OCSG1': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 255, ocool_sensitive_cbm: 0 },
-    'OCSG2': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 275 },
-    'M3a': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 17, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'M3b': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 17, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'M4a': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 19, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'M4b': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 19, sg_kg: 0, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'S3a': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 24, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'S3b': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 24, sg_sensitive_kg: 0, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'S4a': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 24, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-    'S4b': { price_cbm: 0, sensitive_cbm: 0, sg_cbm: 0, sg_sensitive_cbm: 0, price_kg: 0, sensitive_kg: 0, sg_kg: 0, sg_sensitive_kg: 24, ocool_cbm: 0, ocool_sensitive_cbm: 0 },
-  };
+  // Convert database shipping prices to usable format
+  const priceData = {};
+  if (typeof dbShippingPrices !== 'undefined') {
+    dbShippingPrices.forEach(row => {
+      priceData[row.shipping_code] = {
+        price_cbm: row.price_cbm_normal_goods,
+        sensitive_cbm: row.price_cbm_sensitive_goods,
+        sg_cbm: row.sg_price_cbm_normal_goods,
+        sg_sensitive_cbm: row.sg_price_cbm_sensitive_goods,
+        price_kg: row.price_kg_normal_goods,
+        sensitive_kg: row.price_kg_sensitive_goods,
+        sg_kg: row.sg_price_kg_normal_goods,
+        sg_sensitive_kg: row.sg_price_kg_sensitive_goods,
+        ocool_cbm: row.ocool_sg_price_cbm_normal_goods,
+        ocool_sensitive_cbm: row.ocool_sg_price_cbm_sensitive_goods
+      };
+    });
+  }
 
   // Calculate shipping totals based on selected shipping_code and inputs
   function calculateShippingTotals() {
@@ -85,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (airKgHidden) airKgHidden.value = air_kg.toFixed(2);
   }
 
-  // Main calculate function you provided
+  // Main calculate function
 function calculateMain() {
   const price_yen = getFloat('price');
   const conversion_rate = getFloat('conversion_rate') || 0.032;
@@ -111,7 +112,6 @@ function calculateMain() {
   const supplier_1st_yen = total_price_yen / 2;
   const supplier_2nd_yen = total_price_yen / 2;
 
-  // Get additional cartons CBM
   const add_cbm_1 = getFloat('add_carton1_total_cbm');
   const add_cbm_2 = getFloat('add_carton2_total_cbm');
   const add_cbm_3 = getFloat('add_carton3_total_cbm');
@@ -148,18 +148,16 @@ function calculateMain() {
   // After main calculation, calculate shipping totals
   calculateShippingTotals();
 
-  // ===== NEW: Final Selling Unit & Profit Calculations =====
+  // Final Selling Unit & Profit Calculations
   const finalSellingUnitInput = document.getElementById('final_selling_unit');
   const finalSellingUnit = parseFloat(finalSellingUnitInput?.value) || 0;
 
-  // Final total price = total_price_rm + shipping totals + sg_tax
   const priceTotalSea = getFloat('price_total_sea_shipping');
   const priceTotalAirVM = getFloat('price_total_air_shipping_vm');
   const priceTotalAirKG = getFloat('price_total_air_shipping_kg');
   const sgTaxValue = getFloat('sg_tax');
   const finalTotalPrice = total_price_rm + priceTotalSea + priceTotalAirVM + priceTotalAirKG + sgTaxValue;
 
-  // Final unit price = final total price / quantity
   const finalUnitPrice = quantity > 0 ? (finalTotalPrice / quantity) : 0;
 
   const updateField = (id, val) => {
@@ -173,8 +171,15 @@ function calculateMain() {
   updateField('final_total_price', finalTotalPrice);
   updateField('final_unit_price', finalUnitPrice);
 
+  // ✅ ✅ Add Customer 1st and 2nd RM Split (UPDATED)
+  const finalSellingTotal = finalSellingUnit * quantity;
+  const customer_1st_rm = finalSellingTotal / 2;
+  const customer_2nd_rm = finalSellingTotal / 2;
+
+  updateField('customer_1st', customer_1st_rm);
+  updateField('customer_2nd', customer_2nd_rm);
+
   if (finalSellingUnit > 0) {
-    const finalSellingTotal = finalSellingUnit * quantity;
     const finalProfitPerUnit = finalSellingUnit - finalUnitPrice;
     const finalTotalProfit = finalSellingTotal - finalTotalPrice;
     const finalProfitPercent = finalTotalPrice > 0 ? (finalTotalProfit / finalTotalPrice) * 100 : 0;
@@ -186,7 +191,6 @@ function calculateMain() {
     updateField('final_profit_percent', finalProfitPercent);
     updateField('zakat', zakatValue);
   } else {
-    // Clear profit-related fields if no finalSellingUnit input
     updateField('final_selling_total', 0);
     updateField('final_profit_per_unit', 0);
     updateField('final_total_profit', 0);
@@ -194,6 +198,7 @@ function calculateMain() {
     updateField('zakat', 0);
   }
 }
+
 
 
   // Additional cartons calculation
@@ -223,7 +228,7 @@ function calculateMain() {
   const mainInputs = [
     'price', 'conversion_rate', 'shipping_price', 'additional_price',
     'quantity', 'carton_width', 'carton_height', 'carton_length',
-    'no_of_carton', 'weight_carton', 'shipping_code', 'final_selling_unit' // Added final_selling_unit here
+    'no_of_carton', 'weight_carton', 'shipping_code', 'final_selling_unit'
   ];
 
   const additionalInputs = [];

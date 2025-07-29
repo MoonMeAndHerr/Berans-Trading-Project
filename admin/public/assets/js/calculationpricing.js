@@ -48,6 +48,4 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('totalVolumeDisplay').textContent = totalVolume.toFixed(2);
     }
     
-    // In a real implementation, you would fetch products and suppliers from your API
-    // fetchProductsAndSuppliers();
 });
