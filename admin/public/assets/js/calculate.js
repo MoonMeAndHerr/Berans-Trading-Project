@@ -104,7 +104,7 @@ function calculateMain() {
   const total_price_rm = total_price_yen / conversion_rate;
   const deposit_50_yen = total_price_yen / 2;
   const deposit_50_rm = deposit_50_yen / conversion_rate;
-  const cbm_carton = (carton_width * carton_height * carton_length) / 1000000;
+  const cbm_carton = ((carton_width * carton_height * carton_length) / 1000000) * 1.28;
   const vm_carton = (carton_width * carton_height * carton_length) / 5000;
   const total_vm = vm_carton * no_of_carton;
   const total_weight = weight_carton * no_of_carton;
@@ -202,22 +202,24 @@ function calculateMain() {
 
 
   // Additional cartons calculation
-  function calculateAdditionalCartons() {
-    for (let i = 1; i <= 6; i++) {
-      const w = getFloat(`add_carton${i}_width`);
-      const h = getFloat(`add_carton${i}_height`);
-      const l = getFloat(`add_carton${i}_length`);
-      const n = getFloat(`add_carton${i}_no`);
+function calculateAdditionalCartons() {
+  for (let i = 1; i <= 6; i++) {
+    const w = getFloat(`add_carton${i}_width`);
+    const h = getFloat(`add_carton${i}_height`);
+    const l = getFloat(`add_carton${i}_length`);
+    const n = getFloat(`add_carton${i}_no`);
 
-      const cbmPerCarton = (w * h * l) / 1000000; // m³ per carton
-      const totalCbm = cbmPerCarton * n;
+    const cbmPerCarton = (w * h * l) / 1000000; // 
+    const totalCbm = cbmPerCarton * n * 1.28;   // 
 
-      const visible = document.getElementById(`add_carton${i}_total_cbm`);
-      const hidden = document.getElementById(`add_carton${i}_total_cbm_hidden`);
-      if (visible) visible.value = totalCbm.toFixed(6);
-      if (hidden) hidden.value = totalCbm.toFixed(6);
-    }
+    const visible = document.getElementById(`add_carton${i}_total_cbm`);
+    const hidden = document.getElementById(`add_carton${i}_total_cbm_hidden`);
+    if (visible) visible.value = totalCbm.toFixed(6);
+    if (hidden) hidden.value = totalCbm.toFixed(6);
   }
+}
+
+
 
   function calculateAll() {
     calculateAdditionalCartons();
