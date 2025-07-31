@@ -1508,3 +1508,35 @@
 [2025-07-29 06:19:33] Last login updated - {
     "staff_id": "45"
 }
+[2025-07-30 17:53:48] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-07-30 17:54:06] Login attempt started - {
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"
+}
+[2025-07-30 17:54:06] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-07-30 17:54:06] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-07-30 17:54:06] Password verification successful - {
+    "staff_id": 1
+}
+[2025-07-30 17:54:06] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-07-30 17:54:06] Session token created in database - {
+    "staff_id": "1",
+    "token": "6adfa40ab2204970c8be3adf507ea31d"
+}
+[2025-07-30 17:54:06] Last login updated - {
+    "staff_id": "1"
+}
