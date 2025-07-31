@@ -114,7 +114,7 @@
 													<span class="thumb-info-type"><?php echo $row['section_name']; ?></span>
 												</span>
 												<span class="thumb-info-action">
-													<a href="portfolio-single-wide-slider.html">
+													<a href="product?id=<?php echo $row['product_id']; ?>">
 														<span class="thumb-info-action-icon thumb-info-action-icon-primary"><i class="fas fa-link"></i></span>
 													</a>
 													<a href="../../media/<?php echo $row['image_url']; ?>" class="lightbox-portfolio">
