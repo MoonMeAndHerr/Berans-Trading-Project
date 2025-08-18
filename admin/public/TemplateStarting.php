@@ -74,7 +74,6 @@ require_once __DIR__ . '/../private/auth_check.php';
 
 
 
-
                     </div> <!-- container-fluid -->           
                 </div><!-- End Page-content -->
             <?php include __DIR__ . '/../include/footer.php';?>

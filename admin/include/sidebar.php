@@ -153,6 +153,24 @@
                                         </ul>
                                     </div>
                                 </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="#sidebarTablesPricingTest" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="false" aria-controls="sidebarTablesPricingTest">
+                                        <i class="ri-file-list-3-line"></i>
+                                        <span data-key="t-tables">Product Test</span>
+                                    </a>
+                                    <div class="collapse menu-dropdown" id="sidebarTablesPricingTest">
+                                        <ul class="nav nav-sm flex-column">
+                                            <li class="nav-item">
+                                                <a href="forms-price-add-new.php" class="nav-link" data-key="t-basic-elements">New Product</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="forms-price-update.php" class="nav-link" data-key="t-basic-elements">Update Pricing</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
                             </ul>
 
 
