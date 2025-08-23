@@ -139,21 +139,6 @@
                                     </div>
                                 </li>
 
-                                 <li class="nav-item">
-                                    <a class="nav-link menu-link" href="#sidebarTablesCompany" data-bs-toggle="collapse" role="button"
-                                    aria-expanded="false" aria-controls="sidebarTablesCompany">
-                                        <i class="ri-file-list-3-line"></i>
-                                        <span data-key="t-tables">Company</span>
-                                    </a>
-                                    <div class="collapse menu-dropdown" id="sidebarTablesCompany">
-                                        <ul class="nav nav-sm flex-column">
-                                            <li class="nav-item">
-                                                <a href="siteidentity.php" class="nav-link" data-key="t-basic-elements">Change Side Identity</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </li>
-
                                 <li class="nav-item">
                                     <a class="nav-link menu-link" href="#sidebarTablesPricingTest" data-bs-toggle="collapse" role="button"
                                     aria-expanded="false" aria-controls="sidebarTablesPricingTest">
@@ -172,6 +157,39 @@
                                     </div>
                                 </li>
                             </ul>
+
+                            <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Automation</span></li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="siteidentity.php">
+                                        <i class="ri-file-list-3-line"></i>
+                                        <span data-key="t-tables">Company</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="siteidentity.php">
+                                        <i class="ri-file-list-3-line"></i>
+                                        <span data-key="t-tables">Company</span>
+                                    </a>
+                                </li>
+
+                            <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Misc</span></li>
+
+                            
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="siteidentity.php">
+                                        <i class="ri-file-list-3-line"></i>
+                                        <span data-key="t-tables">Xero Auth</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="siteidentity.php">
+                                        <i class="ri-file-list-3-line"></i>
+                                        <span data-key="t-tables">Company</span>
+                                    </a>
+                                </li>
 
 
 
