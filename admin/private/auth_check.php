@@ -8,8 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Define absolute paths for redirects (adjust these if your URL base differs)
-$loginPage = '/beranstrading/admin/public/auth-signin-basic.php';
-$dashboardPage = '/beranstrading/admin/public/dashboard-projects.php';
+$loginPage = '../public/auth-signin-basic.php';
+$dashboardPage = '../public/dashboard-projects.php';
 
 // Inactivity timeout (seconds)
 $inactivityLimit = 600;

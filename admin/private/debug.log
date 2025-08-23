@@ -1,0 +1,47 @@
+[2025-08-23 07:26:06] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-08-23 08:10:24] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-08-23 08:13:10] Login attempt started - {
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/139.0.0.0 Safari\/537.36"
+}
+[2025-08-23 08:13:10] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-08-23 08:13:10] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-08-23 08:13:10] Password verification successful - {
+    "staff_id": 1
+}
+[2025-08-23 08:13:10] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-08-23 08:13:10] Session token created in database - {
+    "staff_id": "1",
+    "token": "87647de4346cfeb4227030ebea44c0bc"
+}
+[2025-08-23 08:13:10] Last login updated - {
+    "staff_id": "1"
+}
+[2025-08-23 08:37:50] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-08-23 08:38:07] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
