@@ -163,10 +163,10 @@
                                     <div class="collapse menu-dropdown" id="sidebarTablesPricingTest">
                                         <ul class="nav nav-sm flex-column">
                                             <li class="nav-item">
-                                                <a href="forms-price-add-new.php" class="nav-link" data-key="t-basic-elements">New Product</a>
+                                                <a href="forms-product-add-new.php" class="nav-link" data-key="t-basic-elements">New Product</a>
                                             </li>
                                             <li class="nav-item">
-                                                <a href="forms-price-update.php" class="nav-link" data-key="t-basic-elements">Update Pricing</a>
+                                                <a href="forms-price-add-new.php" class="nav-link" data-key="t-basic-elements">Add Pricing</a>
                                             </li>
                                         </ul>
                                     </div>
