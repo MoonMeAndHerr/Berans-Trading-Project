@@ -108,9 +108,9 @@
                             <tr>
                             <td><?= htmlspecialchars($row['product_id']) ?></td>
                             <td><?= htmlspecialchars($row['name']) ?></td>
-                            <td><?= htmlspecialchars($row['section_name']) ?></td>
-                            <td><?= htmlspecialchars($row['category_name']) ?></td>
-                            <td><?= htmlspecialchars($row['subcategory_name']) ?></td>
+                            <td><?= htmlspecialchars($row['section_name']) ?> (<?= htmlspecialchars($row['section_id']) ?>)</td>
+                            <td><?= htmlspecialchars($row['category_name']) ?> (<?= htmlspecialchars($row['category_id']) ?>)</td>
+                            <td><?= htmlspecialchars($row['subcategory_name']) ?> (<?= htmlspecialchars($row['subcategory_id']) ?>)</td>
                             <td><?= htmlspecialchars($row['material']) ?></td>
                             <td><?= htmlspecialchars($row['shape']) ?></td>
                             <td><?= htmlspecialchars($row['size_volume']) ?></td>
