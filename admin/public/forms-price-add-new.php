@@ -28,9 +28,17 @@ require_once __DIR__ . '/../private/auth_check.php';
     <!-- custom Css-->
     <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
 
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+    
+
 
 </head>
-<?php include __DIR__ . '/../private/forms_price_add_new_backend.php';?>
+<?php include __DIR__ . '/../private/forms-price-add-new-backend.php';?>
+
 <body>
 
     <!-- Begin page -->
@@ -65,235 +73,259 @@ require_once __DIR__ . '/../private/auth_check.php';
             <!-- ============================================================== -->
             <!-- Start right Content here -->
             <!-- ============================================================== -->
+                        <?php if ($successMessage): ?>
+                            <div class="alert alert-success"><?= htmlspecialchars($successMessage) ?></div>
+                        <?php endif; ?>
 
-<div class="row">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-header align-items-center d-flex">
-                <h4 class="card-title mb-0 flex-grow-1">New Product & Carton Info</h4>
-            </div>
-            <div class="card-body">
+                        <?php if ($errorMessage): ?>
+                            <div class="alert alert-danger"><?= htmlspecialchars($errorMessage) ?></div>
+                        <?php endif; ?>
 
-                <?php if(!empty($successMsg)): ?>
-                    <div class="alert alert-success" id="successAlert"><?= $successMsg ?></div>
-                <?php endif; ?>
-
-                <?php if(!empty($errorMsg)): ?>
-                    <div class="alert alert-danger"><?= $errorMsg ?></div>
-                <?php endif; ?>
-
-                <div class="live-preview">
-                    <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="POST">
-
-                        <div class="row g-3">
-                            <!-- Row 1: Section, Category, Subcategory -->
-                            <div class="row g-3">
-                                <div class="col-lg-4">
-                                    <div class="form-floating">
-                                        <select class="form-select" name="section" required>
-                                            <option selected disabled>Choose Section...</option>
-                                            <?php foreach($sections as $sec): ?>
-                                                <option value="<?= $sec['section_id'] ?>"><?= htmlspecialchars($sec['section_name']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <label>Section</label>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-floating">
-                                        <select class="form-select" name="category" required>
-                                            <option selected disabled>Choose Category...</option>
-                                            <?php foreach($categories as $cat): ?>
-                                                <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['category_name']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <label>Category</label>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-floating">
-                                        <select class="form-select" name="subcategory" required>
-                                            <option selected disabled>Choose Subcategory...</option>
-                                            <?php foreach($subcategories as $sub): ?>
-                                                <option value="<?= $sub['subcategory_id'] ?>"><?= htmlspecialchars($sub['subcategory_name']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <label>Subcategory</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Row 2: Supplier, Material, Product Type -->
-                            <div class="row g-3 mt-3">
-                                <div class="col-lg-4">
-                                    <div class="form-floating">
-                                        <select class="form-select" name="supplier_id" required>
-                                            <option selected disabled>Choose Supplier...</option>
-                                            <?php foreach($suppliers as $sup): ?>
-                                                <option value="<?= $sup['supplier_id'] ?>"><?= htmlspecialchars($sup['supplier_name']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <label>Supplier</label>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4">
-                                    <div class="form-floating">
-                                        <select class="form-select" name="material_id" required>
-                                            <option selected disabled>Choose Material...</option>
-                                            <?php foreach($materials as $mat): ?>
-                                                <option value="<?= $mat['material_id'] ?>"><?= htmlspecialchars($mat['material_name']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <label>Material</label>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4">
-                                    <div class="form-floating">
-                                        <select class="form-select" name="product_type_id" required>
-                                            <option selected disabled>Choose Product Type...</option>
-                                            <?php foreach($product_types as $pt): ?>
-                                                <option value="<?= $pt['product_type_id'] ?>"><?= htmlspecialchars($pt['product_name']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <label>Product Type</label>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                                <!-- Row 2 continued: Variant, Description, Lead Time -->
-                                <div class="row g-3 mt-0">
-                                    <div class="col-lg-4">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control" name="variant" placeholder="Enter Variant">
-                                            <label>Variant</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="form-floating">
-                                            <textarea class="form-control" name="description" placeholder="Enter Description"></textarea>
-                                            <label>Description</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="form-floating">
-                                            <input type="number" class="form-control" name="production_lead_time" placeholder="Enter Lead Time (Days)">
-                                            <label>Production Lead Time (Days)</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Row 3: Size 1,2,3 with metrics -->
-                            <?php for($i=1;$i<=3;$i++): ?>
-                                <div class="row g-2 <?= $i === 1 ? 'mt-4' : '' ?>">
-                                    <div class="col-lg-4">
-                                        <div class="input-group input-group-sm">
-                                            <div class="form-floating flex-grow-1">
-                                                <input type="text" class="form-control form-control-sm" name="size_<?= $i ?>" placeholder="Size <?= $i ?>">
-                                                <label>Size <?= $i ?></label>
-                                            </div>
-                                            <select class="form-select form-select-sm" name="metric_<?= $i ?>" style="max-width: 100px;">
-                                                <option value="cm" selected>cm</option>
-                                                <option value="mm">mm</option>
-                                                <option value="inch">inch</option>
-                                                <option value="kg">kg</option>
-                                                <option value="g">g</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endfor; ?>
-
-                        <!-- Carton Info Section -->
-                        <div class="row mt-5">
+                        <form method="POST">
                             <div class="col-lg-12">
                                 <div class="card">
                                     <div class="card-header align-items-center d-flex">
-                                        <h4 class="card-title mb-0 flex-grow-1">Carton Info</h4>
+                                        <h4 class="card-title mb-0 flex-grow-1"> </h4>
                                     </div>
                                     <div class="card-body">
+                                        <div class="live-preview">
 
-                                        <!-- Main Carton -->
-                                        <div class="row g-3 mb-3">
-                                            <div class="col-lg-2">
-                                                <div class="form-floating">
-                                                    <input type="number" step="0.01" class="form-control" name="carton[width][]" id="carton_width" placeholder="Width">
-                                                    <label>Carton Width (cm)</label>
+                                            <!-- Product Pricing -->
+                                            <div class="row g-3 mt-2">
+                                                <h5 class="text-center fw-bold fs-2 mt-0 mb-3">Product Pricing</h5>
+
+                                                <!-- Dropdowns (unchanged) -->
+                            <div class="col-sm-3">
+                                <select class="form-select" id="section">
+                                    <option disabled selected>Choose Section...</option>
+                                    <?php foreach ($sections as $s): ?>
+                                        <option value="<?= $s['section_id'] ?>"><?= $s['section_name'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <select class="form-select" id="category">
+                                    <option disabled selected>Choose Category...</option>
+                                    <?php foreach ($categories as $c): ?>
+                                        <option value="<?= $c['category_id'] ?>" data-section="<?= $c['section_id'] ?>">
+                                            <?= $c['category_name'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <select class="form-select" id="subcategory">
+                                    <option disabled selected>Choose Subcategory...</option>
+                                    <?php foreach ($subcategories as $sc): ?>
+                                        <option value="<?= $sc['subcategory_id'] ?>" data-category="<?= $sc['category_id'] ?>">
+                                            <?= $sc['subcategory_name'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <select class="form-select" id="product" name="product_id" required>
+                                    <option disabled selected>Choose Product...</option>
+                                    <?php foreach ($products as $p): ?>
+                                        <option value="<?= $p['product_id'] ?>"
+                                            data-section="<?= $p['section_id'] ?>"
+                                            data-category="<?= $p['category_id'] ?>"
+                                            data-subcategory="<?= $p['subcategory_id'] ?>"
+                                            data-supplier-id="<?= $p['supplier_id'] ?>"
+                                            data-supplier-name="<?= htmlspecialchars($p['supplier_name']) ?>"
+                                        ><?= $p['display_name'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                                            </div>
+
+                                            <!-- Inputs arranged 3 per row -->
+                                            <div class="row g-3 mt-3">
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="text" id="supplier_name" class="form-control" placeholder="Supplier" readonly>
+                                                        <label>Supplier</label>
+                                                    </div>
+                                                    <input type="hidden" id="supplier_id" name="supplier_id">
+                                                </div>
+
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="number" step="0.01" class="form-control" name="new_price_yen" placeholder="Price (YEN)" required>
+                                                        <label>Price (YEN)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="number" class="form-control" name="new_moq_quantity" placeholder="MOQ (Quantity)" required>
+                                                        <label>MOQ (Quantity)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="number" step="0.01" class="form-control" name="new_shipping_moq_yen" placeholder="Shipping / MOQ (YEN)" required>
+                                                        <label>Shipping / MOQ (YEN)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="number" step="0.01" class="form-control" name="new_additional_price_moq_yen" placeholder="Additional Price / MOQ (YEN)" required>
+                                                        <label>Additional Price / MOQ (YEN)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="number" step="0.0001" class="form-control" name="new_conversion_rate" id="conversion_rate" placeholder="Conversion Rate" required>
+                                                        <label>Conversion Rate</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="number" step="0.01" class="form-control" name="new_unit_price_yen" placeholder="Unit Price (YEN)" readonly>
+                                                        <label>Unit Price (YEN)</label>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-2">
-                                                <div class="form-floating">
-                                                    <input type="number" step="0.01" class="form-control" name="carton[height][]" id="carton_height" placeholder="Height">
-                                                    <label>Carton Height (cm)</label>
+
+
+                                            <!-- Divider -->
+                                            <div class="row mt-5">
+                                                <div class="col-12 text-center">
+                                                    <hr style="width: 95%; height:1px; border:none; background-color:#000; margin:0.5rem auto;">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-2">
-                                                <div class="form-floating">
-                                                    <input type="number" step="0.01" class="form-control" name="carton[length][]" id="carton_length" placeholder="Length">
-                                                    <label>Carton Length (cm)</label>
+
+                                            <!-- Freight -->
+                                            <div class="row g-3 mt-4 align-items-end">
+                                                <h5 class="text-center fw-bold fs-2 mt-2 mb-3">Freight</h5>
+
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <select class="form-select" name="new_freight_method" id="freight_method" required>
+                                                            <option disabled selected>Choose Freight Method...</option>
+                                                            <?php foreach($shipping_methods as $ship): ?>
+                                                                <?php 
+                                                                $rate_display = null;
+                                                                foreach ($ship as $col => $val) {
+                                                                    if (in_array($col, ['shipping_price_id', 'shipping_code'])) continue;
+                                                                    if ($val !== null && $val != 0) {
+                                                                        $rate_display = $val;
+                                                                        break;
+                                                                    }
+                                                                }
+                                                                if ($rate_display === null) continue;
+                                                                ?>
+                                                                <option value="<?= $ship['shipping_price_id'] ?>"
+                                                                    <?php 
+                                                                    foreach($ship as $col => $val) {
+                                                                        if (in_array($col, ['shipping_price_id', 'shipping_code'])) continue;
+                                                                        echo " data-$col='$val'";
+                                                                    } 
+                                                                    ?>
+                                                                >
+                                                                    <?= $ship['shipping_code'] ?> (RM <?= number_format($rate_display, 2) ?>)
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                        <label>Freight Method</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="number" step="0.0001" class="form-control" name="new_total_cbm_moq" placeholder="Total CBM / MOQ (m³)" readonly>
+                                                        <label>Total CBM / MOQ (m³)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="number" step="0.01" class="form-control" name="new_total_weight_moq" placeholder="Total Weight / MOQ (kg)" readonly>
+                                                        <label>Total Weight / MOQ (kg)</label>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-2">
-                                                <div class="form-floating">
-                                                    <input type="number" class="form-control" name="carton[pcs][]" id="pcs_per_carton" placeholder="Qty/Carton">
-                                                    <label>Quantity / Carton</label>
+
+
+                                            <!-- Divider -->
+                                            <div class="row mt-5">
+                                                <div class="col-12 text-center">
+                                                    <hr style="width: 95%; height:1px; border:none; background-color:#000; margin:0.5rem auto;">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-2">
-                                                <div class="form-floating">
-                                                    <input type="number" step="0.01" class="form-control" name="carton[weight][]" id="weight_carton" placeholder="Carton Weight">
-                                                    <label>Carton Weight (kg)</label>
+
+                                            <!-- Final Pricing -->
+                                            
+                                            <div class="row g-3 mt-4">
+                                            <h5 class="text-center fw-bold fs-2 mt-2 mb-3">Final Pricing</h5>
+
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="number" step="0.01" class="form-control" name="selling_price_unit" id="selling_price_unit" placeholder="Selling Price (RM)">
+                                                        <label>Selling Price (RM)</label>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <div class="form-floating">
-                                                    <input type="number" step="0.000001" class="form-control" name="carton[cbm][]" id="cbm_carton" placeholder="CBM/Carton" readonly>
-                                                    <label>CBM / Carton (m³)</label>
+                                                
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="number" step="0.0001" class="form-control" name="display_cbm_rate" id="display_cbm_rate" placeholder="Choosen CBM Rate" readonly>
+                                                        <label>Choosen CBM Rate</label>
+                                                    </div>
                                                 </div>
+
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="number" step="0.0001" class="form-control" name="display_total_cbm" id="display_total_cbm" placeholder="Total CBM" readonly>
+                                                        <label>Total CBM</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="number" step="0.01" class="form-control" name="new_unit_price_rm" placeholder="Unit Price (RM)" readonly>
+                                                        <label>Unit Price (RM)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="number" step="0.01" class="form-control" name="new_unit_freight_cost_rm" placeholder="Unit Freight Cost (RM)" readonly>
+                                                        <label>Unit Freight Cost (RM)</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4">
+                                                    <div class="form-floating">
+                                                        <input type="number" step="0.01" class="form-control" name="new_unit_profit_rm" placeholder="Unit Profit (RM)" readonly>
+                                                        <label>Unit Profit (RM)</label>
+                                                    </div>
+                                                </div>
+
                                             </div>
+
+                                            <div class="col-12 mt-5 text-center">
+                                                <button type="submit" class="btn btn-primary">Save Pricing</button>
+                                            </div>
+
                                         </div>
-
-                                        <!-- Container for dynamic additional cartons -->
-                                        <div id="additionalCartonsContainer"></div>
-
-                                        <!-- Add Carton Button -->
-                                        <div class="mt-3">
-                                            <button type="button" id="addCartonButton" class="btn btn-secondary">Add Additional Carton</button>
-                                        </div>
-
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                            <!-- Submit Button -->
-                            <div class="col-lg-12 text-end mt-3">
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </div>
-
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                        </form>
 
 
 
 
-
-           
-
+                                                  
 
 
 
-
-
-
+                        
 
                     </div> <!-- container-fluid -->           
                 </div><!-- End Page-content -->
@@ -314,63 +346,249 @@ require_once __DIR__ . '/../private/auth_check.php';
 
     <!-- prismjs plugin -->
     <script src="assets/libs/prismjs/prism.js"></script>
+
     <script src="assets/js/app.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const maxAdditional = 6;
-    let additionalCount = 0;
-    const container = document.getElementById('additionalCartonsContainer');
-    const addBtn = document.getElementById('addCartonButton');
+// --- Cascading Dropdowns with Choices.js & Product Filtering ---
+document.addEventListener('DOMContentLoaded', function () {
+    const sectionSelect = document.getElementById('section');
+    const categorySelect = document.getElementById('category');
+    const subcategorySelect = document.getElementById('subcategory');
+    const productSelect = document.getElementById('product');
+    const supplierNameInput = document.getElementById('supplier_name');
+    const supplierIdInput = document.getElementById('supplier_id');
 
-    const getFloat = id => parseFloat(document.getElementById(id)?.value) || 0;
+    if (!sectionSelect || !categorySelect || !subcategorySelect || !productSelect) return;
 
-    const calculateCBM = (w,h,l)=> (w*h*l)/1000000 * 1.28;
+    const allCategories = Array.from(categorySelect.options)
+        .filter(opt => opt.value)
+        .map(opt => ({ value: opt.value, label: opt.text, section: opt.dataset.section }));
 
-    function calculateAll() {
-        // Main carton
-        document.getElementById('cbm_carton').value = calculateCBM(
-            getFloat('carton_width'), getFloat('carton_height'), getFloat('carton_length')
-        ).toFixed(6);
+    const allSubcategories = Array.from(subcategorySelect.options)
+        .filter(opt => opt.value)
+        .map(opt => ({ value: opt.value, label: opt.text, category: opt.dataset.category }));
 
-        // Additional cartons
-        for(let i=1;i<=additionalCount;i++){
-            document.getElementById(`add_carton${i}_cbm`).value = calculateCBM(
-                getFloat(`add_carton${i}_width`),
-                getFloat(`add_carton${i}_height`),
-                getFloat(`add_carton${i}_length`)
-            ).toFixed(6);
-        }
+    const allProducts = Array.from(productSelect.options)
+        .filter(opt => opt.value)
+        .map(opt => ({
+            value: opt.value,
+            label: opt.text,
+            section: opt.dataset.section,
+            category: opt.dataset.category,
+            subcategory: opt.dataset.subcategory,
+            supplierId: opt.dataset.supplierId || '',
+            supplierName: opt.dataset.supplierName || ''
+        }));
+
+    const baseCfg = { searchEnabled: true, shouldSort: false, itemSelectText: '', placeholder: true };
+    const chSection = new Choices(sectionSelect, baseCfg);
+    const chCategory = new Choices(categorySelect, baseCfg);
+    const chSubcat = new Choices(subcategorySelect, baseCfg);
+    const chProduct = new Choices(productSelect, baseCfg);
+
+    function clearProductAndSupplier() {
+        chProduct.removeActiveItems();
+        productSelect.value = '';
+        supplierNameInput.value = '';
+        supplierIdInput.value = '';
     }
 
-    ['carton_width','carton_height','carton_length'].forEach(id=>{
-        document.getElementById(id).addEventListener('input', calculateAll);
-    });
+    function rebuildCategoryChoices() {
+        const section = sectionSelect.value;
+        chCategory.clearChoices();
+        const filtered = allCategories.filter(c => !section || c.section === section);
+        chCategory.setChoices([{ value: '', label: 'Choose Category...', disabled: true }], 'value', 'label', false);
+        chCategory.setChoices(filtered.map(c => ({ value: c.value, label: c.label })), 'value', 'label', true);
+        chSubcat.clearChoices();
+        chSubcat.setChoices([{ value: '', label: 'Choose Subcategory...', disabled: true }], 'value', 'label', false);
+        clearProductAndSupplier();
+    }
 
-    addBtn.addEventListener('click', () => {
-        if(additionalCount>=maxAdditional) return;
-        additionalCount++;
-        const i = additionalCount;
-        const row = document.createElement('div');
-        row.classList.add('row','g-3','mb-3');
-        row.innerHTML = `
-            <div class="col-lg-2"><div class="form-floating"><input type="number" step="0.01" class="form-control" name="carton[width][]" id="add_carton${i}_width" placeholder="Width"><label>Carton Width (cm)</label></div></div>
-            <div class="col-lg-2"><div class="form-floating"><input type="number" step="0.01" class="form-control" name="carton[height][]" id="add_carton${i}_height" placeholder="Height"><label>Carton Height (cm)</label></div></div>
-            <div class="col-lg-2"><div class="form-floating"><input type="number" step="0.01" class="form-control" name="carton[length][]" id="add_carton${i}_length" placeholder="Length"><label>Carton Length (cm)</label></div></div>
-            <div class="col-lg-2"><div class="form-floating"><input type="number" class="form-control" name="carton[pcs][]" id="add_carton${i}_pcs" placeholder="Qty/Carton"><label>Quantity / Carton</label></div></div>
-            <div class="col-lg-2"><div class="form-floating"><input type="number" step="0.01" class="form-control" name="carton[weight][]" id="add_carton${i}_weight" placeholder="Carton Weight"><label>Carton Weight (kg)</label></div></div>
-            <div class="col-lg-2"><div class="form-floating"><input type="number" step="0.000001" class="form-control" name="carton[cbm][]" id="add_carton${i}_cbm" placeholder="CBM/Carton" readonly><label>CBM / Carton (m³)</label></div></div>
-        `;
-        container.appendChild(row);
-        ['width','height','length'].forEach(f=>{
-            document.getElementById(`add_carton${i}_${f}`).addEventListener('input', calculateAll);
-        });
-    });
+    function rebuildSubcategoryChoices() {
+        const category = categorySelect.value;
+        chSubcat.clearChoices();
+        const filtered = allSubcategories.filter(sc => !category || sc.category === category);
+        chSubcat.setChoices([{ value: '', label: 'Choose Subcategory...', disabled: true }], 'value', 'label', false);
+        chSubcat.setChoices(filtered.map(sc => ({ value: sc.value, label: sc.label })), 'value', 'label', true);
+        clearProductAndSupplier();
+    }
 
-    calculateAll();
+    function rebuildProductChoices() {
+        const section = sectionSelect.value;
+        const category = categorySelect.value;
+        const subcategory = subcategorySelect.value;
+
+        const filtered = allProducts.filter(p =>
+            (!section || p.section === section) &&
+            (!category || p.category === category) &&
+            (!subcategory || p.subcategory === subcategory)
+        );
+
+        chProduct.clearChoices();
+        chProduct.setChoices([{ value: '', label: 'Choose Product...', disabled: true }], 'value', 'label', false);
+        chProduct.setChoices(filtered.map(p => ({ value: p.value, label: p.label })), 'value', 'label', true);
+        clearProductAndSupplier();
+    }
+
+    sectionSelect.addEventListener('change', function () {
+        rebuildCategoryChoices();
+        rebuildProductChoices();
+    });
+    categorySelect.addEventListener('change', function () {
+        rebuildSubcategoryChoices();
+        rebuildProductChoices();
+    });
+    subcategorySelect.addEventListener('change', rebuildProductChoices);
+
+    productSelect.addEventListener('change', function () {
+        const selectedValue = chProduct.getValue(true);
+        const meta = allProducts.find(p => p.value === selectedValue);
+        if (meta) {
+            supplierNameInput.value = meta.supplierName || '';
+            supplierIdInput.value = meta.supplierId || '';
+        } else {
+            supplierNameInput.value = '';
+            supplierIdInput.value = '';
+        }
+    });
 });
 </script>
 
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const productSelect = document.getElementById('product');
+    const moqInput = document.querySelector('input[name="new_moq_quantity"]');
+    const priceYenInput = document.querySelector('input[name="new_price_yen"]');
+    const additionalFeeInput = document.querySelector('input[name="new_additional_price_moq_yen"]');
+    const unitPriceYenInput = document.querySelector('input[name="new_unit_price_yen"]'); // readonly
+    const conversionRateInput = document.getElementById('conversion_rate');
+    const totalCbmField = document.querySelector('input[name="new_total_cbm_moq"]');
+    const totalWeightField = document.querySelector('input[name="new_total_weight_moq"]');
+    const freightSelect = document.getElementById('freight_method');
+    const displayCbmRateField = document.getElementById('display_cbm_rate');
+    const displayTotalCBMField = document.getElementById('display_total_cbm');
+    const unitPriceRMField = document.querySelector('input[name="new_unit_price_rm"]');
+    const unitFreightRMField = document.querySelector('input[name="new_unit_freight_cost_rm"]');
+    const unitProfitRMField = document.querySelector('input[name="new_unit_profit_rm"]');
+    const sellingPriceField = document.getElementById('selling_price_unit');
+
+    const productCartonData = {};
+    <?php foreach($products as $p): ?>
+    productCartonData[<?= $p['product_id'] ?>] = {
+        pcs_per_carton: <?= $p['pcs_per_carton'] ?? 0 ?>,
+        cbm_carton: <?= $p['cbm_carton'] ?? 0 ?>,
+        carton_weight: <?= $p['carton_weight'] ?? 0 ?>,
+        add_cartons: [
+            <?php for($i=1;$i<=6;$i++): ?>
+            {
+                pcs: <?= $p["add_carton{$i}_pcs"] ?? 0 ?>,
+                cbm: <?= $p["add_carton{$i}_total_cbm"] ?? 0 ?>,
+                weight: <?= $p["add_carton{$i}_weight"] ?? 0 ?>
+            }<?= $i<6 ? ',' : '' ?>
+            <?php endfor; ?>
+        ]
+    };
+    <?php endforeach; ?>
+
+    let selectedCartonData = null;
+
+    // 🔹 Auto-calculate Unit Price (YEN)
+    function calculateUnitPriceYen() {
+        const priceYen = parseFloat(priceYenInput.value) || 0;
+        const moq = parseInt(moqInput.value) || 0;
+        const additionalFee = parseFloat(additionalFeeInput.value) || 0;
+        if (moq > 0) {
+            const amount1 = priceYen * moq;
+            const amount2 = amount1 + moq + additionalFee;
+            const unitPrice = amount2 / moq;
+            unitPriceYenInput.value = unitPrice.toFixed(2);
+        } else {
+            unitPriceYenInput.value = '';
+        }
+    }
+
+    function calculateTotals() {
+        if (!selectedCartonData) return;
+        const moq = parseInt(moqInput.value) || 0;
+        if (moq <= 0) return;
+
+        // 🔹 Calculate Unit Price (YEN) first
+        calculateUnitPriceYen();
+
+        // Total CBM and weight
+        let totalCartons = Math.ceil(moq / Math.max(1, selectedCartonData.pcs_per_carton));
+        let totalCBM = totalCartons * selectedCartonData.cbm_carton;
+        let totalWeight = totalCartons * selectedCartonData.carton_weight;
+
+        selectedCartonData.add_cartons.forEach(ac => {
+            if (ac.pcs > 0) {
+                let extraCartons = Math.ceil(moq / ac.pcs);
+                totalCBM += extraCartons * ac.cbm;
+                totalWeight += extraCartons * ac.weight;
+            }
+        });
+
+        totalCbmField.value = totalCBM.toFixed(3);
+        totalWeightField.value = totalWeight.toFixed(2);
+        displayTotalCBMField.value = totalCBM.toFixed(6);
+
+        // Fetch CBM Rate
+        const freightOption = freightSelect.selectedOptions[0];
+        if (!freightOption) return;
+        let cbmRate = 0;
+        for (const key in freightOption.dataset) {
+            const val = parseFloat(freightOption.dataset[key]);
+            if (!isNaN(val) && val > 0) { cbmRate = val; break; }
+        }
+        displayCbmRateField.value = cbmRate.toFixed(4);
+
+        const unitPriceYen = parseFloat(unitPriceYenInput.value) || 0;
+        const conversionRate = parseFloat(conversionRateInput.value) || 1;
+        const sellingPrice = parseFloat(sellingPriceField.value) || 0;
+
+        const totalFreightCost = cbmRate * totalCBM;
+        const totalSupplierPrice = unitPriceYen * moq / conversionRate;
+        const totalPrice = totalFreightCost + totalSupplierPrice;
+        const unitPriceRM = totalPrice / moq;
+        const unitFreightRM = totalFreightCost / moq;
+        const unitProfitRM = sellingPrice - unitPriceRM;
+
+        unitPriceRMField.value = unitPriceRM.toFixed(2);
+        unitFreightRMField.value = unitFreightRM.toFixed(2);
+        unitProfitRMField.value = unitProfitRM.toFixed(2);
+    }
+
+        productSelect.addEventListener('change', function() {
+            const pid = this.value;
+            selectedCartonData = productCartonData[pid] || null;
+
+            // Clear previous calculation
+            totalCbmField.value = '';
+            totalWeightField.value = '';
+            unitPriceRMField.value = '';
+            unitFreightRMField.value = '';
+            unitProfitRMField.value = '';
+            displayCbmRateField.value = '';
+            displayTotalCBMField.value = '';
+            unitPriceYenInput.value = '';
+
+            // Trigger calculation immediately if MOQ is set
+            if ((parseInt(moqInput.value) || 0) > 0) {
+                calculateTotals();
+            }
+        });
+
+
+    moqInput.addEventListener('input', calculateTotals);
+    priceYenInput.addEventListener('input', calculateTotals);
+    additionalFeeInput.addEventListener('input', calculateTotals);
+    unitPriceYenInput.addEventListener('input', calculateTotals);
+    conversionRateInput.addEventListener('input', calculateTotals);
+    freightSelect.addEventListener('change', calculateTotals);
+    sellingPriceField.addEventListener('input', calculateTotals);
+});
+</script>
 
 
 
