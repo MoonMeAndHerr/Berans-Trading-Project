@@ -81,7 +81,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link menu-link" href="#sidebarTablesCustomer" data-bs-toggle="collapse" role="button"
                                     aria-expanded="false" aria-controls="sidebarTablesCustomer">
-                                        <i class="bx bx-comment-add"></i>
+                                        <i class="ri-customer-service-2-fill"></i>
                                         <span data-key="t-tables">Customer</span>
                                     </a>
                                     <div class="collapse menu-dropdown" id="sidebarTablesCustomer">
@@ -103,7 +103,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link menu-link" href="#sidebarTablesSupplier" data-bs-toggle="collapse" role="button"
                                     aria-expanded="false" aria-controls="sidebarTablesSupplier">
-                                        <i class="bx bx-comment-add"></i>
+                                        <i class="ri-store-3-fill"></i>
                                         <span data-key="t-tables">Supplier</span>
                                     </a>
                                     <div class="collapse menu-dropdown" id="sidebarTablesSupplier">
@@ -142,7 +142,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link menu-link" href="#sidebarTablesPricingTest" data-bs-toggle="collapse" role="button"
                                     aria-expanded="false" aria-controls="sidebarTablesPricingTest">
-                                        <i class="ri-file-list-3-line"></i>
+                                        <i class='ri-dropbox-fill'></i> 
                                         <span data-key="t-tables">Product Test</span>
                                     </a>
                                     <div class="collapse menu-dropdown" id="sidebarTablesPricingTest">
@@ -161,16 +161,16 @@
                             <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Automation</span></li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link menu-link" href="siteidentity.php">
-                                        <i class="ri-file-list-3-line"></i>
-                                        <span data-key="t-tables">Company</span>
+                                    <a class="nav-link menu-link" href="database-backup">
+                                        <i class="ri-database-2-fill"></i>
+                                        <span data-key="t-tables">Database Backup</span>
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link menu-link" href="siteidentity.php">
-                                        <i class="ri-file-list-3-line"></i>
-                                        <span data-key="t-tables">Company</span>
+                                    <a class="nav-link menu-link" href="website-backup">
+                                        <i class="ri-window-2-fill"></i>
+                                        <span data-key="t-tables">Website Backup</span>
                                     </a>
                                 </li>
 
@@ -178,22 +178,25 @@
 
                             
                                 <li class="nav-item">
-                                    <a class="nav-link menu-link" href="siteidentity.php">
-                                        <i class="ri-file-list-3-line"></i>
+                                    <a class="nav-link menu-link" href="xero-auth">
+                                        <i class="ri-links-fill"></i>
                                         <span data-key="t-tables">Xero Auth</span>
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
                                     <a class="nav-link menu-link" href="siteidentity.php">
-                                        <i class="ri-file-list-3-line"></i>
-                                        <span data-key="t-tables">Company</span>
+                                        <i class="ri-folder-info-fill"></i>
+                                        <span data-key="t-tables">Company Info</span>
                                     </a>
                                 </li>
 
-
-
-
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="database-sync">
+                                        <i class="ri-database-fill"></i>
+                                        <span data-key="t-tables">Database Sync</span>
+                                    </a>
+                                </li>
                     </ul>
                 </div>
                 <!-- Sidebar -->
