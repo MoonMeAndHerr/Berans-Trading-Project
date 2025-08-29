@@ -32,9 +32,8 @@ require_once __DIR__ . '/../private/auth_check.php';
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-
-    
-
+    <link href="assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
+    <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
 
 </head>
 <?php include __DIR__ . '/../private/forms-price-add-new-backend.php';?>
@@ -73,13 +72,29 @@ require_once __DIR__ . '/../private/auth_check.php';
             <!-- ============================================================== -->
             <!-- Start right Content here -->
             <!-- ============================================================== -->
-                        <?php if ($successMessage): ?>
-                            <div class="alert alert-success"><?= htmlspecialchars($successMessage) ?></div>
-                        <?php endif; ?>
-
-                        <?php if ($errorMessage): ?>
-                            <div class="alert alert-danger"><?= htmlspecialchars($errorMessage) ?></div>
-                        <?php endif; ?>
+                        <?php if ($successMessage || $errorMessage): ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        <?php if ($successMessage): ?>
+            Swal.fire({
+                title: 'Success!',
+                text: <?= json_encode($successMessage) ?>,
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+        <?php endif; ?>
+        
+        <?php if ($errorMessage): ?>
+            Swal.fire({
+                title: 'Error!',
+                text: <?= json_encode($errorMessage) ?>,
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        <?php endif; ?>
+    });
+</script>
+<?php endif; ?>
 
                         <form method="POST">
                             <div class="col-lg-12">
@@ -212,7 +227,7 @@ require_once __DIR__ . '/../private/auth_check.php';
                                                                 <?php 
                                                                 $rate_display = null;
                                                                 foreach ($ship as $col => $val) {
-                                                                    if (in_array($col, ['shipping_price_id', 'shipping_code'])) continue;
+                                                                    if (in_array($col, ['shipping_price_id', 'shipping_code', 'shipping_name'])) continue;
                                                                     if ($val !== null && $val != 0) {
                                                                         $rate_display = $val;
                                                                         break;
@@ -223,12 +238,16 @@ require_once __DIR__ . '/../private/auth_check.php';
                                                                 <option value="<?= $ship['shipping_price_id'] ?>"
                                                                     <?php 
                                                                     foreach($ship as $col => $val) {
-                                                                        if (in_array($col, ['shipping_price_id', 'shipping_code'])) continue;
+                                                                        if (in_array($col, ['shipping_price_id', 'shipping_code', 'shipping_name'])) continue;
                                                                         echo " data-$col='$val'";
                                                                     } 
                                                                     ?>
                                                                 >
-                                                                    <?= $ship['shipping_code'] ?> (RM <?= number_format($rate_display, 2) ?>)
+                                                                    <?= $ship['shipping_code'] ?> - <?= $ship['shipping_name'] ?> 
+                                                                    (RM <?= number_format($rate_display, 2) ?><?= strpos($ship['shipping_code'], 'M3') === 0 || 
+                                                                                                               strpos($ship['shipping_code'], 'M4') === 0 || 
+                                                                                                               strpos($ship['shipping_code'], 'S3') === 0 || 
+                                                                                                               strpos($ship['shipping_code'], 'S4') === 0 ? '/KG' : '/CBM' ?>)
                                                                 </option>
                                                             <?php endforeach; ?>
                                                         </select>
@@ -266,7 +285,9 @@ require_once __DIR__ . '/../private/auth_check.php';
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.01" class="form-control" name="selling_price_unit" id="selling_price_unit" placeholder="Selling Price (RM)">
+                                                        <input type="number" step="0.01" class="form-control" 
+                                                               name="selling_price_unit" id="selling_price_unit" 
+                                                               placeholder="Selling Price (RM)">
                                                         <label>Selling Price (RM)</label>
                                                     </div>
                                                 </div>
@@ -497,10 +518,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function calculateUnitPriceYen() {
         const priceYen = parseFloat(priceYenInput.value) || 0;
         const moq = parseInt(moqInput.value) || 0;
+        const shippingMoq = parseFloat(document.querySelector('input[name="new_shipping_moq_yen"]').value) || 0;
         const additionalFee = parseFloat(additionalFeeInput.value) || 0;
+        
         if (moq > 0) {
             const amount1 = priceYen * moq;
-            const amount2 = amount1 + moq + additionalFee;
+            const amount2 = amount1 + shippingMoq + additionalFee;  // Modified calculation
             const unitPrice = amount2 / moq;
             unitPriceYenInput.value = unitPrice.toFixed(2);
         } else {
@@ -588,6 +611,61 @@ document.addEventListener('DOMContentLoaded', () => {
     freightSelect.addEventListener('change', calculateTotals);
     sellingPriceField.addEventListener('input', calculateTotals);
 });
+</script>
+
+<script>
+document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Validate required fields
+    const requiredFields = this.querySelectorAll('[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (!field.value) {
+            isValid = false;
+            Swal.fire({
+                title: 'Error!',
+                text: `Please fill in ${field.placeholder}`,
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+    
+    if (!isValid) return;
+
+    // Show confirmation dialog
+    Swal.fire({
+        title: 'Save Pricing',
+        text: 'Are you sure you want to save this pricing information?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, save it!',
+        cancelButtonText: 'No, cancel!',
+        showCloseButton: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            this.submit();
+        }
+    });
+});
+
+// Replace any existing alerts in your calculation scripts with SweetAlert2
+function showError(message) {
+    Swal.fire({
+        title: 'Error!',
+        text: message,
+        icon: 'error',
+        confirmButtonText: 'OK'
+    });
+}
+
+// Example usage in your calculation script:
+if (moq <= 0) {
+    showError('MOQ must be greater than 0');
+    return;
+}
 </script>
 
 

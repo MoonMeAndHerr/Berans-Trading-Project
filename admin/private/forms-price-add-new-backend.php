@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':new_unit_price_rm' => $_POST['new_unit_price_rm'] ?? null,
             ':new_unit_freight_cost_rm' => $_POST['new_unit_freight_cost_rm'] ?? null,
             ':new_unit_profit_rm' => $_POST['new_unit_profit_rm'] ?? null,
+            ':new_selling_price' => $_POST['selling_price_unit'] ?? null,
         ];
 
         if ($existing) {
@@ -54,7 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     new_total_weight_moq = :new_total_weight_moq,
                     new_unit_price_rm = :new_unit_price_rm,
                     new_unit_freight_cost_rm = :new_unit_freight_cost_rm,
-                    new_unit_profit_rm = :new_unit_profit_rm
+                    new_unit_profit_rm = :new_unit_profit_rm,
+                    new_selling_price = :new_selling_price
                 WHERE price_id = :price_id
             ");
             $data[':price_id'] = $existing['price_id'];
@@ -67,12 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     product_id, supplier_id,
                     new_price_yen, new_moq_quantity, new_shipping_moq_yen, new_additional_price_moq_yen,
                     new_conversion_rate, new_unit_price_yen, new_freight_method, new_total_cbm_moq,
-                    new_total_weight_moq, new_unit_price_rm, new_unit_freight_cost_rm, new_unit_profit_rm
+                    new_total_weight_moq, new_unit_price_rm, new_unit_freight_cost_rm, new_unit_profit_rm,
+                    new_selling_price
                 ) VALUES (
                     :product_id, :supplier_id,
                     :new_price_yen, :new_moq_quantity, :new_shipping_moq_yen, :new_additional_price_moq_yen,
                     :new_conversion_rate, :new_unit_price_yen, :new_freight_method, :new_total_cbm_moq,
-                    :new_total_weight_moq, :new_unit_price_rm, :new_unit_freight_cost_rm, :new_unit_profit_rm
+                    :new_total_weight_moq, :new_unit_price_rm, :new_unit_freight_cost_rm, :new_unit_profit_rm,
+                    :new_selling_price
                 )
             ");
             $data[':product_id'] = $product_id;
