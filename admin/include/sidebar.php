@@ -16,7 +16,7 @@
                     </span>
                 </a>
                 <!-- Light Logo-->
-                <a href="index.html" class="logo logo-light">
+                <a href="index" class="logo logo-light">
                     <span class="logo-sm">
                         <img src="assets/images/logo-sm.png" alt="" height="22">
                     </span>
