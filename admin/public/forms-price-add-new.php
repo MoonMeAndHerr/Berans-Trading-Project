@@ -194,9 +194,13 @@ require_once __DIR__ . '/../private/auth_check.php';
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.0001" class="form-control" name="new_conversion_rate" id="conversion_rate" placeholder="Conversion Rate" required>
-                                                        <label>Conversion Rate</label>
+                                                        <input type="number" step="0.0001" class="form-control" 
+                                                               id="conversion_rate" 
+                                                               value="<?= number_format($currentConversionRate, 4) ?>" 
+                                                               readonly>
+                                                        <label>Conversion Rate (Auto-fetched)</label>
                                                     </div>
+                                                    <input type="hidden" name="new_conversion_rate" value="<?= $currentConversionRate ?>">
                                                 </div>
 
                                                 <div class="col-lg-4">
@@ -219,41 +223,19 @@ require_once __DIR__ . '/../private/auth_check.php';
                                             <div class="row g-3 mt-4 align-items-end">
                                                 <h5 class="text-center fw-bold fs-2 mt-2 mb-3">Freight</h5>
 
-                                                <div class="col-lg-4">
-                                                    <div class="form-floating">
-                                                        <select class="form-select" name="new_freight_method" id="freight_method" required>
-                                                            <option disabled selected>Choose Freight Method...</option>
-                                                            <?php foreach($shipping_methods as $ship): ?>
-                                                                <?php 
-                                                                $rate_display = null;
-                                                                foreach ($ship as $col => $val) {
-                                                                    if (in_array($col, ['shipping_price_id', 'shipping_code', 'shipping_name'])) continue;
-                                                                    if ($val !== null && $val != 0) {
-                                                                        $rate_display = $val;
-                                                                        break;
-                                                                    }
-                                                                }
-                                                                if ($rate_display === null) continue;
-                                                                ?>
-                                                                <option value="<?= $ship['shipping_price_id'] ?>"
-                                                                    <?php 
-                                                                    foreach($ship as $col => $val) {
-                                                                        if (in_array($col, ['shipping_price_id', 'shipping_code', 'shipping_name'])) continue;
-                                                                        echo " data-$col='$val'";
-                                                                    } 
-                                                                    ?>
-                                                                >
-                                                                    <?= $ship['shipping_code'] ?> - <?= $ship['shipping_name'] ?> 
-                                                                    (RM <?= number_format($rate_display, 2) ?><?= strpos($ship['shipping_code'], 'M3') === 0 || 
-                                                                                                               strpos($ship['shipping_code'], 'M4') === 0 || 
-                                                                                                               strpos($ship['shipping_code'], 'S3') === 0 || 
-                                                                                                               strpos($ship['shipping_code'], 'S4') === 0 ? '/KG' : '/CBM' ?>)
-                                                                </option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                        <label>Freight Method</label>
-                                                    </div>
+                                            <div class="col-lg-4">
+                                                <div class="form-floating">
+                                                    <select class="form-select" name="new_freight_method" id="freight_method" required>
+                                                        <option disabled selected>Choose Freight Method...</option>
+                                                        <?php foreach($shipping_methods as $ship): ?>
+                                                            <option value="<?= $ship['shipping_code'] ?>" data-freight-rate="<?= $ship['freight_rate'] ?>">
+                                                                <?= $ship['shipping_code'] ?> - <?= htmlspecialchars($ship['shipping_name']) ?> (RM <?= number_format($ship['freight_rate'], 2) ?><?= strpos($ship['shipping_code'], 'air') !== false || strpos($ship['shipping_code'], 'AIR') !== false ? '/KG' : '/CBM' ?>)
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                    <label>Freight Method</label>
                                                 </div>
+                                            </div>
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
@@ -482,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const moqInput = document.querySelector('input[name="new_moq_quantity"]');
     const priceYenInput = document.querySelector('input[name="new_price_yen"]');
     const additionalFeeInput = document.querySelector('input[name="new_additional_price_moq_yen"]');
-    const unitPriceYenInput = document.querySelector('input[name="new_unit_price_yen"]'); // readonly
+    const unitPriceYenInput = document.querySelector('input[name="new_unit_price_yen"]');
     const conversionRateInput = document.getElementById('conversion_rate');
     const totalCbmField = document.querySelector('input[name="new_total_cbm_moq"]');
     const totalWeightField = document.querySelector('input[name="new_total_weight_moq"]');
@@ -493,6 +475,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const unitFreightRMField = document.querySelector('input[name="new_unit_freight_cost_rm"]');
     const unitProfitRMField = document.querySelector('input[name="new_unit_profit_rm"]');
     const sellingPriceField = document.getElementById('selling_price_unit');
+
+    // Set conversion rate from database
+    const conversionRate = <?= $currentConversionRate ?>;
+    conversionRateInput.value = conversionRate.toFixed(4);
 
     const productCartonData = {};
     <?php foreach($products as $p): ?>
@@ -514,7 +500,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let selectedCartonData = null;
 
-    // 🔹 Auto-calculate Unit Price (YEN)
     function calculateUnitPriceYen() {
         const priceYen = parseFloat(priceYenInput.value) || 0;
         const moq = parseInt(moqInput.value) || 0;
@@ -523,7 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (moq > 0) {
             const amount1 = priceYen * moq;
-            const amount2 = amount1 + shippingMoq + additionalFee;  // Modified calculation
+            const amount2 = amount1 + shippingMoq + additionalFee;
             const unitPrice = amount2 / moq;
             unitPriceYenInput.value = unitPrice.toFixed(2);
         } else {
@@ -536,10 +521,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const moq = parseInt(moqInput.value) || 0;
         if (moq <= 0) return;
 
-        // 🔹 Calculate Unit Price (YEN) first
         calculateUnitPriceYen();
 
-        // Total CBM and weight
+        // Calculate total CBM and weight
         let totalCartons = Math.ceil(moq / Math.max(1, selectedCartonData.pcs_per_carton));
         let totalCBM = totalCartons * selectedCartonData.cbm_carton;
         let totalWeight = totalCartons * selectedCartonData.carton_weight;
@@ -556,21 +540,25 @@ document.addEventListener('DOMContentLoaded', () => {
         totalWeightField.value = totalWeight.toFixed(2);
         displayTotalCBMField.value = totalCBM.toFixed(6);
 
-        // Fetch CBM Rate
+        // Get freight rate from selected option
         const freightOption = freightSelect.selectedOptions[0];
         if (!freightOption) return;
-        let cbmRate = 0;
-        for (const key in freightOption.dataset) {
-            const val = parseFloat(freightOption.dataset[key]);
-            if (!isNaN(val) && val > 0) { cbmRate = val; break; }
-        }
-        displayCbmRateField.value = cbmRate.toFixed(4);
+        
+        const freightRate = parseFloat(freightOption.dataset.freightRate) || 0;
+        displayCbmRateField.value = freightRate.toFixed(4);
 
         const unitPriceYen = parseFloat(unitPriceYenInput.value) || 0;
-        const conversionRate = parseFloat(conversionRateInput.value) || 1;
         const sellingPrice = parseFloat(sellingPriceField.value) || 0;
 
-        const totalFreightCost = cbmRate * totalCBM;
+        // Determine if air freight based on shipping code
+        const shippingCode = freightOption.value.toLowerCase();
+        const isAirFreight = shippingCode.includes('air');
+
+        // Calculate freight cost based on method
+        const totalFreightCost = isAirFreight 
+            ? freightRate * totalWeight 
+            : freightRate * totalCBM;
+
         const totalSupplierPrice = unitPriceYen * moq / conversionRate;
         const totalPrice = totalFreightCost + totalSupplierPrice;
         const unitPriceRM = totalPrice / moq;
@@ -582,32 +570,30 @@ document.addEventListener('DOMContentLoaded', () => {
         unitProfitRMField.value = unitProfitRM.toFixed(2);
     }
 
-        productSelect.addEventListener('change', function() {
-            const pid = this.value;
-            selectedCartonData = productCartonData[pid] || null;
+    productSelect.addEventListener('change', function() {
+        const pid = this.value;
+        selectedCartonData = productCartonData[pid] || null;
 
-            // Clear previous calculation
-            totalCbmField.value = '';
-            totalWeightField.value = '';
-            unitPriceRMField.value = '';
-            unitFreightRMField.value = '';
-            unitProfitRMField.value = '';
-            displayCbmRateField.value = '';
-            displayTotalCBMField.value = '';
-            unitPriceYenInput.value = '';
+        // Clear previous calculations
+        totalCbmField.value = '';
+        totalWeightField.value = '';
+        unitPriceRMField.value = '';
+        unitFreightRMField.value = '';
+        unitProfitRMField.value = '';
+        displayCbmRateField.value = '';
+        displayTotalCBMField.value = '';
+        unitPriceYenInput.value = '';
 
-            // Trigger calculation immediately if MOQ is set
-            if ((parseInt(moqInput.value) || 0) > 0) {
-                calculateTotals();
-            }
-        });
+        if ((parseInt(moqInput.value) || 0) > 0) {
+            calculateTotals();
+        }
+    });
 
-
+    // Event listeners - removed conversion rate listener since it's readonly
     moqInput.addEventListener('input', calculateTotals);
     priceYenInput.addEventListener('input', calculateTotals);
     additionalFeeInput.addEventListener('input', calculateTotals);
-    unitPriceYenInput.addEventListener('input', calculateTotals);
-    conversionRateInput.addEventListener('input', calculateTotals);
+    document.querySelector('input[name="new_shipping_moq_yen"]').addEventListener('input', calculateTotals);
     freightSelect.addEventListener('change', calculateTotals);
     sellingPriceField.addEventListener('input', calculateTotals);
 });
@@ -674,10 +660,10 @@ if (moq <= 0) {
 
 
 
+</body>
 
 
-
-
+</html>
 </body>
 
 </html>
