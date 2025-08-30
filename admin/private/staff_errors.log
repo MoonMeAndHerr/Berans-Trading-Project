@@ -9,21 +9,3 @@
 [29-Jul-2025 06:15:27 Europe/Berlin] PHP Warning:  Undefined array key "company_id" in C:\xampp\htdocs\beranstrading\admin\private\staff-add-backend.php on line 57
 [29-Jul-2025 06:15:30 Europe/Berlin] PHP Warning:  Undefined array key "company_id" in C:\xampp\htdocs\beranstrading\admin\private\staff-add-backend.php on line 57
 [29-Jul-2025 06:15:30 Europe/Berlin] PHP Warning:  Undefined array key "company_id" in C:\xampp\htdocs\beranstrading\admin\private\staff-add-backend.php on line 57
-[29-Jul-2025 11:14:24 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 131
-[29-Jul-2025 11:14:24 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 131
-[29-Jul-2025 11:14:24 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 131
-[29-Jul-2025 11:14:24 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 132
-[29-Jul-2025 11:14:24 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 132
-[29-Jul-2025 11:14:24 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 132
-[29-Jul-2025 11:14:24 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 131
-[29-Jul-2025 11:14:24 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 131
-[29-Jul-2025 11:14:24 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 131
-[29-Jul-2025 11:14:24 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 132
-[29-Jul-2025 11:14:24 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 132
-[29-Jul-2025 11:14:24 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 132
-[29-Jul-2025 11:14:24 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 131
-[29-Jul-2025 11:14:24 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 131
-[29-Jul-2025 11:14:24 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 131
-[29-Jul-2025 11:14:24 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 132
-[29-Jul-2025 11:14:24 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 132
-[29-Jul-2025 11:14:24 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Berans-Trading-Project\admin\public\all-product.php on line 132
