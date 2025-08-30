@@ -420,11 +420,12 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     // Initialize Choices.js on all selects
-    const sectionChoices = new Choices('#section', { searchEnabled: true });
-    const categoryChoices = new Choices('#category', { searchEnabled: true });
-    const subcategoryChoices = new Choices('#subcategory', { searchEnabled: true });
-    const materialChoices = new Choices('#material', { searchEnabled: true });
-    const productTypeChoices = new Choices('#product_type', { searchEnabled: true });
+    const sectionChoices = new Choices('#section', { searchEnabled: true, searchPlaceholderValue: 'Search for section...', placeholder: true, placeholderValue: 'Choose Section...' });
+    const categoryChoices = new Choices('#category', { searchEnabled: true, searchPlaceholderValue: 'Search for category...', placeholder: true, placeholderValue: 'Choose Category...' });
+    const subcategoryChoices = new Choices('#subcategory', { searchEnabled: true, searchPlaceholderValue: 'Search for subcategory...', placeholder: true, placeholderValue: 'Choose Subcategory...' });
+    const materialChoices = new Choices('#material', { searchEnabled: true, searchPlaceholderValue: 'Search for material...', placeholder: true, placeholderValue: 'Choose Material...' });
+    const productTypeChoices = new Choices('#product_type', { searchEnabled: true, searchPlaceholderValue: 'Search for product type...', placeholder: true, placeholderValue: 'Choose Product Type...' });
+    const supplierChoices = new Choices('#supplier', { searchEnabled: true, searchPlaceholderValue: 'Search for supplier...', placeholder: true, placeholderValue: 'Choose Supplier...' });
 
     function fetchOptions(type, parent_id, targetChoices) {
         fetch(`forms-product-add-new.php?ajax=1&type=${type}&parent_id=${parent_id}`)

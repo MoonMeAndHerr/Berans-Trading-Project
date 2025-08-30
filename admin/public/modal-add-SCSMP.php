@@ -28,24 +28,32 @@
             <?php $values = $_SESSION['modal_values'] ?? []; ?>
             
             <!-- Nav Tabs -->
-            <ul class="nav nav-tabs px-4" id="scsmpTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="add-tab" data-bs-toggle="tab" data-bs-target="#addTabContent" type="button" role="tab">Add</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="update-tab" data-bs-toggle="tab" data-bs-target="#updateTabContent" type="button" role="tab">Update</button>
-                </li>
-                <!-- Add Delete Tab -->
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="delete-tab" data-bs-toggle="tab" data-bs-target="#deleteTabContent" type="button" role="tab">Delete</button>
-                </li>
-            </ul>
+            <div class="card">
+    <div class="card-body">
+        <!-- Nav tabs -->
+        <ul class="nav nav-pills animation-nav nav-justified gap-2 mb-3" role="tablist">
+            <li class="nav-item waves-effect waves-light">
+                <a class="nav-link active" data-bs-toggle="tab" href="#addTabContent" role="tab">
+                    Add
+                </a>
+            </li>
+            <li class="nav-item waves-effect waves-light">
+                <a class="nav-link" data-bs-toggle="tab" href="#updateTabContent" role="tab">
+                    Update
+                </a>
+            </li>
+            <li class="nav-item waves-effect waves-light">
+                <a class="nav-link" data-bs-toggle="tab" href="#deleteTabContent" role="tab">
+                    Delete
+                </a>
+            </li>
+        </ul>
 
-            <div class="tab-content px-4 py-3">
-
-                <!-- ADD TAB -->
-                <div class="tab-pane fade show active" id="addTabContent" role="tabpanel">
-                    <form action="../private/modal-add-SCSMP-backend.php" method="POST">
+        <!-- Tab Content -->
+        <div class="tab-content text-muted">
+            <!-- Add Tab Content -->
+            <div class="tab-pane active" id="addTabContent" role="tabpanel">
+                <form action="../private/modal-add-SCSMP-backend.php" method="POST">
 
                 <!-- Section -->
                 <h6 class="fw-bold mb-2">Add Section</h6>
@@ -154,9 +162,7 @@
 
 <!-- DELETE TAB -->
 <div class="tab-pane fade" id="deleteTabContent" role="tabpanel">
-    <form action="../private/modal-add-SCSMP-backend.php" method="POST" 
-          onsubmit="return confirmDeletion();">
-
+    <form method="POST" id="deleteForm">
         <!-- Top-level selector: choose delete type -->
         <h6 class="fw-bold mb-2">Choose Level to Delete</h6>
         <select class="form-select mb-3" id="delete_level">
@@ -215,7 +221,25 @@
 
         <button type="submit" class="btn btn-danger w-100">Delete</button>
     </form>
-</div>
+
+    <!-- Warning Message for Pending Delete -->
+    <?php if (isset($_SESSION['modal_warning'])): ?>
+        <div class="alert alert-warning" role="alert">
+            <pre class="mb-2"><?= htmlspecialchars($_SESSION['modal_warning']) ?></pre>
+            <form method="POST">
+                <?php foreach ($_SESSION['pending_delete'] as $key => $value): ?>
+                    <input type="hidden" name="<?= htmlspecialchars($key) ?>" value="<?= htmlspecialchars($value) ?>">
+                <?php endforeach; ?>
+                <input type="hidden" name="confirm_delete" value="1">
+                <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </form>
+        </div>
+        <?php 
+        unset($_SESSION['modal_warning']);
+        unset($_SESSION['pending_delete']);
+        ?>
+    <?php endif; ?>
                 
             </div>
 
@@ -280,7 +304,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     targetSelect.appendChild(opt);
                 });
             })
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error('Error fetching options:', err);
+            });
     }
 
     // --- TAB HANDLERS ---
@@ -345,47 +371,93 @@ document.addEventListener('DOMContentLoaded', function () {
     setupCascade(deleteMaterial, deleteProductType, null, 'product_type');
 
     // --- DELETE CONFIRMATION ---
-    const deleteForm = document.querySelector('#deleteTabContent form');
-    if(deleteForm){
-        deleteForm.addEventListener('submit', function(e){
+    const deleteForm = document.querySelector('#deleteForm');
+    if(deleteForm) {
+        deleteForm.addEventListener('submit', function(e) {
             e.preventDefault();
-
+            
             const level = deleteLevel.value;
             let selectedText = '';
-            let warning = '';
-
-            switch(level){
+            let selectedId = '';
+            
+            switch(level) {
                 case 'section': 
-                    selectedText = deleteSection.options[deleteSection.selectedIndex]?.text; 
-                    warning = 'This will delete everything under this Section!'; 
+                    selectedText = deleteSection.options[deleteSection.selectedIndex]?.text;
+                    selectedId = deleteSection.value;
                     break;
                 case 'category': 
-                    selectedText = deleteCategory.options[deleteCategory.selectedIndex]?.text; 
-                    warning = 'This will delete everything under this Category!'; 
+                    selectedText = deleteCategory.options[deleteCategory.selectedIndex]?.text;
+                    selectedId = deleteCategory.value;
                     break;
                 case 'subcategory': 
-                    selectedText = deleteSubcategory.options[deleteSubcategory.selectedIndex]?.text; 
-                    warning = 'This will delete everything under this Subcategory!'; 
+                    selectedText = deleteSubcategory.options[deleteSubcategory.selectedIndex]?.text;
+                    selectedId = deleteSubcategory.value;
                     break;
                 case 'material': 
-                    selectedText = deleteMaterial.options[deleteMaterial.selectedIndex]?.text; 
-                    warning = 'This will delete all Product Types under this Material!'; 
+                    selectedText = deleteMaterial.options[deleteMaterial.selectedIndex]?.text;
+                    selectedId = deleteMaterial.value;
                     break;
                 case 'product_type': 
-                    selectedText = deleteProductType.options[deleteProductType.selectedIndex]?.text; 
-                    warning = ''; 
+                    selectedText = deleteProductType.options[deleteProductType.selectedIndex]?.text;
+                    selectedId = deleteProductType.value;
                     break;
             }
 
-            if(!selectedText){
-                alert('Please select a value to delete!');
-                return false;
+            if(!selectedId || !selectedText) {
+                alert('Please select an item to delete!');
+                return;
             }
 
-            const confirmed = confirm(`Are you sure you want to delete the ${level.replace('_',' ')}: "${selectedText}"?\n${warning}`);
-            if(confirmed){
-                deleteForm.submit();
-            }
+            const formData = new FormData();
+            formData.append('delete_level', level);
+            formData.append(`delete_${level}_id`, selectedId);
+            
+            fetch('../private/modal-add-SCSMP-backend.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.warning) {
+                    if(confirm(`${data.message}\n\nAre you sure you want to delete this item?`)) {
+                        formData.append('confirm_delete', '1');
+                        return fetch('../private/modal-add-SCSMP-backend.php', {
+                            method: 'POST',
+                            body: formData
+                        });
+                    }
+                }
+                return Promise.reject('Cancelled');
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    alert('Successfully deleted!');
+                    window.location.reload();
+                } else {
+                    throw new Error(data.error || 'Delete failed');
+                }
+            })
+            .catch(error => {
+                if(error !== 'Cancelled') {
+                    console.error('Delete error:', error);
+                    alert('An error occurred during deletion: ' + error.message);
+                }
+            });
+        });
+    }
+
+    // --- Handle modal cleanup ---
+    const modal = document.getElementById('addSCSMPModal');
+    if(modal) {
+        modal.addEventListener('hidden.bs.modal', function () {
+            // Clear any alerts
+            const alerts = modal.querySelectorAll('.alert');
+            alerts.forEach(alert => alert.remove());
+            
+            // Reset forms
+            const forms = modal.querySelectorAll('form');
+            forms.forEach(form => form.reset());
         });
     }
 
@@ -397,13 +469,16 @@ document.addEventListener('DOMContentLoaded', function () {
 <!-- Reopen modal after redirect -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.hash === "#addSCSMPModal") {
+    // Check if modal should be reopened
+    <?php if(isset($_SESSION['reopen_modal'])): ?>
         let modalEl = document.getElementById('addSCSMPModal');
         if (modalEl) {
             let modal = new bootstrap.Modal(modalEl);
             modal.show();
         }
-    }
+        <?php unset($_SESSION['reopen_modal']); ?>
+    <?php endif; ?>
+    
     <?php unset($_SESSION['modal_values']); // clear after use ?>
 });
 </script>

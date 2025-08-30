@@ -4,21 +4,21 @@
             <div class="d-flex">
                 <!-- LOGO -->
                 <div class="navbar-brand-box horizontal-logo">
-                    <a href="index.html" class="logo logo-dark">
+                    <a href="dashboard-projects.php" class="logo logo-dark">
                         <span class="logo-sm">
-                            <img src="assets/images/logo-sm.png" alt="" height="22">
+                            <img src="/beranstrading/assets/images/beranslogodark.png" alt="Berans Logo" height="50" style="margin: 10px 10px;">
                         </span>
                         <span class="logo-lg">
-                            <img src="assets/images/logo-dark.png" alt="" height="17">
+                            <img src="/beranstrading/assets/images/beranslogodark.png" alt="Berans Logo" height="60" style="margin: 10px 10px;">
                         </span>
                     </a>
 
-                    <a href="index.html" class="logo logo-light">
+                    <a href="dashboard-projects.php" class="logo logo-light">
                         <span class="logo-sm">
-                            <img src="assets/images/logo-sm.png" alt="" height="22">
+                            <img src="/beranstrading/assets/images/beranslogo.png" alt="Berans Logo" height="50" style="margin: 10px 10px;">
                         </span>
                         <span class="logo-lg">
-                            <img src="assets/images/logo-light.png" alt="" height="17">
+                            <img src="/beranstrading/assets/images/beranslogo.png" alt="Berans Logo" height="60" style="margin: 10px 10px;">
                         </span>
                     </a>
                 </div>
