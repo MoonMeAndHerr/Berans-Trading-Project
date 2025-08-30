@@ -1,4 +1,5 @@
 <?php
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -10,6 +11,15 @@ $pdo = openDB();
 
 $successMessage = '';
 $errorMessage = '';
+
+// Get current conversion rate from database
+$conversionRateStmt = $pdo->query("SELECT new_conversion_rate FROM price WHERE new_conversion_rate IS NOT NULL AND new_conversion_rate > 0 ORDER BY price_id DESC LIMIT 1");
+$currentConversionRate = $conversionRateStmt->fetchColumn();
+
+// If no conversion rate found, set a default
+if (!$currentConversionRate) {
+    $currentConversionRate = 1.0000; // Default value
+}
 
 // Insert or update product pricing
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -30,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':new_moq_quantity' => $_POST['new_moq_quantity'] ?? null,
             ':new_shipping_moq_yen' => $_POST['new_shipping_moq_yen'] ?? null,
             ':new_additional_price_moq_yen' => $_POST['new_additional_price_moq_yen'] ?? null,
-            ':new_conversion_rate' => $_POST['new_conversion_rate'] ?? null,
+            ':new_conversion_rate' => $currentConversionRate, // Use database value
             ':new_unit_price_yen' => $_POST['new_unit_price_yen'] ?? null,
             ':new_freight_method' => $_POST['new_freight_method'] ?? null,
             ':new_total_cbm_moq' => $_POST['new_total_cbm_moq'] ?? null,
@@ -38,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':new_unit_price_rm' => $_POST['new_unit_price_rm'] ?? null,
             ':new_unit_freight_cost_rm' => $_POST['new_unit_freight_cost_rm'] ?? null,
             ':new_unit_profit_rm' => $_POST['new_unit_profit_rm'] ?? null,
+            ':new_selling_price' => $_POST['selling_price_unit'] ?? null,
         ];
 
         if ($existing) {
@@ -54,7 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     new_total_weight_moq = :new_total_weight_moq,
                     new_unit_price_rm = :new_unit_price_rm,
                     new_unit_freight_cost_rm = :new_unit_freight_cost_rm,
-                    new_unit_profit_rm = :new_unit_profit_rm
+                    new_unit_profit_rm = :new_unit_profit_rm,
+                    new_selling_price = :new_selling_price
                 WHERE price_id = :price_id
             ");
             $data[':price_id'] = $existing['price_id'];
@@ -67,12 +79,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     product_id, supplier_id,
                     new_price_yen, new_moq_quantity, new_shipping_moq_yen, new_additional_price_moq_yen,
                     new_conversion_rate, new_unit_price_yen, new_freight_method, new_total_cbm_moq,
-                    new_total_weight_moq, new_unit_price_rm, new_unit_freight_cost_rm, new_unit_profit_rm
+                    new_total_weight_moq, new_unit_price_rm, new_unit_freight_cost_rm, new_unit_profit_rm,
+                    new_selling_price
                 ) VALUES (
                     :product_id, :supplier_id,
                     :new_price_yen, :new_moq_quantity, :new_shipping_moq_yen, :new_additional_price_moq_yen,
                     :new_conversion_rate, :new_unit_price_yen, :new_freight_method, :new_total_cbm_moq,
-                    :new_total_weight_moq, :new_unit_price_rm, :new_unit_freight_cost_rm, :new_unit_profit_rm
+                    :new_total_weight_moq, :new_unit_price_rm, :new_unit_freight_cost_rm, :new_unit_profit_rm,
+                    :new_selling_price
                 )
             ");
             $data[':product_id'] = $product_id;
@@ -89,8 +103,8 @@ $sections = $pdo->query("SELECT * FROM section")->fetchAll(PDO::FETCH_ASSOC);
 $categories = $pdo->query("SELECT * FROM category")->fetchAll(PDO::FETCH_ASSOC);
 $subcategories = $pdo->query("SELECT * FROM subcategory")->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch shipping methods
-$shipping_methods = $pdo->query("SELECT * FROM price_shipping")->fetchAll(PDO::FETCH_ASSOC);
+// Fetch shipping methods - Updated to use simplified structure
+$shipping_methods = $pdo->query("SELECT shipping_price_id, shipping_code, shipping_name, freight_rate FROM price_shipping WHERE freight_rate > 0")->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch products with latest supplier + carton info
 $products = $pdo->query("
