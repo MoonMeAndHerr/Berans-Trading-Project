@@ -1,31 +1,17 @@
 <?php
-    require_once __DIR__ . '/../../global/main_configuration.php';
-    require_once __DIR__ . '/../private/auth_check.php';
+
+    
     include __DIR__ . '/../private/forms-new-order-backend.php';
+    include __DIR__ . '/../include/header.php';
+
 ?>
 
-<!doctype html>
-<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg">
-    <head>
-        <meta charset="utf-8" />
-        <title>Berans Trading</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-        <meta content="Themesbrand" name="author" />
-        
-        <!-- Stylesheets -->
-        <link rel="shortcut icon" href="assets/images/favicon.ico">
-        <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-        <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-        <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
-        <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
-        <link href="assets/libs/choices.js/public/assets/styles/choices.min.css" rel="stylesheet" type="text/css" />
-        
+
         <!-- Scripts -->
         <script src="assets/js/layout.js"></script>
         <script src="assets/libs/choices.js/public/assets/scripts/choices.min.js"></script>
-
         <!-- Add this CSS in the head section after your existing stylesheets -->
+
         <style>
         .select-wrapper {
             position: relative;
@@ -41,15 +27,6 @@
             position: relative;
         }
         </style>
-    </head>
-
-    <body>
-        <!-- Layout Wrapper -->
-        <div id="layout-wrapper">
-            <?php 
-                include __DIR__ . '/../include/header.php';
-                include __DIR__ . '/../include/sidebar.php'; 
-            ?>
 
             <!-- Main Content -->
             <div class="main-content">

@@ -1,49 +1,8 @@
 <?php
 
-require_once __DIR__ . '/../../global/main_configuration.php';
-require_once __DIR__ . '/../private/auth_check.php';
 include __DIR__ . '/../private/table-product-list-backend.php';
+include __DIR__ . '/../include/header.php';
 ?>
-
-<!doctype html>
-<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg">
-
-<head>
-    <meta charset="utf-8" />
-    <title>Product List - Berans Trading</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-    <meta content="Themesbrand" name="author" />
-    <!-- App favicon -->
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
-
-    <!-- Layout config Js -->
-    <script src="assets/js/layout.js"></script>
-    <!-- Bootstrap Css -->
-    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <!-- Icons Css -->
-    <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-    <!-- App Css-->
-    <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
-    <!-- custom Css-->
-    <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
-    
-    <!-- DataTables CSS -->
-    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <!-- jQuery FIRST -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-
-<body>
-    <!-- Begin page -->
-    <div id="layout-wrapper">
-        <?php 
-        include __DIR__ . '/../include/header.php';
-        include __DIR__ . '/../include/sidebar.php'; 
-        ?>
 
         <!-- ============================================================== -->
         <!-- Start right Content here -->
@@ -151,7 +110,7 @@ include __DIR__ . '/../private/table-product-list-backend.php';
                     <h5 class="modal-title" id="updateProductModalLabel">Update Product & Carton Info</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" id="updateProductForm">
+                <form method="POST" id="updateProductForm" enctype="multipart/form-data">
                     <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                         <div class="row g-3">
                             <!-- Product Hierarchy Selection - READONLY -->
@@ -211,6 +170,11 @@ include __DIR__ . '/../private/table-product-list-backend.php';
                                         <input type="number" class="form-control" name="production_lead_time" id="update_production_lead_time" placeholder="Enter Lead Time (Days)" required>
                                         <label>Production Lead Time (Days)</label>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                    <label>Product Image</label>
+                                    <input type="file" class="form-control" name="product_image">
                                 </div>
                             </div>
 
@@ -474,6 +438,11 @@ include __DIR__ . '/../private/table-product-list-backend.php';
     <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="assets/js/plugins.js"></script>
     <script src="assets/libs/prismjs/prism.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- jQuery FIRST -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     <!-- DataTables JS - After jQuery -->
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>

@@ -49,6 +49,20 @@ if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
         $size1 = !empty($_POST['size_1']) && !empty($_POST['metric_1']) ? $_POST['size_1'].' '.$_POST['metric_1'] : null;
         $size2 = !empty($_POST['size_2']) && !empty($_POST['metric_2']) ? $_POST['size_2'].' '.$_POST['metric_2'] : null;
         $size3 = !empty($_POST['size_3']) && !empty($_POST['metric_3']) ? $_POST['size_3'].' '.$_POST['metric_3'] : null;
+
+        if (!empty($_FILES['product_image']['name'])) {
+
+            $ext = pathinfo($_FILES['product_image']['name'], PATHINFO_EXTENSION);
+            $product_image = 'product_' . time() . '.' . $ext;
+            move_uploaded_file($_FILES['product_image']['tmp_name'], $uploadDir . $logo_name);
+
+            $pdo = openDB();
+            $stmt = $pdo->prepare("UPDATE product SET image_url = :product_image WHERE product_id = :product_id");
+            $stmt->bindParam(':product_image', $logo_name);
+            $stmt->bindParam(':product_id', $product_id);
+            $stmt->execute();
+
+        }
         
         $updateStmt = $pdo->prepare("
             UPDATE product SET

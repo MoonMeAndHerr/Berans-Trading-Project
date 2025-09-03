@@ -6,10 +6,10 @@
     <head>
         
         <meta charset="utf-8" />
-        <title>Sign In | BeransTrading </title>
+        <title><?php echo WEB_NAME; ?> | <?php echo WEB_TAGLINE; ?></title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-        <meta content="Themesbrand" name="author" />
+        <meta content="<?php echo WEB_TAGLINE; ?>" name="description" />
+        <meta content="Berans" name="author" />
         <!-- App favicon -->
         <link rel="shortcut icon" href="assets/images/favicon.ico">
 

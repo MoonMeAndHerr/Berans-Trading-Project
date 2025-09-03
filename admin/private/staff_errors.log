@@ -9,3 +9,191 @@
 [29-Jul-2025 06:15:27 Europe/Berlin] PHP Warning:  Undefined array key "company_id" in C:\xampp\htdocs\beranstrading\admin\private\staff-add-backend.php on line 57
 [29-Jul-2025 06:15:30 Europe/Berlin] PHP Warning:  Undefined array key "company_id" in C:\xampp\htdocs\beranstrading\admin\private\staff-add-backend.php on line 57
 [29-Jul-2025 06:15:30 Europe/Berlin] PHP Warning:  Undefined array key "company_id" in C:\xampp\htdocs\beranstrading\admin\private\staff-add-backend.php on line 57
+[03-Sep-2025 08:50:20 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 08:50:20 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 08:50:25 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 08:50:25 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 08:51:00 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 08:51:00 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 08:15:17 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 08:15:17 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 08:16:14 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 08:16:14 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 08:16:42 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 08:16:42 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 09:30:16 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 09:30:16 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:29:45 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:29:45 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:29:45 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 36
+[03-Sep-2025 10:29:45 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 36
+[03-Sep-2025 10:29:45 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 36
+[03-Sep-2025 10:46:49 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:46:49 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:46:51 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:46:51 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:46:52 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:46:52 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:49:59 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:49:59 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:55:41 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:55:41 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:56:46 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:56:46 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:56:46 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:56:46 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:13:07 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:13:07 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:14:07 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:14:07 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:16:14 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:16:14 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Undefined array key "error" in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:14 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:14 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Undefined array key "error" in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:14 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:14 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Undefined array key "error" in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:14 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:14 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Undefined array key "error" in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:14 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:14 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Undefined array key "error" in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:14 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:14 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:14 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:16:26 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:16:26 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:26 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:26 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:26 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:26 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:26 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:26 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:16:27 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:16:27 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:27 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:27 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:27 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:27 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 79
+[03-Sep-2025 11:16:27 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:27 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:16:39 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:16:39 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:16:39 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:17:16 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 81
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 82
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Undefined variable $staff in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 11:17:16 UTC] PHP Warning:  Trying to access array offset on null in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 11:17:16 UTC] PHP Deprecated:  urlencode(): Passing null to parameter #1 ($string) of type string is deprecated in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\database-backup.php on line 83
+[03-Sep-2025 10:27:02 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:27:02 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:27:14 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:27:14 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:28:32 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:28:32 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:28:40 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:28:40 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:32:29 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:32:29 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:32:37 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:32:37 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:35:36 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:35:36 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:35:39 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 10:35:39 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist

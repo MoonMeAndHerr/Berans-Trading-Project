@@ -49,16 +49,26 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     try{
         $pdo->beginTransaction();
 
+        $uploadDir = '../../media/';
+
         // --- Handle sizes ---
         $size1 = !empty($_POST['size_1']) && !empty($_POST['metric_1']) ? $_POST['size_1'].' '.$_POST['metric_1'] : null;
         $size2 = !empty($_POST['size_2']) && !empty($_POST['metric_2']) ? $_POST['size_2'].' '.$_POST['metric_2'] : null;
         $size3 = !empty($_POST['size_3']) && !empty($_POST['metric_3']) ? $_POST['size_3'].' '.$_POST['metric_3'] : null;
 
+        if (!empty($_FILES['image']['name'])) {
+
+            $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $logo_name = 'product_' . time() . '.' . $ext;
+            move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $logo_name);
+
+        }
+
         // --- Insert Product ---
         $stmt = $pdo->prepare("INSERT INTO Product 
             (section_id, category_id, subcategory_id, material_id, product_type_id, variant, description, production_lead_time,
-            size_1, size_2, size_3, product_code)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
+            image_url,size_1, size_2, size_3, product_code)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
         $stmt->execute([
             $_POST['section'],
@@ -69,6 +79,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $_POST['variant'] ?? null,
             $_POST['description'] ?? null,
             $_POST['production_lead_time'] ?? null,
+            $logo_name ?? null,
             $size1,
             $size2,
             $size3,

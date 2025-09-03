@@ -45,8 +45,8 @@ function closeDB(&$pdo) {
 
 $pdo = openDB();
 
-$sql = "SELECT `company_name`, `company_logo`, `company_tagline`, `bank_name`, `bank_account_name`, `bank_account_number`, `address`, `contact` 
-FROM `company` 
+$sql = "SELECT *
+FROM `site_config` 
 WHERE `company_id` = 1";
 $stmt = $pdo->query($sql);
 
@@ -60,6 +60,9 @@ while ($row = $stmt->fetch()) {
     $bank_account_number = $row['bank_account_number'];
     $address = $row['address'];
     $contact = $row['contact'];
+    $logo_light = $row['logo_light'];
+    $logo_dark = $row['logo_dark'];
+    $favicon = $row['favicon'];
 
 }
 

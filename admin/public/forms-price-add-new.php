@@ -1,51 +1,8 @@
 <?php
+include __DIR__ . '/../private/forms-price-add-new-backend.php';
+include __DIR__ . '/../include/header.php';
 
-require_once __DIR__ . '/../../global/main_configuration.php';
-require_once __DIR__ . '/../private/auth_check.php';
 ?>
-
-<!doctype html>
-<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg">
-
-<head>
-
-    <meta charset="utf-8" />
-    <title>Berans Trading</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-    <meta content="Themesbrand" name="author" />
-    <!-- App favicon -->
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
-
-    <!-- Layout config Js -->
-    <script src="assets/js/layout.js"></script>
-    <!-- Bootstrap Css -->
-    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <!-- Icons Css -->
-    <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-    <!-- App Css-->
-    <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
-    <!-- custom Css-->
-    <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
-
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-    <link href="assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
-    <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
-
-</head>
-<?php include __DIR__ . '/../private/forms-price-add-new-backend.php';?>
-
-<body>
-
-    <!-- Begin page -->
-    <div id="layout-wrapper">
-        <?php 
-        include __DIR__ . '/../include/header.php';
-        include __DIR__ . '/../include/sidebar.php'; 
-        ?>
 
         <!-- ============================================================== -->
         <!-- Start right Content here -->
@@ -346,6 +303,9 @@ require_once __DIR__ . '/../private/auth_check.php';
     <script src="assets/libs/feather-icons/feather.min.js"></script>
     <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="assets/js/plugins.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
 
     <!-- prismjs plugin -->
     <script src="assets/libs/prismjs/prism.js"></script>

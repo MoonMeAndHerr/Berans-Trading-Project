@@ -15,6 +15,8 @@ unset($_SESSION['success']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+    $uploadDir = '../../media/';
+
     $company_name = trim($_POST['company_name'] ?? '');
     $company_tagline = trim($_POST['company_tagline'] ?? '');
     $bank_name = trim($_POST['bank_name'] ?? '');
@@ -22,6 +24,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = trim($_POST['address'] ?? '');
     $contact = trim($_POST['contact'] ?? '');
     $email = trim($_POST['email'] ?? '');
+
+    if (!empty($_FILES['logolight']['name'])) {
+        $ext = pathinfo($_FILES['logolight']['name'], PATHINFO_EXTENSION);
+        $logo_name = 'logolight_' . time() . '.' . $ext;
+        move_uploaded_file($_FILES['logolight']['tmp_name'], $uploadDir . $logo_name);
+
+        $pdo = openDB();
+        $stmt = $pdo->prepare("UPDATE site_config SET logo_light = :logoname WHERE company_id = '1'");
+        $stmt->bindParam(':logoname', $logo_name);
+        $stmt->execute();
+
+    }
+
+    if (!empty($_FILES['logodark']['name'])) {
+        $ext = pathinfo($_FILES['logodark']['name'], PATHINFO_EXTENSION);
+        $logo_name = 'logodark_' . time() . '.' . $ext;
+        move_uploaded_file($_FILES['logodark']['tmp_name'], $uploadDir . $logo_name);
+
+        $pdo = openDB();
+        $stmt = $pdo->prepare("UPDATE site_config SET logo_dark = :logoname WHERE company_id = '1'");
+        $stmt->bindParam(':logoname', $logo_name);
+        $stmt->execute();
+
+    }
+
+    if (!empty($_FILES['icon']['name'])) {
+        $ext = pathinfo($_FILES['icon']['name'], PATHINFO_EXTENSION);
+        $favicon_name = 'favicon_' . time() . '.' . $ext;
+        move_uploaded_file($_FILES['icon']['tmp_name'], $uploadDir . $favicon_name);
+
+        $pdo = openDB();
+        $stmt = $pdo->prepare("UPDATE site_config SET favicon = :faviconname WHERE company_id = '1'");
+        $stmt->bindParam(':faviconname', $favicon_name);
+        $stmt->execute();
+
+    }
 
     // Basic validation
     if (empty($company_name)) $errors[] = "Company name is required.";
@@ -40,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         try {
             $stmt = $pdo->prepare("
-                UPDATE company SET 
+                UPDATE site_config SET 
                     company_name = :company_name,
                     company_tagline = :company_tagline,
                     bank_name = :bank_name,

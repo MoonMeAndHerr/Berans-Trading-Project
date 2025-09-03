@@ -2,48 +2,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
-<!doctype html>
-<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg">
-
-<head>
-
-    <meta charset="utf-8" />
-    <title>Berans Trading</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-    <meta content="Themesbrand" name="author" />
-
-        <!-- App favicon -->
-        <link rel="shortcut icon" href="assets/images/favicon.ico">
-
-        <!-- dropzone css -->
-        <link rel="stylesheet" href="assets/libs/dropzone/dropzone.css" type="text/css" />
-
-        <!-- Filepond css -->
-        <link rel="stylesheet" href="assets/libs/filepond/filepond.min.css" type="text/css" />
-        <link rel="stylesheet" href="assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.css">
-
-        <!-- Layout config Js -->
-        <script src="assets/js/layout.js"></script>
-        <!-- Bootstrap Css -->
-        <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-        <!-- Icons Css -->
-        <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-        <!-- App Css-->
-        <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
-        <!-- custom Css-->
-        <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
-
-
-</head>
-
-<body>
-
-    <!-- Begin page -->
-    <div id="layout-wrapper">
         <?php 
-        include __DIR__ . '/../include/header.php';
-        include __DIR__ . '/../include/sidebar.php'; 
+            include __DIR__ . '/../include/header.php'; 
         ?>
 
         <!-- ============================================================== -->
@@ -55,12 +15,12 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0">Site Identity</h4>
+                                    <h4 class="mb-sm-0">Site Config</h4>
 
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Home</a></li>
-                                            <li class="breadcrumb-item active">Site Identity</li>
+                                            <li class="breadcrumb-item active">Site Config</li>
                                         </ol>
                                     </div>
 
@@ -76,7 +36,7 @@
                     <div class="col-lg-12">
                         <div class="card mt-2 shadow">
                             <div class="card-header align-items-center d-flex">
-                                <h4 class="card-title mb-0 flex-grow-1">Site Identity</h4>
+                                <h4 class="card-title mb-0 flex-grow-1">Site Config</h4>
                             </div><!-- end card header -->
                             <div class="card-body">
                                 <div class="live-preview">
@@ -100,13 +60,13 @@
                                     <?php endif; ?>
 
                                     
-                                    <form action="" method="post">
+                                    <form action="" method="post" enctype="multipart/form-data">
                                         <div class="row g-3">
 
                                         <?php
 
                                             $pdo = openDB();
-                                            $stmt = $pdo->query("SELECT * FROM company WHERE company_id = 1 LIMIT 1");
+                                            $stmt = $pdo->query("SELECT * FROM site_config WHERE company_id = 1 LIMIT 1");
                                             $site_identity = $stmt->fetch(PDO::FETCH_ASSOC);
 
                                         ?>
@@ -158,6 +118,22 @@
                                                     <label for="email">Company Email</label>
                                                 </div>
                                             </div>
+
+                                            <div class="col-lg-12">
+                                                <label for="logolight">Logo Light</label>
+                                                <input type="file" class="form-control" id="logolight" name="logolight" >
+                                            </div>
+
+                                            <div class="col-lg-12">
+                                                <label for="logodark">Logo Dark</label>
+                                                <input type="file" class="form-control" id="logodark" name="logodark"  >
+                                            </div>
+
+                                            <div class="col-lg-12">
+                                                <label for="icon">Favicon</label>
+                                                <input type="file" class="form-control" id="icon" name="icon"  >
+                                            </div>
+
                                             <!-- Submit -->
                                             <div class="col-lg-12">
                                                 <div class="text-end">
@@ -166,20 +142,16 @@
                                             </div>
                                         </div>
                                     </form>
+                                    <form>
+                                    
+                                    </form>
                                     
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-
-
-
-
-
-
-
+                
                     </div> <!-- container-fluid -->           
                 </div><!-- End Page-content -->
             <?php include __DIR__ . '/../include/footer.php';?>
