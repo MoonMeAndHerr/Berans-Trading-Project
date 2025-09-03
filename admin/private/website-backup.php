@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once __DIR__ . '/../../global/main_configuration.php';
 
 function backupSourceCode($rootPath, $triggeredBy) {
@@ -45,7 +46,8 @@ function backupSourceCode($rootPath, $triggeredBy) {
     $stmt->bindParam(1, $zipData, PDO::PARAM_LOB);
     $stmt->execute();
 
-    echo "✅ Website backup saved to database.";
+    $_SESSION['result'] = "Website backup created successfully.";
+    header("Location: ../public/website-backup.php");
 }
 
-backupSourceCode("C:\laragon\www\Work Related\Berans-Trading-Project");
+

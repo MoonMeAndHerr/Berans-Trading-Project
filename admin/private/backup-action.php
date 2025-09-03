@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../../global/main_configuration.php';
 
 $db = openDB();
@@ -41,9 +42,10 @@ case "rollback":
 
             $db->exec("SET FOREIGN_KEY_CHECKS=1");
 
-            echo "✅ Database rollback successful. (Force logout users here)";
+            header("Location: ../public/logout.php");
         } catch (Exception $e) {
-            echo "❌ Database rollback failed: " . $e->getMessage();
+            $_SESSION['result'] = "❌ Database rollback failed: " . $e->getMessage();
+            header("Location: ../public/database-backup.php");
         }
 
     } elseif ($backup['backup_type'] === 'website') {
@@ -64,9 +66,10 @@ case "rollback":
 
             unlink($tmpZip);
 
-            echo "✅ Website rollback successful.";
+            header("Location: ../public/logout.php");
         } catch (Exception $e) {
-            echo "❌ Website rollback failed: " . $e->getMessage();
+            $_SESSION['result'] = "❌ Website rollback failed: " . $e->getMessage();
+            header("Location: ../public/website-backup.php");
         }
     }
     break;
@@ -89,9 +92,11 @@ case "download":
     case "delete":
         $stmt = $db->prepare("DELETE FROM backup_history WHERE id = ?");
         $stmt->execute([$id]);
-        echo "✅ Backup deleted successfully.";
+        $_SESSION['result'] = "✅ Backup deleted successfully.";
+        header("Location: ../public/website-backup.php");
         break;
 
     default:
-        echo "Invalid action.";
+        $_SESSION['result'] = "❌ Invalid action.";
+        header("Location: ../public/website-backup.php");
 }

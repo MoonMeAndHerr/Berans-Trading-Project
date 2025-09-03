@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../global/main_configuration.php';
 require 'vendor/autoload.php';
 
 use League\OAuth2\Client\Provider\GenericProvider;
@@ -40,9 +41,18 @@ try {
 
     if (!empty($connections)) {
         $_SESSION['tenant_id'] = $connections[0]['tenantId'];
-        echo "✅ Connected to Xero!<br>";
-        echo "Tenant ID: " . $_SESSION['tenant_id'] . "<br> ";
-        echo "Access Token: " . $_SESSION['access_token'];
+            $stmt = $pdo->prepare("
+                UPDATE site_config SET 
+                    xero_refresh_token = :xero_refresh_token,
+                    xero_tenant_id = :xero_tenant_id,
+                WHERE company_id = 1
+                LIMIT 1
+            ");
+
+            $stmt->execute([
+                ':xero_refresh_token' => $_SESSION['refresh_token'],
+                ':xero_tenant_id' => $_SESSION['tenant_id'],
+            ]);
     } else {
         echo "❌ No active Xero tenant connection found.";
     }

@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once __DIR__ . '/../../global/main_configuration.php';
 
 function backupDatabase($triggeredBy) {

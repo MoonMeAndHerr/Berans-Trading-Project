@@ -197,3 +197,130 @@
 [03-Sep-2025 10:35:36 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
 [03-Sep-2025 10:35:39 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
 [03-Sep-2025 10:35:39 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:45:31 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:45:31 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:45:51 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:45:51 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:47:46 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:47:46 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:53:23 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:53:23 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:53:28 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:53:28 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:54:29 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:54:29 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:54:30 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:54:30 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:54:34 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:54:34 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:03 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\global\main_configuration.php on line 3
+[03-Sep-2025 13:55:03 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:03 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:04 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\global\main_configuration.php on line 3
+[03-Sep-2025 13:55:04 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:04 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:11 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\global\main_configuration.php on line 3
+[03-Sep-2025 13:55:11 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:11 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:15 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\global\main_configuration.php on line 3
+[03-Sep-2025 13:55:15 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:15 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:16 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\global\main_configuration.php on line 3
+[03-Sep-2025 13:55:16 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:16 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:17 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\global\main_configuration.php on line 3
+[03-Sep-2025 13:55:17 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:17 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:17 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\global\main_configuration.php on line 3
+[03-Sep-2025 13:55:17 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:17 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:19 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\global\main_configuration.php on line 3
+[03-Sep-2025 13:55:19 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:19 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:59 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:59 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:55:59 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:00 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:00 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:00 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:00 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:00 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:00 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:01 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:01 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:01 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:01 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:01 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:01 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:02 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:02 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:02 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:02 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:02 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:02 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:03 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:03 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:03 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:03 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:03 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:03 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:03 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:03 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:03 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:03 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:03 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:03 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:04 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:04 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:04 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:04 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:04 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:04 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:04 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:04 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:04 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:05 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:05 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:05 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:05 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:05 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:05 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:05 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:05 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:05 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:05 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:05 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:05 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:06 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:06 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:06 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:06 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:06 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:06 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:06 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:06 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:06 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:06 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:08 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:08 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:08 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:08 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:08 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:08 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:08 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:08 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:34 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:36 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:36 UTC] PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from C:\laragon\www\Work Related\Berans-Trading-Project\admin\private\staff-add-backend.php on line 10) in C:\laragon\www\Work Related\Berans-Trading-Project\admin\public\website-backup.php on line 5
+[03-Sep-2025 13:56:57 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:56:57 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:57:20 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:57:20 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:57:21 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:57:21 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:57:26 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:57:26 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:57:29 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:57:29 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:57:33 UTC] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[03-Sep-2025 13:57:33 UTC] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist

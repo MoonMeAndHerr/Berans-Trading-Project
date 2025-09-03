@@ -36,13 +36,20 @@
                     <h3 class="card-title mb-0 me-3" style="white-space: nowrap;">Database Backup List</h3><a href="../private/backup-cron.php?action=database-backup" class="btn btn-sm btn-primary">Backup Now</a>
                 </div>
 
-                <!-- ✅ SHOW DELETE MESSAGE -->
-                <?php if (isset($_SESSION['result'])): ?>
+                <?php 
+                
+                    if (isset($_SESSION['result'])){
+                    
+                ?>
                     <div class="alert alert-success">
                         <?= htmlspecialchars($_SESSION['result']) ?>
                     </div>
-                    <?php unset($_SESSION['result']); ?>
-                <?php endif; ?>
+
+                <?php
+
+                    } unset($_SESSION['result']);
+
+                ?>
 
                 <!-- ✅ Add padding inside the card body -->
                 <div class="card-body px-4 py-3">
