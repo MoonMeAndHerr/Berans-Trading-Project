@@ -1,4 +1,7 @@
 <?php
+use GuzzleHttp\Client;
+require 'vendor/autoload.php';
+use League\OAuth2\Client\Provider\GenericProvider;
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -54,8 +57,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $customer_name        = trim($_POST['customer_name'] ?? '');
         $customer_phone       = trim($_POST['customer_phone'] ?? '');
         $customer_address     = trim($_POST['customer_address'] ?? '');
+        $customer_city        = trim($_POST['customer_city'] ?? '');
+        $customer_region       = trim($_POST['customer_region'] ?? '');
+        $customer_postcode     = trim($_POST['customer_postcode'] ?? '');
+        $customer_country     = trim($_POST['customer_country'] ?? '');
         $customer_company     = trim($_POST['customer_company_name'] ?? '');
         $customer_designation = trim($_POST['customer_designation'] ?? '');
+        $xero_relation = trim($_POST['xero_relation'] ?? '');
 
         // Validate required fields
         if ($customer_name === '') {
@@ -63,22 +71,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (empty($errors)) {
+
+            try {
+
+            $xeroAuth = refreshXeroToken(); // always returns valid token
+            $accessToken = $xeroAuth['access_token'];
+            $tenantId    = $xeroAuth['tenant_id'];
+            
+            $client = new Client();
+            $response = $client->post('https://api.xero.com/api.xro/2.0/Contacts/$contactId', [
+                'headers' => [
+                    'Authorization'   => 'Bearer ' . $accessToken,
+                    'Accept'          => 'application/json',
+                    'Content-Type'    => 'application/json',
+                    'Xero-tenant-id'  => $tenantId,
+                ],
+                'json' => [
+                    'ContactID' => $xero_relation,
+                    'Name'       => $customer_name,
+                    "IsSupplier"=> false,
+                    "IsCustomer"=> true,
+                    'Phones' => [
+                        [
+                            'PhoneType'    => 'MOBILE',
+                            'PhoneNumber'  => $customer_phone
+                        ]
+                    ],
+                    'Addresses' => [
+                        [
+                            'AddressType'   => 'STREET',
+                            'AddressLine1'  => $customer_address,
+                            'City'          => $customer_city,
+                            'Region'        => $customer_region,
+                            'PostalCode'    => $customer_postcode,
+                            'Country'       => $customer_country
+                        ]
+                    ]
+
+                ]
+            ]);
+
+
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $responseBody = $e->getResponse()->getBody()->getContents();
+            $errors[] = 'Xero API error: ' . $responseBody;
+
+        }
+
+
             try {
                 $stmt = $pdo->prepare("UPDATE customer SET 
                     customer_name = :customer_name,
                     customer_phone = :customer_phone,
                     customer_address = :customer_address,
+                    customer_city = :customer_city,
+                    customer_region = :customer_region,
+                    customer_postcode = :customer_postcode,
+                    customer_country = :customer_country,
                     customer_company_name = :customer_company_name,
                     customer_designation = :customer_designation
-                    WHERE customer_id = :id AND deleted_at IS NULL");
+                    WHERE xero_relation = :id AND deleted_at IS NULL");
 
                 $stmt->execute([
                     ':customer_name'        => $customer_name,
                     ':customer_phone'       => $customer_phone ?: null,
                     ':customer_address'     => $customer_address ?: null,
+                    ':customer_city'       => $customer_city ?: null,
+                    ':customer_region'     => $customer_region ?: null,
+                    ':customer_postcode'=> $customer_postcode ?: null,
+                    ':customer_country' => $customer_country ?: null,
                     ':customer_company_name'=> $customer_company ?: null,
                     ':customer_designation' => $customer_designation ?: null,
-                    ':id'                   => $customerId,
+                    ':id'                   => $xero_relation,
                 ]);
 
                 $_SESSION['success'] = '✅ Customer updated successfully.';
@@ -191,6 +255,38 @@ if (isset($_SESSION['errors'])) {
                         <textarea id="customer_address" name="customer_address" class="form-control" rows="3"><?= htmlspecialchars($customer['customer_address'] ?? '') ?></textarea>
                     </div>
                 </div>
+
+                <div class="row mb-3 align-items-center">
+                    <label for="customer_city" class="col-lg-3 col-form-label">City</label>
+                    <div class="col-lg-9">
+                        <input type="text" id="customer_city" name="customer_city" class="form-control" value="<?= htmlspecialchars($customer['customer_city'] ?? '') ?>">
+                    </div>
+                </div>
+
+                <div class="row mb-3 align-items-center">
+                    <label for="customer_region" class="col-lg-3 col-form-label">Region</label>
+                    <div class="col-lg-9">
+                        <input type="text" id="customer_region" name="customer_region" class="form-control" value="<?= htmlspecialchars($customer['customer_region'] ?? '') ?>">
+                    </div>
+                </div>
+
+                <div class="row mb-3 align-items-center">
+                    <label for="customer_postcode" class="col-lg-3 col-form-label">Postal Code</label>
+                    <div class="col-lg-9">
+                        <input type="text" id="customer_postcode" name="customer_postcode" class="form-control" value="<?= htmlspecialchars($customer['customer_postcode'] ?? '') ?>">
+                    </div>
+                </div>
+
+                <div class="row mb-3 align-items-center">
+                    <label for="customer_country" class="col-lg-3 col-form-label">Country</label>
+                    <div class="col-lg-9">
+                        <input type="text" id="customer_country" name="customer_country" class="form-control" value="<?= htmlspecialchars($customer['customer_country'] ?? '') ?>">
+                    </div>
+                </div>
+
+                <input type="hidden" name="xero_relation" value="<?= htmlspecialchars($customer['xero_relation'] ?? '') ?>">
+
+
 
                 <!-- Update Button -->
                 <div class="d-flex gap-2">

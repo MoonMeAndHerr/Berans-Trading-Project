@@ -358,7 +358,7 @@
 
                             
                                 <li class="nav-item">
-                                    <a class="nav-link menu-link" href="xero-auth">
+                                    <a class="nav-link menu-link" href="xero-main">
                                         <i class="ri-links-fill"></i>
                                         <span data-key="t-tables">Xero Auth</span>
                                     </a>

@@ -8,7 +8,7 @@
 							<div class="header-column">
 								<div class="header-row">
 									<div class="header-logo">
-										<a href="index.php"><img alt="Berans" width="100" height="60" data-sticky-width="82" data-sticky-height="40" data-sticky-top="0" src="<?php echo "../../siteidentity/". WEB_LOGO ?>"></a>
+										<a href="index.php"><img alt="Berans" width="100" height="60" data-sticky-width="82" data-sticky-height="40" data-sticky-top="0" src="<?php echo "../../media/". WEB_LOGO ?>"></a>
 									</div>
 								</div>
 							</div>

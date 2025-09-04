@@ -1,4 +1,7 @@
 <?php
+use GuzzleHttp\Client;
+require 'vendor/autoload.php';
+use League\OAuth2\Client\Provider\GenericProvider;
 // ✅ Session and configuration
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -23,6 +26,10 @@ $contact_person = '';
 $phone          = '';
 $email          = '';
 $address        = '';
+$city = '';
+$region          = '';
+$postcode          = '';
+$country        = '';
 $notes          = '';
 
 // ✅ Handle delete form submission
@@ -61,7 +68,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_supplier_id']
     $phone           = trim($_POST['phone'] ?? '');
     $email           = trim($_POST['email'] ?? '');
     $address         = trim($_POST['address'] ?? '');
+    $city           = trim($_POST['city'] ?? '');
+    $region           = trim($_POST['region'] ?? '');
+    $postcode         = trim($_POST['postcode'] ?? '');
+    $country           = trim($_POST['country'] ?? '');
     $notes           = trim($_POST['notes'] ?? '');
+
 
     // Validation
     if (empty($supplier_name)) {
@@ -75,18 +87,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_supplier_id']
         try {
             if ($is_update) {
                 $supplier_id = $_POST['supplier_id'];
+                $xero_relation = $_POST['xero_relation'] ?? null;
+
+                try {
+
+                $xeroAuth = refreshXeroToken(); // always returns valid token
+                $accessToken = $xeroAuth['access_token'];
+                $tenantId    = $xeroAuth['tenant_id'];
+                
+                $client = new Client();
+                $response = $client->post('https://api.xero.com/api.xro/2.0/Contacts/$contactId', [
+                    'headers' => [
+                        'Authorization'   => 'Bearer ' . $accessToken,
+                        'Accept'          => 'application/json',
+                        'Content-Type'    => 'application/json',
+                        'Xero-tenant-id'  => $tenantId,
+                    ],
+                    'json' => [
+                        'ContactID' => $xero_relation,
+                        'FirstName' => $contact_person,
+                        'EmailAddress' => $email,
+                        'IsSupplier' => true,  
+                        'Addresses' => [[
+                            'AddressType' => 'STREET',
+                            'AddressLine1' => $address,
+                            'City' => $city,
+                            'Region' => $region,
+                            'PostalCode' => $postcode,
+                            'Country' => $country
+                        ]],
+                        'Phones' => [[
+                            'PhoneType' => 'DEFAULT',
+                            'PhoneNumber' => $phone
+                        ]],
+                        'ContactPersons' => [[
+                            'FirstName' => $contact_person,
+                            'EmailAddress' => $email
+                        ]]
+
+                    ]
+                ]);
+
+
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                $errors[] = 'Xero API error: ' . $responseBody;
+
+            }
                 // Update query
                 $stmt = $pdo->prepare("
                     UPDATE supplier 
-                    SET supplier_name=?, supplier_contact_person=?, phone=?, email=?, address=?, notes=? 
-                    WHERE supplier_id=?");
+                    SET supplier_name=?, supplier_contact_person=?, phone=?, email=?, address=?, city=?, region=?, postcode=?, country=?, notes=? 
+                    WHERE xero_relation=? AND supplier_id=?");
                 $stmt->execute([
                     $supplier_name,
                     $contact_person,
                     $phone,
                     $email,
                     $address,
+                    $city,
+                    $region,
+                    $postcode,
+                    $country,
                     $notes,
+                    $xero_relation,
                     $supplier_id
                 ]);
 
@@ -96,17 +160,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_supplier_id']
                 exit();
 
             } else {
+
+                $xeroAuth = refreshXeroToken(); // always returns valid token
+                $accessToken = $xeroAuth['access_token'];
+                $tenantId    = $xeroAuth['tenant_id'];
+                
+                $client = new Client();
+
+                $response = $client->post('https://api.xero.com/api.xro/2.0/Contacts', [
+                    'headers' => [
+                        'Authorization'   => 'Bearer ' . $accessToken,
+                        'Accept'          => 'application/json',
+                        'Content-Type'    => 'application/json',
+                        'Xero-tenant-id'  => $tenantId,
+                    ],
+                    'json' => [
+                        'Name' => $supplier_name,
+                        'FirstName' => $contact_person,
+                        'EmailAddress' => $email,
+                        'IsSupplier' => true,  
+                        'Addresses' => [[
+                            'AddressType' => 'STREET',
+                            'AddressLine1' => $address,
+                            'City' => $city,
+                            'Region' => $region,
+                            'PostalCode' => $postcode,
+                            'Country' => $country
+                        ]],
+                        'Phones' => [[
+                            'PhoneType' => 'DEFAULT',
+                            'PhoneNumber' => $phone
+                        ]],
+                        'ContactPersons' => [[
+                            'FirstName' => $contact_person,
+                            'EmailAddress' => $email
+                        ]]
+                    ]
+                ]);
+
+                $result = json_decode($response->getBody(), true);
+
+                if (!empty($result['Contacts'][0]['ContactID'])) {
+                    $xero_relation = $result['Contacts'][0]['ContactID'];
+                } else {
+                    $errors[] = 'Failed to retrieve ContactID from Xero response.';
+                }
+                
                 // Insert query
                 $stmt = $pdo->prepare("
-                    INSERT INTO supplier (supplier_name, supplier_contact_person, phone, email, address, notes) 
-                    VALUES (?, ?, ?, ?, ?, ?)");
+                    INSERT INTO supplier (supplier_name, supplier_contact_person, phone, email, address, city, region, postcode, country, notes, xero_relation) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $supplier_name,
                     $contact_person,
                     $phone,
                     $email,
                     $address,
-                    $notes
+                    $city,
+                    $region,
+                    $postcode,
+                    $country,
+                    $notes,
+                    $xero_relation
                 ]);
 
                 // Redirect with success for add
@@ -147,6 +262,10 @@ if ($supplier_id) {
             $phone          = $supplier['phone'];
             $email          = $supplier['email'];
             $address        = $supplier['address'];
+            $city          = $supplier['city'];
+            $region          = $supplier['region'];
+            $postcode        = $supplier['postcode'];
+            $country          = $supplier['country'];
             $notes          = $supplier['notes'];
         } else {
             $errors[] = "Supplier not found.";
@@ -174,7 +293,7 @@ try {
 $allSuppliers = [];
 try {
     $stmt = $pdo->query("
-        SELECT supplier_id, supplier_name, supplier_contact_person, phone, email, address, notes 
+        SELECT supplier_id, supplier_name, supplier_contact_person, phone, email, address, city, region, postcode, country, notes 
         FROM supplier ORDER BY supplier_name ASC");
     $allSuppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {

@@ -41,10 +41,12 @@ try {
 
     if (!empty($connections)) {
         $_SESSION['tenant_id'] = $connections[0]['tenantId'];
+        $pdo = openDB();
             $stmt = $pdo->prepare("
                 UPDATE site_config SET 
                     xero_refresh_token = :xero_refresh_token,
                     xero_tenant_id = :xero_tenant_id,
+                    xero_ttl = :xero_ttl
                 WHERE company_id = 1
                 LIMIT 1
             ");
@@ -52,10 +54,16 @@ try {
             $stmt->execute([
                 ':xero_refresh_token' => $_SESSION['refresh_token'],
                 ':xero_tenant_id' => $_SESSION['tenant_id'],
+                ':xero_ttl' => date('Y-m-d H:i:s', $_SESSION['expires'])
             ]);
+            $_SESSION['success'] = '✅ Xero connected successfully!';
+            header('Location: xero-main.php');
     } else {
-        echo "❌ No active Xero tenant connection found.";
+        $_SESSION['failed'] = '❌ Fail to establish connection.';
+        header('Location: xero-main.php');
+
     }
 } catch (\Exception $e) {
-    echo "Failed to get access token or tenant ID: " . $e->getMessage();
+        $_SESSION['failed'] = '❌ Fail to establish connection with error: ' . $e->getMessage();
+        header('Location: xero-main.php');
 }

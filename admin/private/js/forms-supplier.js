@@ -6,6 +6,11 @@ const supplierSelect = document.getElementById('supplierSelectUpdate');
   const phoneField = document.getElementById('update_supplier_phone');
   const emailField = document.getElementById('update_supplier_email');
   const addressField = document.getElementById('update_supplier_address');
+  const cityField = document.getElementById('update_supplier_city');
+  const regionField = document.getElementById('update_supplier_region');
+  const postcodeField = document.getElementById('update_supplier_postcode');
+  const countryField = document.getElementById('update_supplier_country');
+  const xeroField = document.getElementById('update_supplier_xero_relation');
   const notesField = document.getElementById('update_supplier_notes');
 
   supplierSelect.addEventListener('change', function() {
@@ -21,6 +26,11 @@ const supplierSelect = document.getElementById('supplierSelectUpdate');
       emailField.value = '';
       addressField.value = '';
       notesField.value = '';
+      cityField.value = '';
+      regionField.value = '';
+      postcodeField.value = '';
+      countryField.value = '';
+      xeroField.value = '';
       return;
     }
 
@@ -33,6 +43,11 @@ const supplierSelect = document.getElementById('supplierSelectUpdate');
     emailField.value = selectedOption.dataset.email || '';
     addressField.value = selectedOption.dataset.address || '';
     notesField.value = selectedOption.dataset.notes || '';
+    cityField.value = selectedOption.dataset.contact || '';
+    regionField.value = selectedOption.dataset.phone || '';
+    postcodeField.value = selectedOption.dataset.email || '';
+    countryField.value = selectedOption.dataset.address || '';
+    xeroField.value = selectedOption.dataset.notes || '';
   });
 
   const deleteSelect = document.getElementById('deleteSupplierSelect');

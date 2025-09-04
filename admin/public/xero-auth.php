@@ -16,7 +16,7 @@ $provider = new GenericProvider([
 ]);
 
 $authorizationUrl = $provider->getAuthorizationUrl([
-    'scope' => 'openid profile email accounting.transactions accounting.contacts accounting.settings'
+    'scope' => 'openid profile email accounting.transactions accounting.contacts accounting.settings offline_access'
 ]);
 
 $_SESSION['oauth2state'] = $provider->getState();

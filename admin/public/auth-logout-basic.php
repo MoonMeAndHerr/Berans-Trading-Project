@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../global/main_configuration.php';
 // auth-logout-basic.php - Shows the logout confirmation page
 
 // Start session if not already started

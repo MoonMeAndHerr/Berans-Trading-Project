@@ -1,4 +1,4 @@
-<?php include __DIR__ . '/../private/auth-signin-basic-backend.php';?>
+<?php include __DIR__ . '/../private/auth-signin-basic-backend.php'; ?>
 
 <!doctype html>
 <html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg">
@@ -11,7 +11,7 @@
         <meta content="<?php echo WEB_TAGLINE; ?>" name="description" />
         <meta content="Berans" name="author" />
         <!-- App favicon -->
-        <link rel="shortcut icon" href="assets/images/favicon.ico">
+        <link rel="shortcut icon" href="../../media/<?php echo $favicon; ?>">
 
         <!-- Layout config Js -->
         <script src="assets/js/layout.js"></script>
@@ -50,11 +50,11 @@
                                     <div class="col-lg-12">
                                         <div class="text-center mt-sm-5 mb-4 text-white-50">
                                             <div>
-                                                <a href="index.html" class="d-inline-block auth-logo">
-                                                    <img src="assets/images/logo-light.png" alt="" height="20">
+                                                <a href="index" class="d-inline-block auth-logo">
+                                                    <img src="../../media/<?php echo $logo_light; ?>" alt="" height="100">
                                                 </a>
                                             </div>
-                                            <p class="mt-3 fs-15 fw-medium">BeransTrading, Your One Stop Supplies</p>
+                                            <p class="mt-3 fs-15 fw-medium"><?php echo WEB_NAME; ?>, <?php ECHO WEB_TAGLINE; ?></p>
                                         </div>
                                     </div>
                                 </div>
@@ -79,7 +79,7 @@
                                         
                                                         <div class="mb-3">
                                                             <div class="float-end">
-                                                                <a href="auth-pass-reset-basic.html" class="text-muted">Forgot password?</a>
+                                                                <a href="auth-pass-reset?resetpassword=true" class="text-muted">Forgot password?</a>
                                                             </div>
                                                             <label class="form-label" for="password-input">Password</label>
                                                             <div class="position-relative auth-pass-inputgroup mb-3">
@@ -101,9 +101,6 @@
                                             </div>
                                         </div>
 
-                                        <div class="mt-4 text-center">
-                                            <p class="mb-0">Don't have an account? <a href="auth-signup-basic.html" class="fw-semibold text-primary text-decoration-underline">Signup</a></p>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -118,7 +115,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="text-center">
-                                <p class="mb-0 text-muted">&copy; <script>document.write(new Date().getFullYear())</script> BeransTrading . Crafted with <i class="mdi mdi-heart text-danger"></i> by Themesbrand</p>
+                                <p class="mb-0 text-muted">&copy; <script>document.write(new Date().getFullYear())</script> <?php echo WEB_NAME; ?> . <?php echo WEB_TAGLINE; ?></p>
                             </div>
                         </div>
                     </div>
