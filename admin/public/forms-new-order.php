@@ -6,7 +6,6 @@
 
 ?>
 
-
         <!-- Scripts -->
         <script src="assets/js/layout.js"></script>
         <script src="assets/libs/choices.js/public/assets/scripts/choices.min.js"></script>
@@ -27,6 +26,7 @@
             position: relative;
         }
         </style>
+
 
             <!-- Main Content -->
             <div class="main-content">
@@ -223,241 +223,289 @@
         <script src="assets/js/plugins.js"></script>
         <script src="assets/libs/prismjs/prism.js"></script>
         <script src="assets/js/app.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <!-- Custom Scripts -->
         <script>
-            document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements
-    const sectionSelect = document.getElementById('section');
-    const categorySelect = document.getElementById('category');
-    const subcategorySelect = document.getElementById('subcategory');
-    const productSelect = document.getElementById('product');
-    const moqField = document.getElementById('moq');
-    const quantityInput = document.getElementById('quantity');
-    const addProductBtn = document.getElementById('addProduct');
-    const productList = document.getElementById('productList').getElementsByTagName('tbody')[0];
-    let productCount = 1;
+            document.addEventListener('DOMContentLoaded', function () {
+                const sectionSelect = document.getElementById('section');
+                const categorySelect = document.getElementById('category');
+                const subcategorySelect = document.getElementById('subcategory');
+                const productSelect = document.getElementById('product');
 
-    // Event: Product Selection Change
-    productSelect.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        if (selectedOption && !selectedOption.disabled) {
-            moqField.value = selectedOption.dataset.moq || '';
-        } else {
-            moqField.value = '';
-        }
-    });
+                if (!sectionSelect || !categorySelect || !subcategorySelect || !productSelect) return;
 
-    // Event: Add Product Button Click
-    addProductBtn.addEventListener('click', () => {
-        const selectedOption = productSelect.options[productSelect.selectedIndex];
-        const quantity = parseInt(quantityInput.value);
-        const moq = parseInt(moqField.value);
-        
-        // Validation for Add Product
-        if (!selectedOption || selectedOption.disabled) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Please select a product',
-                icon: 'error'
-            });
-            return;
-        }
+                // Store all data for client-side filtering (like forms-price-add-new.php)
+                const allCategories = Array.from(categorySelect.options)
+                    .filter(opt => opt.value)
+                    .map(opt => ({ value: opt.value, label: opt.text, section: opt.dataset.section }));
 
-        // Debug logging
-        console.log('Selected product data:', {
-            price: selectedOption.dataset.price,
-            moq: selectedOption.dataset.moq,
-            priceId: selectedOption.dataset.priceId
-        });
+                const allSubcategories = Array.from(subcategorySelect.options)
+                    .filter(opt => opt.value)
+                    .map(opt => ({ value: opt.value, label: opt.text, category: opt.dataset.category }));
 
-        // Check if price exists
-        if (!selectedOption.dataset.price || selectedOption.dataset.price === 'null' || selectedOption.dataset.price === '0') {
-            Swal.fire({
-                title: 'Error!',
-                text: 'This product has no selling price set. Please set the selling price in Product Pricing first.',
-                icon: 'error'
-            });
-            return;
-        }
+                const allProducts = Array.from(productSelect.options)
+                    .filter(opt => opt.value)
+                    .map(opt => ({
+                        value: opt.value,
+                        label: opt.text,
+                        section: opt.dataset.section,
+                        category: opt.dataset.category,
+                        subcategory: opt.dataset.subcategory,
+                        moq: opt.dataset.moq,
+                        price: opt.dataset.price,
+                        priceId: opt.dataset.priceId
+                    }));
 
-        // Check if MOQ exists
-        if (!moq || moq === 0) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'MOQ is not set. Please set the MOQ in Product Pricing first.',
-                icon: 'error'
-            });
-            return;
-        }
+                const baseCfg = { searchEnabled: true, shouldSort: false, itemSelectText: '', placeholder: true };
+                const chSection = new Choices(sectionSelect, baseCfg);
+                const chCategory = new Choices(categorySelect, baseCfg);
+                const chSubcat = new Choices(subcategorySelect, baseCfg);
+                const chProduct = new Choices(productSelect, baseCfg);
+                const chCustomer = new Choices('#customer', baseCfg);
 
-        if (!quantity || quantity < 1) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Quantity must be greater than 0',
-                icon: 'error'
-            });
-            return;
-        }
+                // DOM Elements
+                const moqField = document.getElementById('moq');
+                const quantityInput = document.getElementById('quantity');
+                const addProductBtn = document.getElementById('addProduct');
+                const productList = document.getElementById('productList').getElementsByTagName('tbody')[0];
+                let productCount = 1;
 
-        // Get values
-        const unitPrice = parseFloat(selectedOption.dataset.price);
-        if (isNaN(unitPrice)) {
-            console.error('Invalid unit price:', selectedOption.dataset.price);
-            Swal.fire({
-                title: 'Error!',
-                text: 'Error: Invalid product price format. Please check the selling price in Product Pricing.',
-                icon: 'error'
-            });
-            return;
-        }
-
-        // Create new row
-        const row = productList.insertRow();
-        row.innerHTML = `
-            <td>${productCount}</td>
-            <td>${selectedOption.textContent}</td>
-            <td>${unitPrice.toFixed(2)}</td>
-            <td>${quantity}</td>
-            <td>${(unitPrice * quantity).toFixed(2)}</td>
-            <td>
-                <button type="button" class="btn btn-danger btn-sm" onclick="confirmRemoveProduct(this)">
-                    Remove
-                </button>
-            </td>
-            <input type="hidden" name="products[]" value='${JSON.stringify({
-                product_id: selectedOption.value,
-                price_id: selectedOption.dataset.priceId,
-                product_name: selectedOption.textContent,
-                quantity: quantity,
-                unit_price: unitPrice,
-                total_price: unitPrice * quantity
-            })}'>
-        `;
-
-        productCount++;
-
-        // Reset form
-        productSelect.selectedIndex = 0;
-        quantityInput.value = '';
-        moqField.value = '';
-    });
-
-    // Cascade Functions
-    function rebuildCategoryChoices() {
-        const sectionId = sectionSelect.value;
-        [...categorySelect.options].forEach(opt => {
-            if (!opt.value) return;
-            opt.hidden = opt.dataset.section !== sectionId;
-        });
-        categorySelect.value = '';
-        rebuildSubcategoryChoices();
-    }
-
-    function rebuildSubcategoryChoices() {
-        const categoryId = categorySelect.value;
-        [...subcategorySelect.options].forEach(opt => {
-            if (!opt.value) return;
-            opt.hidden = opt.dataset.category !== categoryId;
-        });
-        subcategorySelect.value = '';
-        rebuildProductChoices();
-    }
-
-    function rebuildProductChoices() {
-        const sectionId = sectionSelect.value;
-        const categoryId = categorySelect.value;
-        const subcategoryId = subcategorySelect.value;
-
-        [...productSelect.options].forEach(opt => {
-            if (!opt.value) return;
-            opt.hidden = !(
-                (!sectionId || opt.dataset.section === sectionId) &&
-                (!categoryId || opt.dataset.category === categoryId) &&
-                (!subcategoryId || opt.dataset.subcategory === subcategoryId)
-            );
-        });
-        
-        productSelect.value = '';
-        moqField.value = '';
-    }
-
-    // Event listeners for cascade
-    sectionSelect.addEventListener('change', rebuildCategoryChoices);
-    categorySelect.addEventListener('change', rebuildSubcategoryChoices);
-    subcategorySelect.addEventListener('change', rebuildProductChoices);
-
-    // Initialize cascade
-    rebuildCategoryChoices();
-});
-
-        function confirmRemoveProduct(button) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'Do you want to remove this product from the order?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, remove it!',
-                cancelButtonText: 'No, cancel!',
-                showCloseButton: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    button.closest('tr').remove();
+                function clearProductAndMOQ() {
+                    chProduct.removeActiveItems();
+                    productSelect.value = '';
+                    moqField.value = '';
                 }
-            });
-        }
 
-        function prepareSubmission() {
-            const products = [];
-            const rows = document.querySelectorAll('#productList tbody tr');
-            
-            if (rows.length === 0) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Please add at least one product to the invoice',
-                    icon: 'error'
+                function rebuildCategoryChoices() {
+                    const section = sectionSelect.value;
+                    chCategory.clearChoices();
+                    const filtered = allCategories.filter(c => !section || c.section === section);
+                    chCategory.setChoices([{ value: '', label: 'Choose Category...', disabled: true }], 'value', 'label', false);
+                    chCategory.setChoices(filtered.map(c => ({ value: c.value, label: c.label })), 'value', 'label', true);
+                    chSubcat.clearChoices();
+                    chSubcat.setChoices([{ value: '', label: 'Choose Subcategory...', disabled: true }], 'value', 'label', false);
+                    clearProductAndMOQ();
+                }
+
+                function rebuildSubcategoryChoices() {
+                    const category = categorySelect.value;
+                    chSubcat.clearChoices();
+                    const filtered = allSubcategories.filter(sc => !category || sc.category === category);
+                    chSubcat.setChoices([{ value: '', label: 'Choose Subcategory...', disabled: true }], 'value', 'label', false);
+                    chSubcat.setChoices(filtered.map(sc => ({ value: sc.value, label: sc.label })), 'value', 'label', true);
+                    clearProductAndMOQ();
+                }
+
+                function rebuildProductChoices() {
+                    const section = sectionSelect.value;
+                    const category = categorySelect.value;
+                    const subcategory = subcategorySelect.value;
+
+                    const filtered = allProducts.filter(p =>
+                        (!section || p.section === section) &&
+                        (!category || p.category === category) &&
+                        (!subcategory || p.subcategory === subcategory)
+                    );
+
+                    chProduct.clearChoices();
+                    chProduct.setChoices([{ value: '', label: 'Choose Product...', disabled: true }], 'value', 'label', false);
+                    chProduct.setChoices(filtered.map(p => ({ value: p.value, label: p.label })), 'value', 'label', true);
+                    clearProductAndMOQ();
+                }
+
+                // Event listeners for cascade filtering
+                sectionSelect.addEventListener('change', function () {
+                    rebuildCategoryChoices();
+                    rebuildProductChoices();
                 });
-                return false;
-            }
-
-            const customerId = document.getElementById('customer').value;
-            if (!customerId) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Please select a customer',
-                    icon: 'error'
+                categorySelect.addEventListener('change', function () {
+                    rebuildSubcategoryChoices();
+                    rebuildProductChoices();
                 });
-                return false;
-            }
+                subcategorySelect.addEventListener('change', rebuildProductChoices);
 
-            // Show confirmation before submitting
-            Swal.fire({
-                title: 'Create Invoice?',
-                text: 'Are you sure you want to create this invoice?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, create it!',
-                cancelButtonText: 'No, cancel!',
-                showCloseButton: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    rows.forEach(row => {
-                        const hiddenInput = row.querySelector('input[type="hidden"]');
-                        if (hiddenInput) {
-                            const product = JSON.parse(hiddenInput.value);
-                            product.product_name = row.cells[1].textContent;
-                            products.push(product);
-                        }
+                // Product selection - update MOQ
+                productSelect.addEventListener('change', function () {
+                    const selectedValue = chProduct.getValue(true);
+                    const productData = allProducts.find(p => p.value === selectedValue);
+                    if (productData) {
+                        moqField.value = productData.moq || '';
+                    } else {
+                        moqField.value = '';
+                    }
+                });
+
+                // Event: Add Product Button Click
+                addProductBtn.addEventListener('click', () => {
+                    const selectedProductId = chProduct.getValue(true);
+                    const productData = allProducts.find(p => p.value === selectedProductId);
+                    const quantity = parseInt(quantityInput.value);
+                    const moq = parseInt(moqField.value);
+                    
+                    // Validation for Add Product
+                    if (!selectedProductId || !productData) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Please select a product',
+                            icon: 'error'
+                        });
+                        return;
+                    }
+
+                    // Debug logging
+                    console.log('Selected product data:', {
+                        price: productData.price,
+                        moq: productData.moq,
+                        priceId: productData.priceId
                     });
 
-                    document.getElementById('productsJson').value = JSON.stringify(products);
-                    document.getElementById('invoiceForm').submit();
-                }
+                    // Check if price exists
+                    if (!productData.price || productData.price === 'null' || productData.price === '0') {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'This product has no selling price set. Please set the selling price in Product Pricing first.',
+                            icon: 'error'
+                        });
+                        return;
+                    }
+
+                    // Check if MOQ exists
+                    if (!moq || moq === 0) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'MOQ is not set. Please set the MOQ in Product Pricing first.',
+                            icon: 'error'
+                        });
+                        return;
+                    }
+
+                    if (!quantity || quantity < 1) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Quantity must be greater than 0',
+                            icon: 'error'
+                        });
+                        return;
+                    }
+
+                    // Get values
+                    const unitPrice = parseFloat(productData.price);
+                    if (isNaN(unitPrice)) {
+                        console.error('Invalid unit price:', productData.price);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Error: Invalid product price format. Please check the selling price in Product Pricing.',
+                            icon: 'error'
+                        });
+                        return;
+                    }
+
+                    // Create new row
+                    const row = productList.insertRow();
+                    row.innerHTML = `
+                        <td>${productCount}</td>
+                        <td>${productData.label}</td>
+                        <td>${unitPrice.toFixed(2)}</td>
+                        <td>${quantity}</td>
+                        <td>${(unitPrice * quantity).toFixed(2)}</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmRemoveProduct(this)">
+                                Remove
+                            </button>
+                        </td>
+                        <input type="hidden" name="products[]" value='${JSON.stringify({
+                            product_id: selectedProductId,
+                            price_id: productData.priceId,
+                            product_name: productData.label,
+                            quantity: quantity,
+                            unit_price: unitPrice,
+                            total_price: unitPrice * quantity
+                        })}'>
+                    `;
+
+                    productCount++;
+
+                    // Reset form - using Choices.js methods
+                    chProduct.setChoiceByValue('');
+                    quantityInput.value = '';
+                    moqField.value = '';
+                });
+
+                // Initialize cascade - clear dependent dropdowns initially
+                chCategory.clearChoices();
+                chCategory.setChoices([{ value: '', label: 'Choose Category...', disabled: true, selected: true }]);
+                chSubcat.clearChoices();
+                chSubcat.setChoices([{ value: '', label: 'Choose Subcategory...', disabled: true, selected: true }]);
+                chProduct.clearChoices();
+                chProduct.setChoices([{ value: '', label: 'Choose Product...', disabled: true, selected: true }]);
             });
-            
-            return false; // Always return false as we're handling the submit via SweetAlert2
-        }
+
+            function confirmRemoveProduct(button) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'Do you want to remove this product from the order?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, remove it!',
+                    cancelButtonText: 'No, cancel!',
+                    showCloseButton: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        button.closest('tr').remove();
+                    }
+                });
+            }
+
+            function prepareSubmission() {
+                const products = [];
+                const rows = document.querySelectorAll('#productList tbody tr');
+                
+                if (rows.length === 0) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Please add at least one product to the invoice',
+                        icon: 'error'
+                    });
+                    return false;
+                }
+
+                const customerId = document.getElementById('customer').value;
+                if (!customerId) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Please select a customer',
+                        icon: 'error'
+                    });
+                    return false;
+                }
+
+                // Show confirmation before submitting
+                Swal.fire({
+                    title: 'Create Invoice?',
+                    text: 'Are you sure you want to create this invoice?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, create it!',
+                    cancelButtonText: 'No, cancel!',
+                    showCloseButton: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        rows.forEach(row => {
+                            const hiddenInput = row.querySelector('input[type="hidden"]');
+                            if (hiddenInput) {
+                                const product = JSON.parse(hiddenInput.value);
+                                product.product_name = row.cells[1].textContent;
+                                products.push(product);
+                            }
+                        });
+
+                        document.getElementById('productsJson').value = JSON.stringify(products);
+                        document.getElementById('invoiceForm').submit();
+                    }
+                });
+                
+                return false; // Always return false as we're handling the submit via SweetAlert2
+            }
         </script>
     </body>
 </html>

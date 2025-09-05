@@ -62,6 +62,12 @@
                                         </div>
                                     </div>
                                 </div>
+                                                </a>
+                                            </div>
+                                            <p class="mt-3 fs-15 fw-medium"><?php echo WEB_NAME; ?>, <?php ECHO WEB_TAGLINE; ?></p>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <div class="row justify-content-center">
                                     <div class="col-md-8 col-lg-6 col-xl-5">
