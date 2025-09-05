@@ -97,7 +97,8 @@
 									<?php
 
 										$pdo = openDB();
-										$sql = "SELECT * FROM product INNER JOIN section on product.section_id = section.section_id ORDER BY product_id DESC LIMIT 12";
+										$sql = "SELECT * FROM product INNER JOIN section on product.section_id = section.section_id 
+										INNER JOIN material on product.material_id = material.material_id INNER JOIN product_type on product.product_type_id = product_type.product_type_id ORDER BY product_id DESC LIMIT 12";
 										$stmt = $pdo->query($sql);
 										closeDB($pdo);
 
@@ -110,7 +111,7 @@
 											<span class="thumb-info-wrapper border-radius-0">
 												<img src="../../media/<?php echo $row['image_url']; ?>" class="img-fluid product-image border-radius-0" alt="">
 												<span class="thumb-info-title">
-													<span class="thumb-info-inner line-height-1 font-weight-bold text-dark position-relative top-3"><?php echo $row['name']; ?></span>
+													<span class="thumb-info-inner line-height-1 font-weight-bold text-dark position-relative top-3"><?php echo $row['material_name'].' '.$row['product_name'].' '.$row['size_1'].'*'.$row['size_2'].'*'.$row['size_3'].' '.$row['variant']; ?></span>
 													<span class="thumb-info-type"><?php echo $row['section_name']; ?></span>
 												</span>
 												<span class="thumb-info-action">
