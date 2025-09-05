@@ -2,6 +2,9 @@
 
 if(session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/../../global/main_configuration.php';
+use GuzzleHttp\Client;
+require 'vendor/autoload.php';
+use League\OAuth2\Client\Provider\GenericProvider;
 
 $pdo = openDB();
 
@@ -264,6 +267,42 @@ if(isset($_GET['action'])) {
         case 'submit_payment':
             $invoice_id = $_POST['invoice_id'] ?? null;
             $amount_paid = $_POST['amount_paid'] ?? null;
+
+            $stmt = $pdo->prepare("SELECT xero_relation FROM invoice WHERE invoice_id=?");
+            $stmt->execute([$invoice_id]);
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $xero_relation = $data[0]['xero_relation'];
+
+            try {
+                $xeroAuth   = refreshXeroToken(); // always returns valid token
+                $accessToken = $xeroAuth['access_token'];
+                $tenantId    = $xeroAuth['tenant_id'];
+
+                $client = new Client();
+                $response = $client->post('https://api.xero.com/api.xro/2.0/Payments', [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $accessToken,
+                        'Xero-tenant-id' => $tenantId,
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json'
+                    ],
+                    'json' => [
+                        'Invoice' => [
+                            'InvoiceID' => $xero_relation // the invoice you created earlier
+                        ],
+                        'Account' => [
+                            'Code' => '090' // Bank account code in your Chart of Accounts
+                        ],
+                        'Date'   => date('Y-m-d'),
+                        'Amount' => $amount_paid, 
+                    ]
+                ]);
+
+                $data = json_decode($response->getBody(), true);
+
+            } catch (Exception $e) {
+                error_log("Xero API Error: " . $e->getMessage());
+            }
             
             if($invoice_id && $amount_paid) {
                 try {

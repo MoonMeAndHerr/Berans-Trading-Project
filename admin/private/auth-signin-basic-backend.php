@@ -1,10 +1,13 @@
 <?php
+
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 session_start();
 
 require_once __DIR__ . '/../../global/main_configuration.php';
 require_once __DIR__ . '/../private/logger.php';
+
+
 
 $pdo = openDB(); 
 
@@ -53,6 +56,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'username' => $user['username'],
                         'role'     => $user['role']
                     ]);
+
+                    if(isset($_POST['remember'])) {
+
+                        $token = bin2hex(random_bytes(32)); // secure random token
+                        $expiry = date('Y-m-d H:i:s', strtotime('+30 days'));
+
+                        // Save to DB
+                        $stmt = $pdo->prepare("UPDATE staff SET remember_token = ?, remember_expiry = ? WHERE staff_id = ?");
+                        $stmt->execute([$token, $expiry, $user['staff_id']]);
+
+                        // Save to cookie (HttpOnly, 30 days)
+                        setcookie('remember_me', $token, time() + (86400 * 30), "/", "", true, true);
+                                        
+                    }
 
                     // ✅ Create session token in database
                     $token      = bin2hex(random_bytes(16));

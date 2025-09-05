@@ -2,6 +2,9 @@
 if(session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/../private/auth_check.php';
 require_once __DIR__ . '/../../global/main_configuration.php';
+use GuzzleHttp\Client;
+require 'vendor/autoload.php';
+use League\OAuth2\Client\Provider\GenericProvider;
 
 $pdo = openDB();
 
@@ -103,6 +106,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $customer_id = $_POST['customer_id'];
         $products = $_POST['products'];
+
+        $stmt = $pdo->prepare("SELECT * FROM customer WHERE customer_id = ?");
+        $stmt->execute([$_POST['customer_id']]);
+        $customer = $stmt->fetch(PDO::FETCH_ASSOC);
+        $xero_relation_customer = $customer['xero_relation'];
+
         
         error_log("Products array received: " . print_r($products, true));
 
@@ -224,6 +233,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $pdo->commit();
+
+        $lineItems = [];
+
+        foreach ($products as $productJson) {
+            // Decode JSON string to array
+            $product = json_decode($productJson, true);
+
+            $product_id = $product['product_id'];
+            $stmt = $pdo->prepare("SELECT * FROM product WHERE product_id = ?");
+            $stmt->execute([$product_id]);
+            $productfetch = $stmt->fetch(PDO::FETCH_ASSOC);
+            $product_code = $productfetch['item_code'];
+
+            $price_id = $product['price_id'];
+            $stmt = $pdo->prepare("SELECT * FROM price WHERE price_id = ?");
+            $stmt->execute([$price_id]);
+            $pricefetch = $stmt->fetch(PDO::FETCH_ASSOC);
+            $price = $pricefetch['new_selling_price'];
+
+            $quantity = $product['quantity'];
+            $productName = $product['product_name'];
+
+            // Build line item
+            $lineItems[] = [
+                'Description' => $productName,
+                'Quantity'    => $quantity,
+                'UnitAmount'  => $price,
+                'AccountCode' => '200', // default Sales account
+                'ItemCode'    => $product_code,
+            ];
+        }
+
+            $stmt = $pdo->prepare("SELECT * FROM customer WHERE customer_id = ?");
+            $stmt->execute([$_POST['customer_id']]);
+            $customer = $stmt->fetch(PDO::FETCH_ASSOC);
+            $xero_relation_customer = $customer['xero_relation'];
+
+            try {
+
+                $xeroAuth = refreshXeroToken(); // always returns valid token
+                $accessToken = $xeroAuth['access_token'];
+                $tenantId    = $xeroAuth['tenant_id'];
+                                
+                $client = new Client();
+
+                $response = $client->post('https://api.xero.com/api.xro/2.0/Invoices', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $accessToken,
+                    'Xero-tenant-id' => $tenantId,
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'Type' => 'ACCREC', // sales invoice
+                    'Contact' => [
+                        'ContactID' => $xero_relation_customer,
+                    ],
+                    'Date' => date('Y-m-d'),
+                    'DueDate' => date('Y-m-d', strtotime('+14 days')),
+                    'LineItems' => $lineItems,
+                    'Reference' => $invoice_number,
+                    'Status'    => 'AUTHORISED' 
+                ]
+            ]);
+
+            $data = json_decode($response->getBody(), true);
+            $xero_relation = $data['Invoices'][0]['InvoiceID'];
+
+            $stmt = $pdo->prepare("UPDATE invoice SET xero_relation = ? WHERE invoice_id = ?");
+            $stmt->execute([$xero_relation, $invoice_id]);
+
+            } catch (Exception $e) {
+                // Log error but continue
+                $output = var_export($e->getMessage(), true);
+                echo "<script>console.log('Problem: " . $output . "' );</script>";
+            }
+
         $_SESSION['success'] = "Invoice #$invoice_number created successfully!";
         error_log("Transaction committed successfully");
         header('Location: ' . $_SERVER['HTTP_REFERER']);

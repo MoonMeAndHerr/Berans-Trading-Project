@@ -1,4 +1,8 @@
-<?php include __DIR__ . '/../private/auth-signin-basic-backend.php'; ?>
+<?php 
+
+    include __DIR__ . '/../private/auth-signin-basic-backend.php'; 
+    require_once __DIR__ . '/../private/remember-me.php';
+?>
 
 <!doctype html>
 <html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg">
@@ -69,6 +73,9 @@
                                                     <?php if ($error): ?>
                                                         <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
                                                     <?php endif; ?>
+                                                    <?php if (isset($_SESSION['status'])){ ?>
+                                                        <div class="alert alert-success"><?php echo $_SESSION['status']; ?></div>
+                                                    <?php } unset($_SESSION['status']); ?>
                                                 </div>
                                                 <div class="p-2 mt-4">
                                                     <form method="POST" action="auth-signin-basic.php">

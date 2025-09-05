@@ -48,8 +48,59 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         $code_prefix = strtoupper(substr($section,0,1) . substr($category,0,1) . substr($subcategory,0,1));
         $product_code = $code_prefix . str_pad($product_id,5,'0',STR_PAD_LEFT);
 
-        $pdo->prepare("UPDATE Product SET product_code = ? WHERE product_id = ?")
-            ->execute([$product_code, $product_id]);
+        $stmt = $pdo->prepare("SELECT * FROM material WHERE material_id = ?");
+        $stmt->execute([$_POST['material_id']]);
+        $material = $stmt->fetch(PDO::FETCH_ASSOC);
+        $materrialName = $material['material_name'];
+
+        $stmt = $pdo->prepare("SELECT * FROM product_type WHERE product_type_id = ?");
+        $stmt->execute([$_POST['product_type_id']]);
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        $productType = $product['product_name'];
+
+        $productName = $materrialName.' '.$productType.' '.$size1.'*'.$size2.'*'.$size3.' '.$_POST['variant'];
+
+        try {
+
+                $xeroAuth = refreshXeroToken(); // always returns valid token
+                $accessToken = $xeroAuth['access_token'];
+                $tenantId    = $xeroAuth['tenant_id'];
+                        
+                $client = new Client();
+                $response = $client->post('https://api.xero.com/api.xro/2.0/Items', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $accessToken,
+                    'Xero-tenant-id' => $tenantId,
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => [
+                    'Code' => $product_code,  // unique product code
+                    'Name' => $productName,
+                    'Description' => $_POST['description'],
+                    'IsSold' => true,
+                    'IsPurchased' => false,
+                    'IsTrackedAsInventory' => false, // no stock tracking
+
+                    'SalesDetails' => [
+                        'UnitPrice'   => 1.00,
+                        'AccountCode' => '200',   // Sales account in Xero
+                        'TaxType'     => 'OUTPUT' // GST/VAT sales tax (depends on your Xero settings)
+                    ]
+                ]
+            ]);
+
+            $result = json_decode($response->getBody(), true);
+            $xero_relation = $result['Items'][0]['ItemID'] ?? null;
+
+        } catch (Exception $e) {
+            // Log error but continue
+            $output = var_export($e->getMessage(), true);
+            echo "<script>console.log('Problem: " . $output . "' );</script>";
+        }
+
+        $pdo->prepare("UPDATE Product SET product_code = ?, xero_relation = ? WHERE product_id = ?")
+            ->execute([$product_code, $xero_relation, $product_id]);
 
         // --- Insert Price (Carton + Supplier info) ---
         $supplier_id = $_POST['supplier_id'] ?? null;

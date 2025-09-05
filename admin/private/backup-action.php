@@ -81,9 +81,11 @@ case "download":
     if ($backup['backup_type'] === 'database') {
         header("Content-Type: application/sql");
         header("Content-Disposition: attachment; filename=\"$fileName.sql\"");
+        header("Location: ../public/database-backup.php");
     } else {
         header("Content-Type: application/zip");
         header("Content-Disposition: attachment; filename=\"$fileName.zip\"");
+        header("Location: ../public/website-backup.php");
     }
 
     echo $fileData;

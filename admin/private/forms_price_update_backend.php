@@ -2,7 +2,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
+use GuzzleHttp\Client;
+require 'vendor/autoload.php';
+use League\OAuth2\Client\Provider\GenericProvider;
 
 require_once __DIR__ . '/../private/auth_check.php';
 require_once __DIR__ . '/../../global/main_configuration.php';
@@ -261,6 +263,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $stmt->execute($bind);
+
+        $stmt = $pdo->prepare("SELECT * FROM product WHERE product_id = ?");
+        $stmt->execute([$product_id]);
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        $product_code = $product['product_code'];
+        
+        try {
+            $xeroAuth = refreshXeroToken(); // always returns valid token
+            $accessToken = $xeroAuth['access_token'];
+            $tenantId    = $xeroAuth['tenant_id'];
+            
+            $client = new Client();
+            $response = $client->post('https://api.xero.com/api.xro/2.0/Items', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $accessToken,
+                    'Xero-tenant-id' => $tenantId,
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => [
+                    'Code' => $product_code,
+                    'SalesDetails' => [
+                        'UnitPrice' => $final_unit_price,
+                    ]
+                ]
+            ]);
+
+            $result = json_decode($response->getBody(), true);
+            echo "<pre>"; print_r($result); echo "</pre>";
+
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $response = $e->getResponse();
+            $body = $response ? $response->getBody()->getContents() : 'No response body';
+            echo "<pre>API Error: " . $body . "</pre>";
+        }
 
         // 🔹 UPSERT shipping totals (update if exists, else insert)
         // Check if price_id exists in price_shipping_totals

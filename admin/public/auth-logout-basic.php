@@ -25,7 +25,7 @@ header("Expires: Thu, 01 Jan 1970 00:00:00 GMT");
         <meta content="<?php echo WEB_TAGLINE; ?>" name="description" />
         <meta content="Berans" name="author" />
         <!-- App favicon -->
-        <link rel="shortcut icon" href="assets/images/favicon.ico">
+        <link rel="shortcut icon" href="../../media/<?php echo $favicon; ?>">
 
         <!-- Layout config Js -->
         <script src="assets/js/layout.js"></script>
@@ -62,11 +62,11 @@ header("Expires: Thu, 01 Jan 1970 00:00:00 GMT");
                         <div class="col-lg-12">
                             <div class="text-center mt-sm-5 mb-4 text-white-50">
                                 <div>
-                                    <a href="index.html" class="d-inline-block auth-logo">
-                                        <img src="assets/images/logo-light.png" alt="" height="20">
+                                    <a href="index" class="d-inline-block auth-logo">
+                                        <img src="../../media/<?php echo $logo_light; ?>" alt="" height="100">
                                     </a>
                                 </div>
-                                <p class="mt-3 fs-15 fw-medium">Premium Admin & Dashboard Template</p>
+                                <p class="mt-3 fs-15 fw-medium"><?php echo WEB_NAME; ?>, <?php ECHO WEB_TAGLINE; ?></p>
                             </div>
                         </div>
                     </div>
@@ -85,7 +85,7 @@ header("Expires: Thu, 01 Jan 1970 00:00:00 GMT");
 
                                     <div class="mt-4 pt-2">
                                         <h5>You are Logged Out</h5>
-                                        <p class="text-muted">Thank you for using <span class="fw-semibold">velzon</span> admin template</p>
+                                        <p class="text-muted">Thank you for using <span class="fw-semibold"><?php echo WEB_NAME; ?></span></p>
                                         <div class="mt-4">
                                             <a href="auth-signin-basic.php" class="btn btn-success w-100">Sign In</a>
                                         </div>
@@ -110,7 +110,7 @@ header("Expires: Thu, 01 Jan 1970 00:00:00 GMT");
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="text-center">
-                                <p class="mb-0 text-muted">&copy; <script>document.write(new Date().getFullYear())</script> Velzon. Crafted with <i class="mdi mdi-heart text-danger"></i> by Themesbrand</p>
+                                <p class="mb-0 text-muted">&copy; <script>document.write(new Date().getFullYear())</script> <?php echo WEB_NAME; ?> . <?php echo WEB_TAGLINE; ?></p>
                             </div>
                         </div>
                     </div>

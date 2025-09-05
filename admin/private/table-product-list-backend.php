@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/../../global/main_configuration.php';
 require_once __DIR__ . '/auth_check.php';
+use GuzzleHttp\Client;
+require 'vendor/autoload.php';
+use League\OAuth2\Client\Provider\GenericProvider;
 
 $pdo = openDB();
 
@@ -63,6 +66,37 @@ if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
             $stmt->execute();
 
         }
+
+            $productName = $_POST['material_name'].' '.$_POST['product_type_name'].' '.$size1.'*'.$size2.'*'.$size3.' '.$_POST['variant'];
+
+            try {
+
+                $xeroAuth = refreshXeroToken(); // always returns valid token
+                $accessToken = $xeroAuth['access_token'];
+                $tenantId    = $xeroAuth['tenant_id'];
+                        
+                $client = new Client();
+                $response = $client->post('https://api.xero.com/api.xro/2.0/Items', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $accessToken,
+                    'Xero-tenant-id' => $tenantId,
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => [
+                    'ItemID' => $_POST['xero_relation'],   
+                    'Code' => $_POST['product_code'],  // unique product code
+                    'Name' => $productName,
+                    'Description' => $_POST['description']
+                ]
+            ]);
+
+
+        } catch (Exception $e) {
+            // Log error but continue
+            $output = var_export($e->getMessage(), true);
+            echo "<script>console.log('Problem: " . $output . "' );</script>";
+        }
         
         $updateStmt = $pdo->prepare("
             UPDATE product SET
@@ -74,7 +108,7 @@ if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
                 size_3 = ?,
                 updated_at = NOW(),
                 updated_by = ?
-            WHERE product_id = ?
+            WHERE product_id = ? AND xero_relation = ?
         ");
         
         $updateStmt->execute([
@@ -85,7 +119,8 @@ if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
             $size2,
             $size3,
             $_SESSION['user_id'] ?? 1,
-            $product_id
+            $product_id,
+            $_POST['xero_relation'],
         ]);
 
         // Update carton information in price table

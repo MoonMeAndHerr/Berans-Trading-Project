@@ -1,7 +1,7 @@
 <?php
 
-    include __DIR__ . '/../private/reset_password_backend.php';
-    include __DIR__ . '/../../global/main_configuration.php';
+    require_once __DIR__ . '/../../global/main_configuration.php';
+    session_start();
 
 ?>
 
@@ -68,7 +68,7 @@
 
                         <?php
 
-                            if($_GET['resetpassword'] == "true") {
+                            if(isset($_GET['resetpassword'])) {
                                 
                         ?>
 
@@ -81,14 +81,29 @@
 
                                     </div>
 
+                                    <?php
+
+                                        if(isset($_SESSION['status'])){
+
+                                    ?>
+
+                                    <div class="alert alert-borderless alert-danger text-center mb-2 mx-2" role="alert">
+                                        <?php echo $_SESSION['status']; ?>
+                                    </div>
+
+                                    <?php
+
+                                        } unset($_SESSION['status']);
+                                    
+                                    ?>
                                     <div class="alert alert-borderless alert-warning text-center mb-2 mx-2" role="alert">
                                         Enter your email and instructions will be sent to you!
                                     </div>
                                     <div class="p-2">
-                                        <form>
+                                        <form method="POST" action="../private/reset_password_backend.php">
                                             <div class="mb-4">
                                                 <label class="form-label">Email</label>
-                                                <input type="email" class="form-control" id="email" placeholder="Enter Email">
+                                                <input type="email" class="form-control" id="email" name=email placeholder="Enter Email" required>
                                             </div>
                                             
                                             <div class="text-center mt-4">
@@ -103,7 +118,7 @@
 
                         <?php
 
-                            } elseif ($_GET['resetcode'] == "true") {
+                            } elseif (isset($_GET['resetcode'])) {
                                 
                         ?>
 
@@ -113,6 +128,22 @@
                                     <div class="text-center mt-2">
                                         <h5 class="text-primary">Forgot Password?</h5>
                                         <p class="text-muted">Reset your password</p>
+
+                                        <?php
+
+                                            if(isset($_SESSION['status'])){
+
+                                        ?>
+
+                                        <div class="alert alert-borderless alert-info text-center mb-2 mx-2" role="alert">
+                                            <?php echo $_SESSION['status']; ?>
+                                        </div>
+
+                                        <?php
+
+                                            } unset($_SESSION['status']);
+                                        
+                                        ?>
 
                                         <lord-icon
                                             src="https://cdn.lordicon.com/rhvddzym.json"
@@ -127,10 +158,10 @@
                                         We've sent a code to your email address. Please enter the code below to reset your password.
                                     </div>
                                     <div class="p-2">
-                                        <form>
+                                        <form method="POST" action="../private/reset_password_backend.php">
                                             <div class="mb-4">
                                                 <label class="form-label">Code</label>
-                                                <input type="text" class="form-control" id="code" placeholder="Enter Code">
+                                                <input type="text" class="form-control" id="code" name="code" placeholder="Enter Code" required>
                                             </div>
                                             
                                             <div class="text-center mt-4">
@@ -145,7 +176,7 @@
 
                         <?php
 
-                            } elseif ($_GET['newpassword'] == "true") {
+                            } elseif (isset($_GET['newpassword'])) {
 
                         ?>
 
@@ -156,7 +187,25 @@
                                                     <p class="text-muted">Reset Your Password</p>
                                                 </div>
                                                 <div class="p-2 mt-4">
-                                                    <form method="POST">
+                                                    <form method="POST" action="../private/reset_password_backend.php">
+                                                        <input type="hidden" name="email" value="<?php echo $reset_email; ?>">
+                                                        
+                                                        <?php
+
+                                                            if(isset($_SESSION['status'])){
+
+                                                        ?>
+
+                                                        <div class="alert alert-borderless alert-info text-center mb-2 mx-2" role="alert">
+                                                            <?php echo $_SESSION['status']; ?>
+                                                        </div>
+
+                                                        <?php
+
+                                                            } unset($_SESSION['status']);
+                                                        
+                                                        ?>
+
                                                        <div class="mb-3">
                                                             <label class="form-label" for="password-input">Password</label>
                                                             <div class="position-relative auth-pass-inputgroup mb-3">
@@ -174,7 +223,7 @@
                                                         </div>
                                                         
                                                         <div class="mt-4">
-                                                            <button class="btn btn-success w-100" type="submit">Reset Password</button>
+                                                            <button class="btn btn-success w-100" type="submit" name="changepassword">Reset Password</button>
                                                         </div>
                                                     </form>
                                                 </div>

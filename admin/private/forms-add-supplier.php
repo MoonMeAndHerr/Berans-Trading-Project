@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_supplier_id']
                 $tenantId    = $xeroAuth['tenant_id'];
                 
                 $client = new Client();
-                $response = $client->post('https://api.xero.com/api.xro/2.0/Contacts/$contactId', [
+                $response = $client->post('https://api.xero.com/api.xro/2.0/Contacts/$xero_relation', [
                     'headers' => [
                         'Authorization'   => 'Bearer ' . $accessToken,
                         'Accept'          => 'application/json',
@@ -105,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_supplier_id']
                     ],
                     'json' => [
                         'ContactID' => $xero_relation,
+                        'Name' => $supplier_name,
                         'FirstName' => $contact_person,
                         'EmailAddress' => $email,
                         'IsSupplier' => true,  
@@ -267,6 +268,7 @@ if ($supplier_id) {
             $postcode        = $supplier['postcode'];
             $country          = $supplier['country'];
             $notes          = $supplier['notes'];
+            $xero          = $supplier['xero_relation'];
         } else {
             $errors[] = "Supplier not found.";
             $supplier_id = null;
@@ -293,7 +295,7 @@ try {
 $allSuppliers = [];
 try {
     $stmt = $pdo->query("
-        SELECT supplier_id, supplier_name, supplier_contact_person, phone, email, address, city, region, postcode, country, notes 
+        SELECT supplier_id, supplier_name, supplier_contact_person, phone, email, address, city, region, postcode, country, notes, xero_relation
         FROM supplier ORDER BY supplier_name ASC");
     $allSuppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {

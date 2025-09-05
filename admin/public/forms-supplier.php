@@ -241,7 +241,12 @@
                                                                 data-phone="<?= htmlspecialchars($sup['phone'], ENT_QUOTES) ?>"
                                                                 data-email="<?= htmlspecialchars($sup['email'], ENT_QUOTES) ?>"
                                                                 data-address="<?= htmlspecialchars($sup['address'], ENT_QUOTES) ?>"
+                                                                data-city="<?= htmlspecialchars($sup['city'], ENT_QUOTES) ?>"
+                                                                data-region="<?= htmlspecialchars($sup['region'], ENT_QUOTES) ?>"
+                                                                data-postcode="<?= htmlspecialchars($sup['postcode'], ENT_QUOTES) ?>"
+                                                                data-country="<?= htmlspecialchars($sup['country'], ENT_QUOTES) ?>"
                                                                 data-notes="<?= htmlspecialchars($sup['notes'], ENT_QUOTES) ?>"
+                                                                data-xero="<?= htmlspecialchars($sup['xero_relation'], ENT_QUOTES) ?>"
                                                             >
                                                                 <?= htmlspecialchars($sup['supplier_name']) ?>
                                                             </option>
@@ -397,6 +402,10 @@
                                                             data-phone="<?= htmlspecialchars($sup['phone'], ENT_QUOTES) ?>"
                                                             data-email="<?= htmlspecialchars($sup['email'], ENT_QUOTES) ?>"
                                                             data-address="<?= htmlspecialchars($sup['address'], ENT_QUOTES) ?>"
+                                                            data-city="<?= htmlspecialchars($sup['city'], ENT_QUOTES) ?>"
+                                                            data-region="<?= htmlspecialchars($sup['region'], ENT_QUOTES) ?>"
+                                                            data-postcode="<?= htmlspecialchars($sup['postcode'], ENT_QUOTES) ?>"
+                                                            data-country="<?= htmlspecialchars($sup['country'], ENT_QUOTES) ?>"
                                                             data-notes="<?= htmlspecialchars($sup['notes'], ENT_QUOTES) ?>"
                                                         >
                                                             <?= htmlspecialchars($sup['supplier_name']) ?>

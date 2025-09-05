@@ -3,6 +3,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+use GuzzleHttp\Client;
+require 'vendor/autoload.php';
+use League\OAuth2\Client\Provider\GenericProvider;
 
 require_once __DIR__ . '/../private/auth_check.php';
 require_once __DIR__ . '/../../global/main_configuration.php';
@@ -72,6 +75,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data[':price_id'] = $existing['price_id'];
             $stmt->execute($data);
 
+            $stmt = $pdo->prepare("SELECT * FROM product WHERE product_id = ?");
+            $stmt->execute([$product_id]);
+            $product = $stmt->fetch(PDO::FETCH_ASSOC);
+            $product_code = $product['product_code'];
+            $xero_relation = $product['xero_relation'];
+            $description = $product['description'];
+            $material_id = $product['material_id'];
+            $product_type_id = $product['product_type_id'];
+            $size1 = $product['size_1'];
+            $size2 = $product['size_2'];
+            $size3 = $product['size_3'];
+            $variant = $product['variant'];
+
+            $stmt = $pdo->prepare("SELECT * FROM material WHERE material_id = ?");
+            $stmt->execute([$material_id]);
+            $material = $stmt->fetch(PDO::FETCH_ASSOC);
+            $materrialName = $material['material_name'];
+
+            $stmt = $pdo->prepare("SELECT * FROM product_type WHERE product_type_id = ?");
+            $stmt->execute([$product_type_id]);
+            $product = $stmt->fetch(PDO::FETCH_ASSOC);
+            $productType = $product['product_name'];
+
+            $productName = $materrialName.' '.$productType.' '.$size1.'*'.$size2.'*'.$size3.' '.$variant;
+        
+            try {
+                $xeroAuth = refreshXeroToken(); // always returns valid token
+                $accessToken = $xeroAuth['access_token'];
+                $tenantId    = $xeroAuth['tenant_id'];
+                
+                $client = new Client();
+                $response = $client->post('https://api.xero.com/api.xro/2.0/Items', [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $accessToken,
+                        'Xero-tenant-id' => $tenantId,
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json'
+                    ],
+                    'json' => [
+                        'ItemID' => $xero_relation, // safer to include if available
+                        'Name' => $productName,  // safer to include
+                        'Description' => $description,
+                        'Code' => $product_code,
+                        'SalesDetails' => [
+                            'UnitPrice' => $_POST['selling_price_unit'],
+                        ]
+                    ]
+                ]);
+
+                $result = json_decode($response->getBody(), true);
+
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                $response = $e->getResponse();
+                $body = $response ? $response->getBody()->getContents() : 'No response body';
+            }
+
             $successMessage = "Pricing record updated successfully!";
         } else {
             $stmt = $pdo->prepare("
@@ -92,6 +151,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data[':product_id'] = $product_id;
             $data[':supplier_id'] = $supplier_id;
             $stmt->execute($data);
+
+            $stmt = $pdo->prepare("SELECT * FROM product WHERE product_id = ?");
+            $stmt->execute([$_POST['product_id']]);
+            $product = $stmt->fetch(PDO::FETCH_ASSOC);
+            $product_code = $product['product_code'];
+            $xero_relation = $product['xero_relation'];
+            $description = $product['description'];
+
+            $stmt = $pdo->prepare("SELECT * FROM material WHERE material_id = ?");
+            $stmt->execute([$material_id]);
+            $material = $stmt->fetch(PDO::FETCH_ASSOC);
+            $materrialName = $material['material_name'];
+
+            $stmt = $pdo->prepare("SELECT * FROM product_type WHERE product_type_id = ?");
+            $stmt->execute([$product_type_id]);
+            $product = $stmt->fetch(PDO::FETCH_ASSOC);
+            $productType = $product['product_name'];
+
+            $productName = $materrialName.' '.$productType.' '.$size1.'*'.$size2.'*'.$size3.' '.$_POST['variant'];
+        
+            try {
+                $xeroAuth = refreshXeroToken(); // always returns valid token
+                $accessToken = $xeroAuth['access_token'];
+                $tenantId    = $xeroAuth['tenant_id'];
+                
+                $client = new Client();
+                $response = $client->post('https://api.xero.com/api.xro/2.0/Items', [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $accessToken,
+                        'Xero-tenant-id' => $tenantId,
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json'
+                    ],
+                    'json' => [
+                        'ItemID' => $xero_relation, // safer to include if available
+                        'Name' => $productName,  // safer to include
+                        'Description' => $description,
+                        'Code' => $product_code,
+                        'SalesDetails' => [
+                            'UnitPrice' => $_POST['selling_price_unit'],
+                        ]
+                    ]
+                ]);
+
+                $result = json_decode($response->getBody(), true);
+
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                $response = $e->getResponse();
+                $body = $response ? $response->getBody()->getContents() : 'No response body';
+            }
 
             $successMessage = "Pricing record inserted successfully!";
         }

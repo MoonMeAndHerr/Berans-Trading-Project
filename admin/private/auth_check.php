@@ -45,52 +45,39 @@ if ($currentPage === basename($loginPage)) {
     return; // No further check for login page
 }
 
-// Check if user is logged in
-if (!isset($_SESSION['staff_id'])) {
+// ====================== AUTHENTICATION CHECK ======================
+// If no valid session, check remember me cookie
+if(!isset($_SESSION['staff_id'])) {
     // Check for remember me cookie
-    if (isset($_COOKIE['remember_token'])) {
-        $cookie_data = json_decode($_COOKIE['remember_token'], true);
-        $pdo = openDb();
-        try {
-            $stmt = $pdo->prepare("SELECT s.* FROM sessions se 
-                                  JOIN staff s ON se.staff_id = s.staff_id
-                                  WHERE se.staff_id = :staff_id AND se.token = :token AND se.expires_at > NOW()");
-            $stmt->bindParam(':staff_id', $cookie_data['staff_id']);
-            $stmt->bindParam(':token', $cookie_data['token']);
-            $stmt->execute();
+    if (isset($_COOKIE['remember_me'])) {
+
+            $token = $_COOKIE['remember_me'];
+
+            $pdo = openDb();
+
+            $stmt = $pdo->prepare("SELECT * FROM staff WHERE remember_token = ?");
+            $stmt->execute([$token]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($user) {
-                $_SESSION['staff_id'] = $user['staff_id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role'];
-                $_SESSION['staff_name'] = $user['staff_name'];
-                
-                // Regenerate session ID for security
-                session_regenerate_id(true);
+            if (strtotime($user['remember_expiry']) > time()) {
 
-                // Redirect to dashboard if this was a remember-me login on the login page
-                if ($currentPage === basename($loginPage)) {
-                    header("Location: $dashboardPage");
-                    exit;
-                }
-            } else {
-                // Invalid remember token
-                setcookie('remember_token', '', time() - 3600, '/');
-                header("Location: $loginPage");
-                exit;
+                $stmt = $pdo->prepare("SELECT * FROM staff WHERE staff_id = ?");
+                $stmt->execute([$user['staff_id']]);
+                $login = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                $_SESSION['staff_id'] = $login['staff_id'];
+                $_SESSION['username'] = $login['username'];
+                $_SESSION['role'] = $login['role'];
+                $_SESSION['staff_name'] = $login['staff_name'];
+                
             }
-        } catch (PDOException $e) {
-            error_log("Remember me error: " . $e->getMessage());
+
+        } else {
             header("Location: $loginPage");
             exit;
         }
-        ClosenDb($pdo);
-    } else {
-        header("Location: $loginPage");
-        exit;
-    }
-}
+    } 
+
 
 // --- Role-Based Access Control ---
 $roleAccessMap = [

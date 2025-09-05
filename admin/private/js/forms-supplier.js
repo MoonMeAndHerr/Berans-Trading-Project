@@ -43,11 +43,11 @@ const supplierSelect = document.getElementById('supplierSelectUpdate');
     emailField.value = selectedOption.dataset.email || '';
     addressField.value = selectedOption.dataset.address || '';
     notesField.value = selectedOption.dataset.notes || '';
-    cityField.value = selectedOption.dataset.contact || '';
-    regionField.value = selectedOption.dataset.phone || '';
-    postcodeField.value = selectedOption.dataset.email || '';
-    countryField.value = selectedOption.dataset.address || '';
-    xeroField.value = selectedOption.dataset.notes || '';
+    cityField.value = selectedOption.dataset.city || '';
+    regionField.value = selectedOption.dataset.region || '';
+    postcodeField.value = selectedOption.dataset.postcode || '';
+    countryField.value = selectedOption.dataset.country || '';
+    xeroField.value = selectedOption.dataset.xero || '';
   });
 
   const deleteSelect = document.getElementById('deleteSupplierSelect');
@@ -57,6 +57,10 @@ const supplierSelect = document.getElementById('supplierSelectUpdate');
   const deletePhone = document.getElementById('delete_supplier_phone');
   const deleteEmail = document.getElementById('delete_supplier_email');
   const deleteAddress = document.getElementById('delete_supplier_address');
+  const deleteCity = document.getElementById('delete_supplier_city');
+  const deleteRegion = document.getElementById('delete_supplier_region');
+  const deletePostcode = document.getElementById('delete_supplier_postcode');
+  const deleteCountry = document.getElementById('delete_supplier_country');
   const deleteNotes = document.getElementById('delete_supplier_notes');
 
   deleteSelect.addEventListener('change', function () {
@@ -70,6 +74,10 @@ const supplierSelect = document.getElementById('supplierSelectUpdate');
       deletePhone.value = '';
       deleteEmail.value = '';
       deleteAddress.value = '';
+      deleteCity.value = '';
+      deleteRegion.value = '';
+      deletePostcode.value = '';
+      deleteCountry.value = '';
       deleteNotes.value = '';
       return;
     }
@@ -81,5 +89,9 @@ const supplierSelect = document.getElementById('supplierSelectUpdate');
     deletePhone.value = selectedOption.dataset.phone || '';
     deleteEmail.value = selectedOption.dataset.email || '';
     deleteAddress.value = selectedOption.dataset.address || '';
+    deleteCity.value = selectedOption.dataset.city || '';
+    deleteRegion.value = selectedOption.dataset.region || '';
+    deletePostcode.value = selectedOption.dataset.postcode || '';
+    deleteCountry.value = selectedOption.dataset.country || '';
     deleteNotes.value = selectedOption.dataset.notes || '';
   });

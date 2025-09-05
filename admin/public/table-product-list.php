@@ -110,7 +110,7 @@ include __DIR__ . '/../include/header.php';
                     <h5 class="modal-title" id="updateProductModalLabel">Update Product & Carton Info</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" id="updateProductForm" enctype="multipart/form-data">
+                <form method="GET" id="updateProductForm" enctype="multipart/form-data">
                     <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                         <div class="row g-3">
                             <!-- Product Hierarchy Selection - READONLY -->
@@ -132,7 +132,7 @@ include __DIR__ . '/../include/header.php';
 
                                 <div class="col-sm-6">
                                     <label class="form-label">Material</label>
-                                    <input type="text" class="form-control" id="update_material_display" readonly style="background-color: #f8f9fa;">
+                                    <input type="text" class="form-control" id="update_material_display"  readonly style="background-color: #f8f9fa;">
                                 </div>
 
                                 <div class="col-sm-6">
@@ -172,11 +172,11 @@ include __DIR__ . '/../include/header.php';
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-12">
+                            <!-- <div class="col-lg-12">
                                     <label>Product Image</label>
                                     <input type="file" class="form-control" name="product_image">
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- Size 1,2,3 with metrics -->
                             <?php for($i=1;$i<=3;$i++): ?>
@@ -263,6 +263,10 @@ include __DIR__ . '/../include/header.php';
                         <button type="submit" class="btn btn-primary">Update Product</button>
                     </div>
                     <input type="hidden" name="product_id" id="update_product_id">
+                    <input type="hidden" name="xero_relation" id="update_xero_relation">
+                    <input type="hidden" name="product_code" id="update_product_code">
+                    <input type="hidden" name="material_name" id="update_material_name">
+                    <input type="hidden" name="product_type_name" id="update_product_type_name">
                     <input type="hidden" name="update_product" value="1">
                 </form>
             </div>
@@ -619,6 +623,10 @@ include __DIR__ . '/../include/header.php';
             
             // Populate basic product data
             $('#update_product_id').val(product.product_id);
+            $('#update_xero_relation').val(product.xero_relation);
+            $('#update_product_code').val(product.product_code);
+            $('#update_material_name').val(product.material_name);
+            $('#update_product_type_name').val(product.product_type_name);
             $('#update_variant').val(product.variant || '');
             $('#update_description').val(product.description || '');
             $('#update_production_lead_time').val(product.production_lead_time || '');

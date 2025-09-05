@@ -45,11 +45,19 @@ if (ini_get("session.use_cookies")) {
 session_destroy();
 
 // ====================== REMEMBER TOKEN CLEANUP ======================
-if (isset($_COOKIE['remember_token'])) {
-    setcookie('remember_token', '', time() - 3600, '/', '', true, true);
-    logDebug("Remember token cookie cleared", [
+if (isset($_COOKIE['remember_me'])) {
+
+    // Clear DB token
+    $pdo = openDB();
+    $stmt = $pdo->prepare("UPDATE staff SET remember_token = NULL, remember_expiry = NULL WHERE staff_id = ?");
+    $stmt->execute([$sessionData['staff_id']]);
+    closeDB($pdo);
+
+    setcookie('remember_me', '', time() - 3600, '/', '', true, true);
+    logDebug("Remember me token cookie cleared", [
         'staff_id' => $sessionData['staff_id'] ?? null
     ]);
+
 }
 
 // ====================== DATABASE SESSION CLEANUP ======================
