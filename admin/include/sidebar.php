@@ -2,6 +2,163 @@
   const currentUserRole = <?= json_encode($_SESSION['role'] ?? 'guest') ?>;
 </script>
 
+    <header id="page-topbar">
+        <div class="layout-width">
+            <div class="navbar-header">
+                <div class="d-flex">
+                    <!-- LOGO -->
+                    <div class="navbar-brand-box horizontal-logo">
+                        <a href="dashboard-projects.php" class="logo logo-dark">
+                            <span class="logo-sm">
+                                <img src="../../media/<?php echo $logo_dark; ?>" alt="Berans Logo" height="50" style="margin: 10px 10px;">
+                            </span>
+                            <span class="logo-lg">
+                                <img src="../../media/<?php echo $logo_dark; ?>" alt="Berans Logo" height="60" style="margin: 10px 10px;">
+                            </span>
+                        </a>
+
+                        <a href="dashboard-projects.php" class="logo logo-light">
+                            <span class="logo-sm">
+                                <img src="../../media/<?php echo $logo_light; ?>" alt="Berans Logo" height="50" style="margin: 10px 10px;">
+                            </span>
+                            <span class="logo-lg">
+                                <img src="../../media/<?php echo $logo_light; ?>" alt="Berans Logo" height="60" style="margin: 10px 10px;">
+                            </span>
+                        </a>
+                    </div>
+
+                    <button type="button" class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger"
+                        id="topnav-hamburger-icon">
+                        <span class="hamburger-icon">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </button>
+
+                    <!-- App Search-->
+                    <form class="app-search d-none" style="display:none;">
+                        <div class="position-relative">
+                            <input type="text" class="form-control" placeholder="Search..." autocomplete="off"
+                                id="search-options" value="">
+                            <span class="mdi mdi-close-circle search-widget-icon search-widget-icon-close d-none"
+                                id="search-close-options"></span>
+                        </div>
+                    </form>
+                </div>
+                    <!-- End App Search-->
+                    
+                <div class="d-flex align-items-center">
+
+                    <div class="dropdown d-md-none topbar-head-dropdown header-item">
+                        <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
+                            id="page-header-search-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                            <i class="bx bx-search fs-22"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                            aria-labelledby="page-header-search-dropdown">
+                            <form class="p-3">
+                                <div class="form-group m-0">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Search ..."
+                                            aria-label="Recipient's username">
+                                        <button class="btn btn-primary" type="submit"><i
+                                                class="mdi mdi-magnify"></i></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="ms-1 header-item d-none d-sm-flex">
+                        <button type="button"
+                            class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle light-dark-mode">
+                            <i class='bx bx-moon fs-22'></i>
+                        </button>
+                    </div>
+
+                    <div class="dropdown ms-sm-3 header-item topbar-user">
+                        <?php
+                        $pdo=openDB();
+                        // Debugging: Check if session ID exists
+                        // echo "<pre>Session ID: "; print_r($_SESSION['staff_id'] ?? 'No session ID'); echo "</pre>";
+
+                        $current_user = null;
+                        if (isset($_SESSION['staff_id'])) {
+                            try {
+                                $stmt = $pdo->prepare("SELECT staff_name, staff_designation FROM staff WHERE staff_id = :staff_id");
+                                $stmt->bindParam(':staff_id', $_SESSION['staff_id']);
+                                $stmt->execute();
+                                $current_user = $stmt->fetch(PDO::FETCH_ASSOC);
+                                
+                                // Debugging: Check what was fetched from database
+                                // echo "<pre>User Data: "; print_r($current_user); echo "</pre>";
+                                
+                                // Ensure we have at least empty strings if fields are NULL
+                                $current_user['staff_name'] = $current_user['staff_name'] ?? 'Staff Member';
+                                $current_user['staff_designation'] = $current_user['staff_designation'] ?? 'Employee';
+                            } catch (PDOException $e) {
+                                // Log the error for debugging
+                                error_log("User data fetch error: " . $e->getMessage());
+                                $current_user = [
+                                    'staff_name' => 'User',
+                                    'staff_designation' => 'Staff'
+                                ];
+                            }
+                        }
+                        closeDB($pdo);
+                        ?>
+
+                        <!-- Your dropdown button -->
+                        <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            <span class="d-flex align-items-center">
+                                <img class="rounded-circle header-profile-user" src="assets/images/users/avatar-<?php echo isset($_SESSION['staff_id']) ? ($_SESSION['staff_id'] % 10 + 1) : '1'; ?>.jpg"
+                                    alt="Header Avatar">
+                                <span class="text-start ms-xl-2">
+                                    <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">
+                                        <?php echo htmlspecialchars($current_user['staff_name'] ?? 'Not connected'); ?>
+                                    </span>
+                                    <span class="d-none d-xl-block ms-1 fs-12 text-muted user-name-sub-text">
+                                        <?php echo htmlspecialchars($current_user['staff_designation'] ?? 'Not connected'); ?>
+                                    </span>
+                                </span>
+                            </span>
+                        </button>
+
+                        
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <!-- item-->
+                            <h6 class="dropdown-header">Welcome <?php echo htmlspecialchars($_SESSION['staff_name'] ?? 'User'); ?>!</h6>
+                            <a class="dropdown-item" href="pages-profile.php"><i
+                                    class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span
+                                    class="align-middle">Profile</span></a>
+                            <a class="dropdown-item" href="apps-tasks-kanban.html"><i
+                                    class="mdi mdi-calendar-check-outline text-muted fs-16 align-middle me-1"></i> <span
+                                    class="align-middle">Taskboard</span></a>
+                            <a class="dropdown-item" href="pages-faqs.html"><i
+                                    class="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1"></i> <span
+                                    class="align-middle">Help</span></a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="pages-profile-settings.html"><span
+                                    class="badge bg-soft-success text-success mt-1 float-end">New</span><i
+                                    class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span
+                                    class="align-middle">Settings</span></a>
+                            <a class="dropdown-item" href="auth-lockscreen-basic.html"><i
+                                    class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span
+                                    class="align-middle">Lock screen</span></a>
+                            <a class="dropdown-item" href="../private/logout.php">
+                                    <i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i>
+                                    <span class="align-middle" data-key="t-logout">Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
         <!-- ========== App Menu ========== -->
         <div class="app-menu navbar-menu">
             <!-- LOGO -->
@@ -9,19 +166,19 @@
                 <!-- Dark Logo-->
                 <a href="dashboard-projects.php" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="/beranstrading/assets/images/beranslogo.png" alt="" height="50" style="margin-top: 10px;">
+                        <img src="../../media/<?php echo $logo_dark; ?>" alt="" height="50" style="margin-top: 10px;">
                     </span>
                     <span class="logo-lg">
-                        <img src="/beranstrading/assets/images/beranslogo.png" alt="" height="70" style="margin-top: 10px;">
+                        <img src="../../media/<?php echo $logo_dark; ?>" alt="" height="70" style="margin-top: 10px;">
                     </span>
                 </a>
                 <!-- Light Logo-->
                 <a href="dashboard-projects.php" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="/beranstrading/assets/images/beranslogo.png" alt="" height="50" style="margin-top: 10px;">
+                        <img src="../../media/<?php echo $logo_light; ?>" alt="" height="50" style="margin-top: 10px;">
                     </span>
                     <span class="logo-lg">
-                        <img src="/beranstrading/assets/images/beranslogo.png" alt="" height="70" style="margin-top: 10px;">
+                        <img src="../../media/<?php echo $logo_light; ?>" alt="" height="70" style="margin-top: 10px;">
                     </span>
                 </a>
                 <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover"
@@ -52,7 +209,7 @@
                         </li> <!-- end Dashboard Menu -->
 
 
-                        <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Pages</span></li>
+                        <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Public Relation</span></li>
                         
                             <ul class="navbar-nav" id="navbar-nav">
                                 <!-- ===== Staff ===== -->
@@ -95,21 +252,6 @@
                                             </a>
                                             </li>
                                             <!-- Add more customer links here if needed -->
-                                        </ul>
-                                    </div>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link menu-link" href="#sidebarTablesCompany" data-bs-toggle="collapse" role="button"
-                                    aria-expanded="false" aria-controls="sidebarTablesCompany">
-                                        <i class="ri-briefcase-2-line"></i>
-                                        <span data-key="t-tables">Company</span>
-                                    </a>
-                                    <div class="collapse menu-dropdown" id="sidebarTablesCompany">
-                                        <ul class="nav nav-sm flex-column">
-                                            <li class="nav-item">
-                                                <a href="siteidentity.php" class="nav-link" data-key="t-basic-elements">Change Side Identity</a>
-                                            </li>
                                         </ul>
                                     </div>
                                 </li>
@@ -196,8 +338,38 @@
 
 
 
+                            <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Automation</span></li>
 
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="database-backup">
+                                        <i class="ri-database-2-fill"></i>
+                                        <span data-key="t-tables">Database Backup</span>
+                                    </a>
+                                </li>
 
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="website-backup">
+                                        <i class="ri-window-2-fill"></i>
+                                        <span data-key="t-tables">Website Backup</span>
+                                    </a>
+                                </li>
+
+                            <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Misc</span></li>
+
+                            
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="xero-main">
+                                        <i class="ri-links-fill"></i>
+                                        <span data-key="t-tables">Xero Auth</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="siteidentity">
+                                        <i class="ri-database-fill"></i>
+                                        <span data-key="t-tables">Site Config</span>
+                                    </a>
+                                </li>
 
                     </ul>
                 </div>

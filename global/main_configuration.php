@@ -1,5 +1,8 @@
 <?php
 
+include __DIR__ . '/../admin/public/refresh_xero_token.php';
+date_default_timezone_set("Asia/Kuala_Lumpur");
+
 #======================= Database Configuration Starts =======================#
 
 function openDB() {
@@ -45,8 +48,8 @@ function closeDB(&$pdo) {
 
 $pdo = openDB();
 
-$sql = "SELECT `company_name`, `company_logo`, `company_tagline`, `bank_name`, `bank_account_name`, `bank_account_number`, `address`, `contact` 
-FROM `company` 
+$sql = "SELECT *
+FROM `site_config` 
 WHERE `company_id` = 1";
 $stmt = $pdo->query($sql);
 
@@ -60,6 +63,13 @@ while ($row = $stmt->fetch()) {
     $bank_account_number = $row['bank_account_number'];
     $address = $row['address'];
     $contact = $row['contact'];
+    $email = $row['email'];
+    $logo_light = $row['logo_light'];
+    $logo_dark = $row['logo_dark'];
+    $favicon = $row['favicon'];
+    $refresh_token = $row['xero_refresh_token'];
+    $tenantID = $row['xero_tenant_id'];
+    $xero_ttl = $row['xero_ttl'];
 
 }
 
@@ -72,11 +82,13 @@ closeDB($pdo);
 define('BASE_DIR', dirname(__DIR__)); # Define the base directory of the project
 define('WEB_NAME', $website_name); # Define the website name
 define('WEB_LOGO', $website_logo); # Define the website logo
+define('WEB_FAVICON', $favicon); # Define the website logo
 define('WEB_TAGLINE', $website_tagline); # Define the website tagline
 define('COMPANY_BANK_NAME', $bankname); # Define the company bank name
 define('COMPANY_ACCOUNT_NAME', $bank_account_name); # Define the company account name
 define('COMPANY_ACCOUNT_NUMBER', $bank_account_number); # Define the company account number
 define('COMPANY_ADDRESS', $address); # Define the company address
+define('COMPANY_EMAIL', $email); # Define the company email
 define('COMPANY_CONTACT', $contact); # Define the company contact information
 
 #======================= Global Variable Configuration Starts =======================#
