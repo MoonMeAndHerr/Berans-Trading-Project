@@ -24,7 +24,13 @@
 
 									$pdo = openDB();
 									$rule = $_GET['sectionid'];
-									$sql = "SELECT * FROM product INNER JOIN section on product.section_id = section.section_id WHERE product.section_id = :rule ";
+									$sql = "SELECT *
+											FROM product p
+											JOIN material m ON p.material_id = m.material_id
+											JOIN product_type pt ON p.product_type_id = pt.product_type_id
+											JOIN subcategory sc ON p.subcategory_id = sc.subcategory_id
+											JOIN category c ON p.category_id = c.category_id
+											JOIN section s ON p.section_id = s.section_id WHERE p.section_id = :rule ";
 									$stmt = $pdo->prepare($sql);
 									$stmt->execute(['rule' => $rule]);
 									closeDB($pdo);
@@ -33,7 +39,13 @@
 
 									$pdo = openDB();
 									$rule = $_GET['categoryid'];
-									$sql = "SELECT * FROM product INNER JOIN section on product.section_id = section.section_id WHERE product.category_id = :rule ";
+									$sql = "SELECT *
+											FROM product p
+											JOIN material m ON p.material_id = m.material_id
+											JOIN product_type pt ON p.product_type_id = pt.product_type_id
+											JOIN subcategory sc ON p.subcategory_id = sc.subcategory_id
+											JOIN category c ON p.category_id = c.category_id
+											JOIN section s ON p.section_id = s.section_id WHERE p.category_id = :rule ";
 									$stmt = $pdo->prepare($sql);
 									$stmt->execute(['rule' => $rule]);
 									closeDB($pdo);
@@ -43,7 +55,13 @@
 
 									$pdo = openDB();
 									$rule = $_GET['subcategoryid'];
-									$sql = "SELECT * FROM product INNER JOIN section on product.section_id = section.section_id WHERE product.subcategory_id = :rule ";
+									$sql = "SELECT *
+											FROM product p
+											JOIN material m ON p.material_id = m.material_id
+											JOIN product_type pt ON p.product_type_id = pt.product_type_id
+											JOIN subcategory sc ON p.subcategory_id = sc.subcategory_id
+											JOIN category c ON p.category_id = c.category_id
+											JOIN section s ON p.section_id = s.section_id WHERE p.subcategory_id = :rule ";
 									$stmt = $pdo->prepare($sql);
 									$stmt->execute(['rule' => $rule]);
 									closeDB($pdo);
@@ -51,7 +69,13 @@
 								} else {
 
 									$pdo = openDB();
-									$sql = "SELECT * FROM product INNER JOIN section on product.section_id = section.section_id";
+									$sql = "SELECT *
+											FROM product p
+											JOIN material m ON p.material_id = m.material_id
+											JOIN product_type pt ON p.product_type_id = pt.product_type_id
+											JOIN subcategory sc ON p.subcategory_id = sc.subcategory_id
+											JOIN category c ON p.category_id = c.category_id
+											JOIN section s ON p.section_id = s.section_id";
 									$stmt = $pdo->query($sql);
 									closeDB($pdo);
 
@@ -82,7 +106,7 @@
 									<div class="d-flex justify-content-between">
 										<div>
 											<a href="#" class="d-block text-uppercase text-decoration-none text-color-default text-color-hover-primary line-height-1 text-0 mb-1"><?php echo $row['section_name']; ?></a>
-											<h3 class="text-3-5 font-weight-medium font-alternative text-transform-none line-height-3 mb-0"><a href="product?id=<?php echo $row['product_id']; ?>" class="text-color-dark text-color-hover-primary"><?php echo $row['name']; ?></a></h3>
+											<h3 class="text-3-5 font-weight-medium font-alternative text-transform-none line-height-3 mb-0"><a href="product?id=<?php echo $row['product_id']; ?>" class="text-color-dark text-color-hover-primary"><?php echo $row['material_name'].' '.$row['product_name'].' '.$row['size_1'].'*'.$row['size_2'].'*'.$row['size_3'].' '.$row['variant']; ?></a></h3>
 										</div>
 										<a href="#" class="text-decoration-none text-color-default text-color-hover-dark text-4"><i class="far fa-heart"></i></a>
 									</div>

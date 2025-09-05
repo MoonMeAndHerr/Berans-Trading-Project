@@ -4804,3 +4804,17 @@
 [2025-09-05 18:26:18] Last login updated - {
     "staff_id": "1"
 }
+[2025-09-05 18:29:26] Logout initiated - {
+    "staff_id": "1",
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/139.0.0.0 Safari\/537.36"
+}
+[2025-09-05 18:29:26] Database session cleanup - {
+    "staff_id": "1",
+    "sessions_deleted": 1
+}
+[2025-09-05 18:29:26] Logout completed successfully - {
+    "staff_id": "1",
+    "username": "admin"
+}

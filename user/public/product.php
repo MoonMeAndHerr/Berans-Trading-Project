@@ -9,9 +9,11 @@
 	} 
 	$sql = "SELECT *
 			FROM product p
+			JOIN material m ON p.material_id = m.material_id
+			JOIN product_type pt ON p.product_type_id = pt.product_type_id
+			JOIN subcategory sc ON p.subcategory_id = sc.subcategory_id
+			JOIN category c ON p.category_id = c.category_id
 			JOIN section s ON p.section_id = s.section_id
-			LEFT JOIN category c ON p.category_id = c.category_id
-			LEFT JOIN subcategory sc ON p.subcategory_id = sc.subcategory_id
 			WHERE product_id = :id";
 	$stmt = $pdo->prepare($sql);
 	$stmt->execute(['id' => $id]);
@@ -63,7 +65,7 @@
 							<div class="summary entry-summary position-relative">
 
 
-								<h1 class="mb-0 font-weight-bold text-7"><?php echo $row['name']; ?></h1>
+								<h1 class="mb-0 font-weight-bold text-7"><?php echo $row['material_name'].' '.$row['product_name'].' '.$row['size_1'].'*'.$row['size_2'].'*'.$row['size_3'].' '.$row['variant']; ?></h1>
 
 								<div class="pb-0 clearfix d-flex align-items-center">
 									<div title="Rated 3 out of 5" class="float-start">
@@ -76,15 +78,10 @@
 									<hr class="bg-color-grey-400">
 								</div>
 
-								<p class="text-3-5 mb-3"><?php echo $row['short_desc']; ?></p>
-
-								<ul class="list list-unstyled text-2">
-									<li class="mb-0">Current Stock: <strong class="text-color-dark"><?php echo $row['current_stock']; ?></strong></li>
-									<li class="mb-0">Reorder Level: <strong class="text-color-dark"><?php echo $row['reorder_level']; ?></strong></li>
-								</ul>
+								<p class="text-3-5 mb-3"><?php echo $row['description']; ?></p>
 
 									<hr>
-									<a href="https://wa.me/+60<?php echo COMPANY_CONTACT;?>?text=Hello,%20I'm%20interested%20in%20your%20product called <?php echo $row['name']; ?>. Can you provide me with more details?">
+									<a href="https://wa.me/+60<?php echo COMPANY_CONTACT;?>?text=Hello,%20I'm%20interested%20in%20your%20product called <?php echo $row['material_name'].' '.$row['product_name'].' '.$row['size_1'].'*'.$row['size_2'].'*'.$row['size_3'].' '.$row['variant']; ?>. Can you provide me with more details?">
 									<button type="submit" class="btn btn-dark btn-modern text-uppercase bg-color-hover-primary border-color-hover-primary">Get Your Quote Now!</button>
 									</a>
 									<hr>
@@ -103,7 +100,7 @@
 								</ul>
 								<div class="tab-content p-0">
 									<div class="tab-pane px-0 py-3 active" id="productDescription">
-										<p><?php echo $row['long_desc']; ?></p>
+										<p><?php echo $row['description']; ?></p>
 									</div>
 									<div class="tab-pane px-0 py-3" id="productInfo">
 										<table class="table table-striped m-0">
@@ -113,23 +110,15 @@
 														Material:
 													</th>
 													<td class="border-top-0">
-														<?php echo $row['material']; ?>
+														<?php echo $row['material_name']; ?>
 													</td>
 												</tr>
 												<tr>
 													<th>
-														Shape:
+														Size:
 													</th>
 													<td>
-														<?php echo $row['shape']; ?>
-													</td>
-												</tr>
-												<tr>
-													<th>
-														Size Volume:
-													</th>
-													<td>
-														<?php echo $row['size_volume']; ?>
+														<?php echo $row['size_1'].'*'.$row['size_2'].'*'.$row['size_3']; ?>
 													</td>
 												</tr>
 											</tbody>
@@ -151,7 +140,13 @@
 										<?php
 
 											$pdo = openDB();
-											$sql = "SELECT * FROM product INNER JOIN section on product.section_id = section.section_id";
+											$sql = "SELECT *
+													FROM product p
+													JOIN material m ON p.material_id = m.material_id
+													JOIN product_type pt ON p.product_type_id = pt.product_type_id
+													JOIN subcategory sc ON p.subcategory_id = sc.subcategory_id
+													JOIN category c ON p.category_id = c.category_id
+													JOIN section s ON p.section_id = s.section_id";
 											$stmt = $pdo->query($sql);
 											closeDB($pdo);
 
@@ -178,7 +173,7 @@
 											<div class="d-flex justify-content-between">
 												<div>
 													<a href="#" class="d-block text-uppercase text-decoration-none text-color-default text-color-hover-primary line-height-1 text-0 mb-1"><?php echo $row['section_name']; ?></a>
-													<h3 class="text-3-5 font-weight-medium font-alternative text-transform-none line-height-3 mb-0"><a href="product?id=<?php echo $row['product_id']; ?>" class="text-color-dark text-color-hover-primary"><?php echo $row['name']; ?></a></h3>
+													<h3 class="text-3-5 font-weight-medium font-alternative text-transform-none line-height-3 mb-0"><a href="product?id=<?php echo $row['product_id']; ?>" class="text-color-dark text-color-hover-primary"><?php echo $row['material_name'].' '.$row['product_name'].' '.$row['size_1'].'*'.$row['size_2'].'*'.$row['size_3'].' '.$row['variant']; ?></a></h3>
 												</div>
 												<a href="#" class="text-decoration-none text-color-default text-color-hover-dark text-4"><i class="far fa-heart"></i></a>
 											</div>
