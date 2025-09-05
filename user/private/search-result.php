@@ -1,6 +1,6 @@
 <?php
 
-	require_once '../../global/main_configuration.php';
+require_once '../../global/main_configuration.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 

@@ -1,6 +1,8 @@
 <?php
 // ✅ Start session and include configs
-
+use GuzzleHttp\Client;
+require 'vendor/autoload.php';
+use League\OAuth2\Client\Provider\GenericProvider;
 require_once __DIR__ . '/../../global/main_configuration.php';
 require_once __DIR__ . '/../private/auth_check.php';
 
@@ -13,6 +15,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $customer_phone       = trim($_POST['customer_phone'] ?? '');
     $customer_address     = trim($_POST['customer_address'] ?? '');
     $customer_company     = trim($_POST['customer_company_name'] ?? '');
+    $customer_city        = trim($_POST['customer_city'] ?? '');
+    $customer_region       = trim($_POST['customer_region'] ?? '');
+    $customer_postcode     = trim($_POST['customer_postcode'] ?? '');
+    $customer_country     = trim($_POST['customer_country'] ?? '');
     $customer_designation = trim($_POST['customer_designation'] ?? '');
 
     if ($customer_name === '') {
@@ -20,6 +26,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
+
+        try {
+
+            $xeroAuth = refreshXeroToken(); // always returns valid token
+            $accessToken = $xeroAuth['access_token'];
+            $tenantId    = $xeroAuth['tenant_id'];
+            
+            $client = new Client();
+            $response = $client->post('https://api.xero.com/api.xro/2.0/Contacts', [
+                'headers' => [
+                    'Authorization'   => 'Bearer ' . $accessToken,
+                    'Accept'          => 'application/json',
+                    'Content-Type'    => 'application/json',
+                    'Xero-tenant-id'  => $tenantId,
+                ],
+                'json' => [
+                    'Name'       => $customer_name,
+                    "IsSupplier"=> false,
+                    "IsCustomer"=> true,
+                    'Phones' => [
+                        [
+                            'PhoneType'    => 'MOBILE',
+                            'PhoneNumber'  => $customer_phone
+                        ]
+                    ],
+                    'Addresses' => [
+                        [
+                            'AddressType'   => 'STREET',
+                            'AddressLine1'  => $customer_address,
+                            'City'          => $customer_city,
+                            'Region'        => $customer_region,
+                            'PostalCode'    => $customer_postcode,
+                            'Country'       => $customer_country
+                        ]
+                    ]
+
+                ]
+            ]);
+
+            $result = json_decode($response->getBody(), true);
+
+            if (!empty($result['Contacts'][0]['ContactID'])) {
+                $xero_relation = $result['Contacts'][0]['ContactID'];
+            } else {
+                $errors[] = 'Failed to retrieve ContactID from Xero response.';
+            }
+
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $responseBody = $e->getResponse()->getBody()->getContents();
+            $errors[] = 'Xero API error: ' . $responseBody;
+
+        }
+        
         try {
             $pdo = openDB();
 
@@ -27,14 +86,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 customer_name,
                 customer_phone,
                 customer_address,
+                customer_city,
+                customer_region,
+                customer_postcode,
+                customer_country,
                 customer_company_name,
-                customer_designation
+                customer_designation,
+                xero_relation
             ) VALUES (
                 :customer_name,
                 :customer_phone,
                 :customer_address,
+                :customer_city,
+                :customer_region,
+                :customer_postcode,
+                :customer_country,
                 :customer_company_name,
-                :customer_designation
+                :customer_designation,
+                :xero_relation
             )";
 
             $insertStmt = $pdo->prepare($insertSQL);
@@ -42,17 +111,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':customer_name'         => $customer_name,
                 ':customer_phone'        => $customer_phone ?: null,
                 ':customer_address'      => $customer_address ?: null,
+                ':customer_city'        => $customer_city ?: null,
+                ':customer_region'      => $customer_region ?: null,
+                ':customer_postcode' => $customer_postcode ?: null,
+                ':customer_country'  => $customer_country ?: null,
                 ':customer_company_name' => $customer_company ?: null,
                 ':customer_designation'  => $customer_designation ?: null,
+                ':xero_relation'         => $xero_relation
             ]);
 
             $_SESSION['success'] = '✅ New customer added successfully!';
-            header('Location: ' . $_SERVER['PHP_SELF']);
-            exit;
 
         } catch (PDOException $e) {
             $errors[] = 'Database error: ' . $e->getMessage();
         }
+
     }
 }
 
@@ -139,49 +212,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 }
 
 ?>
-
-
-
-
-
-
-
-
-<!doctype html>
-<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg">
-
-<head>
-
-    <meta charset="utf-8" />
-    <title>Berans Trading</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-    <meta content="Themesbrand" name="author" />
-    <!-- App favicon -->
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
-
-    <!-- Layout config Js -->
-    <script src="assets/js/layout.js"></script>
-    <!-- Bootstrap Css -->
-    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <!-- Icons Css -->
-    <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-    <!-- App Css-->
-    <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
-    <!-- custom Css-->
-    <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
-
-
-</head>
-
-<body>
-
-    <!-- Begin page -->
-    <div id="layout-wrapper">
-        <?php 
-        include __DIR__ . '/../include/header.php';
-        include __DIR__ . '/../include/sidebar.php'; 
-        ?>
+<?php include __DIR__ . '/../include/header.php';?>
 
         <!-- ============================================================== -->
         <!-- Start right Content here -->
@@ -254,10 +285,50 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
                                                     <!-- Customer Address -->
                                                     <div class="row mb-3">
-                                                        <label for="customer_address" class="col-lg-3 col-form-label">Address</label>
+                                                        <label for="customer_address" class="col-lg-3 col-form-label">Address Line 1</label>
                                                         <div class="col-lg-9">
                                                             <textarea class="form-control" id="customer_address" name="customer_address" rows="3"
                                                                     placeholder="Enter address"><?= isset($_POST['customer_address']) ? htmlspecialchars($_POST['customer_address']) : '' ?></textarea>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Customer City -->
+                                                    <div class="row mb-3">
+                                                        <label for="customer_city" class="col-lg-3 col-form-label">City</label>
+                                                        <div class="col-lg-9">
+                                                            <input type="text" class="form-control" id="customer_city" name="customer_city"
+                                                                value="<?= isset($_POST['customer_city']) ? htmlspecialchars($_POST['customer_city']) : '' ?>"
+                                                                placeholder="Enter city">
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Customer Region -->
+                                                    <div class="row mb-3">
+                                                        <label for="customer_region" class="col-lg-3 col-form-label">Region</label>
+                                                        <div class="col-lg-9">
+                                                            <input type="text" class="form-control" id="customer_region" name="customer_region"
+                                                                value="<?= isset($_POST['customer_region']) ? htmlspecialchars($_POST['customer_region']) : '' ?>"
+                                                                placeholder="Enter region">
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Customer Postcode -->
+                                                    <div class="row mb-3">
+                                                        <label for="customer_postcode" class="col-lg-3 col-form-label">Postal Code</label>
+                                                        <div class="col-lg-9">
+                                                            <input type="text" class="form-control" id="customer_postcode" name="customer_postcode"
+                                                                value="<?= isset($_POST['customer_postcode']) ? htmlspecialchars($_POST['customer_postcode']) : '' ?>"
+                                                                placeholder="Enter postal code">
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Customer Country -->
+                                                    <div class="row mb-3">
+                                                        <label for="customer_country" class="col-lg-3 col-form-label">Country</label>
+                                                        <div class="col-lg-9">
+                                                            <input type="text" class="form-control" id="customer_country" name="customer_country"
+                                                                value="<?= isset($_POST['customer_country']) ? htmlspecialchars($_POST['customer_country']) : '' ?>"
+                                                                placeholder="Enter country">
                                                         </div>
                                                     </div>
 
@@ -324,7 +395,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                                             <th>Phone</th>
                                                             <th>Company</th>
                                                             <th>Designation</th>
-                                                            <th>Address</th>
+                                                            <th>Address Line 1</th>
+                                                            <th>City</th>
+                                                            <th>Region</th>
+                                                            <th>Postal Code</th>
+                                                            <th>Country</th>
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
@@ -337,6 +412,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                                                     <td><?= htmlspecialchars($customer['customer_company_name'] ?? '-') ?></td>
                                                                     <td><?= htmlspecialchars($customer['customer_designation'] ?? '-') ?></td>
                                                                     <td><?= nl2br(htmlspecialchars($customer['customer_address'] ?? '-')) ?></td>
+                                                                    <td><?= htmlspecialchars($customer['customer_city'] ?? '-') ?></td>
+                                                                    <td><?= htmlspecialchars($customer['customer_region'] ?? '-') ?></td>
+                                                                    <td><?= htmlspecialchars($customer['customer_postcode'] ?? '-') ?></td>
+                                                                    <td><?= htmlspecialchars($customer['customer_country'] ?? '-') ?></td>
                                                                     <td><a href="customer-edit-update.php?id=<?= urlencode($customer['customer_id']) ?>" class="btn btn-sm btn-primary">Edit</a></td>
                                                                 </tr>
                                                             <?php endforeach; ?>

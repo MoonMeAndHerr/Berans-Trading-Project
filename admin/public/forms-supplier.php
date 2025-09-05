@@ -1,40 +1,9 @@
-<?php include __DIR__ . '/../private/forms-add-supplier.php';?>
+<?php 
+    include __DIR__ . '/../private/forms-add-supplier.php';
+    include __DIR__ . '/../include/header.php';
+?>
 
-<!doctype html>
-<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg">
-
-<head>
-
-    <meta charset="utf-8" />
-    <title>Berans Trading</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-    <meta content="Themesbrand" name="author" />
-    <!-- App favicon -->
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
-
-    <!-- Layout config Js -->
-    <script src="assets/js/layout.js"></script>
-    <!-- Bootstrap Css -->
-    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <!-- Icons Css -->
-    <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-    <!-- App Css-->
-    <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
-    <!-- custom Css-->
-    <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
-
-
-</head>
-
-<body>
-
-    <!-- Begin page -->
-    <div id="layout-wrapper">
-        <?php 
-        include __DIR__ . '/../include/header.php';
-        include __DIR__ . '/../include/sidebar.php'; 
-        ?>
+ 
 
         <!-- ============================================================== -->
         <!-- Start right Content here -->
@@ -168,6 +137,46 @@
                                                                 </div>
                                                             </div><!-- end col -->
 
+                                                            <!-- City -->
+                                                            <div class="col-md-12">
+                                                                <div class="mb-3">
+                                                                    <label for="cityInput" class="form-label">City</label>
+                                                                    <input type="text" name="city" class="form-control" id="cityInput"
+                                                                        placeholder="Mentakab"
+                                                                        value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
+                                                                </div>
+                                                            </div><!-- end col -->
+
+                                                            <!-- Region -->
+                                                            <div class="col-md-12">
+                                                                <div class="mb-3">
+                                                                    <label for="regionInput" class="form-label">Region</label>
+                                                                    <input type="text" name="region" class="form-control" id="regionInput"
+                                                                        placeholder="Kelantan"
+                                                                        value="<?= htmlspecialchars($_POST['region'] ?? '') ?>">
+                                                                </div>
+                                                            </div><!-- end col -->
+
+                                                            <!-- PostCode -->
+                                                            <div class="col-md-12">
+                                                                <div class="mb-3">
+                                                                    <label for="postcodeInput" class="form-label">Postal Code</label>
+                                                                    <input type="text" name="postcode" class="form-control" id="postcodeInput"
+                                                                        placeholder="13200"
+                                                                        value="<?= htmlspecialchars($_POST['postcode'] ?? '') ?>">
+                                                                </div>
+                                                            </div><!-- end col -->
+
+                                                            <!-- Country -->
+                                                            <div class="col-md-12">
+                                                                <div class="mb-3">
+                                                                    <label for="countryInput" class="form-label">Country</label>
+                                                                    <input type="text" name="country" class="form-control" id="countryInput"
+                                                                        placeholder="Malaysia"
+                                                                        value="<?= htmlspecialchars($_POST['country'] ?? '') ?>">
+                                                                </div>
+                                                            </div><!-- end col -->
+
                                                             <!-- Notes -->
                                                             <div class="col-md-12">
                                                                 <div class="mb-3">
@@ -232,7 +241,12 @@
                                                                 data-phone="<?= htmlspecialchars($sup['phone'], ENT_QUOTES) ?>"
                                                                 data-email="<?= htmlspecialchars($sup['email'], ENT_QUOTES) ?>"
                                                                 data-address="<?= htmlspecialchars($sup['address'], ENT_QUOTES) ?>"
+                                                                data-city="<?= htmlspecialchars($sup['city'], ENT_QUOTES) ?>"
+                                                                data-region="<?= htmlspecialchars($sup['region'], ENT_QUOTES) ?>"
+                                                                data-postcode="<?= htmlspecialchars($sup['postcode'], ENT_QUOTES) ?>"
+                                                                data-country="<?= htmlspecialchars($sup['country'], ENT_QUOTES) ?>"
                                                                 data-notes="<?= htmlspecialchars($sup['notes'], ENT_QUOTES) ?>"
+                                                                data-xero="<?= htmlspecialchars($sup['xero_relation'], ENT_QUOTES) ?>"
                                                             >
                                                                 <?= htmlspecialchars($sup['supplier_name']) ?>
                                                             </option>
@@ -244,7 +258,7 @@
                                                 <form id="updateForm" action="" method="POST">
                                                     <div class="row">
                                                         <input type="hidden" name="supplier_id" id="update_supplier_id">
-
+                                                        <input type="hidden" name="xero_relation" id="update_supplier_xero_relation">
                                                         <!-- Supplier Name -->
                                                         <div class="mb-3">
                                                             <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
@@ -282,6 +296,38 @@
                                                                 <textarea name="address" id="update_supplier_address" class="form-control"></textarea>
                                                             </div>
                                                         </div><!-- end address -->
+
+                                                        <!-- City -->
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">City</label>
+                                                                <input type="text" name="city" id="update_supplier_city" class="form-control">
+                                                            </div>
+                                                        </div><!-- end phone -->
+
+                                                        <!-- Region -->
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Region</label>
+                                                                <input type="text" name="region" id="update_supplier_region" class="form-control">
+                                                            </div>
+                                                        </div><!-- end phone -->
+
+                                                        <!-- Postcode -->
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Postcode</label>
+                                                                <input type="text" name="postcode" id="update_supplier_postcode" class="form-control">
+                                                            </div>
+                                                        </div><!-- end phone -->
+
+                                                        <!-- Country -->
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Country</label>
+                                                                <input type="text" name="country" id="update_supplier_country" class="form-control">
+                                                            </div>
+                                                        </div><!-- end phone -->
 
                                                         <!-- Notes -->
                                                         <div class="col-md-12">
@@ -356,6 +402,10 @@
                                                             data-phone="<?= htmlspecialchars($sup['phone'], ENT_QUOTES) ?>"
                                                             data-email="<?= htmlspecialchars($sup['email'], ENT_QUOTES) ?>"
                                                             data-address="<?= htmlspecialchars($sup['address'], ENT_QUOTES) ?>"
+                                                            data-city="<?= htmlspecialchars($sup['city'], ENT_QUOTES) ?>"
+                                                            data-region="<?= htmlspecialchars($sup['region'], ENT_QUOTES) ?>"
+                                                            data-postcode="<?= htmlspecialchars($sup['postcode'], ENT_QUOTES) ?>"
+                                                            data-country="<?= htmlspecialchars($sup['country'], ENT_QUOTES) ?>"
                                                             data-notes="<?= htmlspecialchars($sup['notes'], ENT_QUOTES) ?>"
                                                         >
                                                             <?= htmlspecialchars($sup['supplier_name']) ?>
@@ -397,6 +447,38 @@
                                                             <label class="form-label">Address</label>
                                                             <textarea id="delete_supplier_address" class="form-control" rows="2" readonly></textarea>
                                                         </div>
+
+                                                        <!-- City -->
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">City</label>
+                                                                <input type="text" id="delete_supplier_city" class="form-control" readonly>
+                                                            </div>
+                                                        </div><!-- end phone -->
+
+                                                        <!-- Region -->
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Region</label>
+                                                                <input type="text" id="delete_supplier_region" class="form-control" readonly>
+                                                            </div>
+                                                        </div><!-- end phone -->
+
+                                                        <!-- Postcode -->
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Postcode</label>
+                                                                <input type="text" id="delete_supplier_postcode" class="form-control" readonly>
+                                                            </div>
+                                                        </div><!-- end phone -->
+
+                                                        <!-- Country -->
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Country</label>
+                                                                <input type="text" id="delete_supplier_country" class="form-control" readonly>
+                                                            </div>
+                                                        </div><!-- end phone -->
 
                                                         <div class="mb-3">
                                                             <label class="form-label">Notes</label>
