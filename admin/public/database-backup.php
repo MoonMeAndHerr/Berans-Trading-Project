@@ -33,7 +33,7 @@
 
             <div class="card mt-1 shadow">
                 <div class="card-header d-flex align-items-center mx-3 mt-2">
-                    <h3 class="card-title mb-0 me-3" style="white-space: nowrap;">Database Backup List</h3><a href="../private/backup-cron.php?action=database-backup" class="btn btn-sm btn-primary">Backup Now</a>
+                    <h3 class="card-title mb-0 me-3" style="white-space: nowrap;">Database Backup List</h3><a href="../private/backup-cron.php?action=database-backup" target="_blank" class="btn btn-sm btn-primary">Backup Now</a>
                 </div>
 
                 <?php 
@@ -85,9 +85,9 @@
                             <td><?= htmlspecialchars($row['triggered_by'] ?: '-') ?></td>
                             <td><?= $row['error_message'] ?></td>
                             <td>
-                                <a href="../private/backup-action?id=<?php echo $row['id']; ?>&action=rollback" class="btn btn-sm btn-success">Rollback</a>
-                                <a href="../private/backup-action?id=<?php echo $row['id']; ?>&action=download" class="btn btn-sm btn-danger">Download</a>
-                                <a href="../private/backup-action?id=<?php echo $row['id']; ?>&action=delete" class="btn btn-sm btn-warning">Delete</a>
+                                <a href="../private/backup-action?id=<?php echo $row['id']; ?>&action=rollback" target="_blank" class="btn btn-sm btn-success">Rollback</a>
+                                <a href="../private/backup-action?id=<?php echo $row['id']; ?>&action=download" target="_blank" class="btn btn-sm btn-danger">Download</a>
+                                <a href="../private/backup-action?id=<?php echo $row['id']; ?>&action=delete" target="_blank" class="btn btn-sm btn-warning">Delete</a>
                             </td>
                             </tr>
                             <?php 

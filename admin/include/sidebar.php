@@ -194,24 +194,16 @@
                     </div>
                     <ul class="navbar-nav" id="navbar-nav">
                         <li class="menu-title"><span data-key="t-menu">Menu</span></li>
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarDashboards" data-bs-toggle="collapse" role="button"
-                                aria-expanded="false" aria-controls="sidebarDashboards">
-                                <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Dashboards</span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarDashboards">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="../public/dashboard-projects.php" class="nav-link" data-key="t-projects"> Projects </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li> <!-- end Dashboard Menu -->
 
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="dashboard-projects.php">
+                                    <i class="ri-dashboard-2-line"></i>
+                                    <span data-key="t-tables">Dashboard</span>
+                                 </a>
+                            </li>
 
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Public Relation</span></li>
-                        
-                            <ul class="navbar-nav" id="navbar-nav">
+                    
                                 <!-- ===== Staff ===== -->
                                 <li class="nav-item">
                                     <a class="nav-link menu-link" href="#sidebarTablesStaff" data-bs-toggle="collapse" role="button"
