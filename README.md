@@ -32,10 +32,6 @@ Each user-type module (admin/, user/, and authentication/) follows a consistent 
 
 This separation ensures a clean distinction between presentation, logic, and shared elements.
 
-- **🛡️ authentication/**
-
-Handles all authentication-related processes such as login, registration, and session management, with its own public/, private/, and include/ folders just like the user and admin modules.
-
 - **🌐 global/**
 
 Contains globally used resources like:
@@ -95,22 +91,9 @@ ProjectRoot/
 │   ├── include/         # Shared frontend components for user
 │   ├── private/         # Backend logic for user
 │   └── public/          # User frontend pages
-├── authentication/
-│   ├── htaccess
-│   ├── index.php
-│   ├── include/         # Shared login UI parts
-│   ├── private/         # Login/session backend logic
-│   └── public/          # Login/register pages
-├── backup/
-│   ├── databases/       # Auto-generated database backups
-│   └── websites/        # Auto-generated website file backups
 ├── database/            # Raw SQL files (manual setup/schema)
 ├── global/              # Global PHP utilities (e.g. DB connect/close)
 ├── media/               # Uploaded media files
-├── siteidentity/
-│   ├── logo/            # Site logo uploads
-│   └── favicon/         # Site favicon uploads
-
 ```
 
 
