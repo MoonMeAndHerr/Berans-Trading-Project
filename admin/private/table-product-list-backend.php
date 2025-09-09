@@ -1,9 +1,8 @@
 <?php
 require_once __DIR__ . '/../../global/main_configuration.php';
 require_once __DIR__ . '/auth_check.php';
-use GuzzleHttp\Client;
-require 'vendor/autoload.php';
 use League\OAuth2\Client\Provider\GenericProvider;
+use GuzzleHttp\Client;
 
 $pdo = openDB();
 

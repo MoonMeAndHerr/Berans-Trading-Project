@@ -1,7 +1,6 @@
 <?php
-use GuzzleHttp\Client;
-require 'vendor/autoload.php';
 use League\OAuth2\Client\Provider\GenericProvider;
+use GuzzleHttp\Client;
 // ✅ Session and configuration
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

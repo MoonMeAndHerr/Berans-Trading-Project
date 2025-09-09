@@ -1,6 +1,7 @@
 <?php
-require 'vendor/autoload.php';
+require_once __DIR__ . '/../../global/main_configuration.php';
 use League\OAuth2\Client\Provider\GenericProvider;
+use GuzzleHttp\Client;
 
 function refreshXeroToken() {
 
