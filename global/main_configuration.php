@@ -3,6 +3,10 @@
 include __DIR__ . '/../admin/public/refresh_xero_token.php';
 date_default_timezone_set("Asia/Kuala_Lumpur");
 
+require 'vendor/autoload.php';
+use League\OAuth2\Client\Provider\GenericProvider;
+use GuzzleHttp\Client;
+
 #======================= Database Configuration Starts =======================#
 
 function openDB() {
