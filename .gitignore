@@ -19,3 +19,31 @@
 /fuel/app/logs/*/*/*
 /fuel/app/cache/*/*
 /fuel/app/config/crypt.php
+
+# Composer dependencies
+/vendor/
+
+# Composer lock file backup (sometimes created on Windows)
+/composer.lock.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor stuff
+/.idea/
+/.vscode/
+*.swp
+
+# Logs and cache
+*.log
+/cache/
+/storage/
+/tmp/
+
+# PHPUnit
+.phpunit.result.cache
+
+# Environment files
+.env
+.env.*
