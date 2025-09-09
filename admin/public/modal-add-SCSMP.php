@@ -1,4 +1,3 @@
-<!-- Modal HTML -->
 <div class="modal fade" id="addSCSMPModal" tabindex="-1" aria-labelledby="addSCSMPLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -103,8 +102,9 @@
                     <input type="text" class="form-control mt-2" name="new_product_type" placeholder="New Product Type" value="">
                 </div>
 
-
-                        <button type="submit" class="btn btn-primary w-100">Add</button>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="ri-add-line me-1"></i> Add
+                        </button>
                     </form>
                 </div>
 
@@ -156,100 +156,261 @@
                         <input type="text" class="form-control mb-3" name="update_product_type_name" placeholder="New Product Type Name"
                                value="<?= htmlspecialchars($values['update_product_type_name'] ?? '') ?>">
 
-                        <button type="submit" class="btn btn-success w-100">Update</button>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="ri-edit-line me-1"></i> Update
+                        </button>
                     </form>
                 </div>
 
 <!-- DELETE TAB -->
 <div class="tab-pane fade" id="deleteTabContent" role="tabpanel">
-    <form method="POST" id="deleteForm">
-        <!-- Top-level selector: choose delete type -->
-        <h6 class="fw-bold mb-2">Choose Level to Delete</h6>
-        <select class="form-select mb-3" id="delete_level">
-            <option disabled selected>Choose Level...</option>
-            <option value="section">Section</option>
-            <option value="category">Category</option>
-            <option value="subcategory">Subcategory</option>
-            <option value="material">Material</option>
-            <option value="product_type">Product Type</option>
-        </select>
-
-        <div id="delete_selectors">
-            <!-- Section -->
-            <div class="mb-3 level-section" style="display:none;">
-                <label>Section</label>
-                <select class="form-select" name="delete_section_id" id="delete_section">
-                    <option disabled selected>Choose Section...</option>
-                    <?php foreach($sections as $sec): ?>
-                        <option value="<?= $sec['section_id'] ?>"><?= htmlspecialchars($sec['section_name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <!-- Category -->
-            <div class="mb-3 level-category" style="display:none;">
-                <label>Category</label>
-                <select class="form-select" name="delete_category_id" id="delete_category">
-                    <option disabled selected>Choose Category...</option>
-                </select>
-            </div>
-
-            <!-- Subcategory -->
-            <div class="mb-3 level-subcategory" style="display:none;">
-                <label>Subcategory</label>
-                <select class="form-select" name="delete_subcategory_id" id="delete_subcategory">
-                    <option disabled selected>Choose Subcategory...</option>
-                </select>
-            </div>
-
-            <!-- Material -->
-            <div class="mb-3 level-material" style="display:none;">
-                <label>Material</label>
-                <select class="form-select" name="delete_material_id" id="delete_material">
-                    <option disabled selected>Choose Material...</option>
-                </select>
-            </div>
-
-            <!-- Product Type -->
-            <div class="mb-3 level-product_type" style="display:none;">
-                <label>Product Type</label>
-                <select class="form-select" name="delete_product_type_id" id="delete_product_type">
-                    <option disabled selected>Choose Product Type...</option>
-                </select>
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-danger w-100">Delete</button>
-    </form>
-
-    <!-- Warning Message for Pending Delete -->
-    <?php if (isset($_SESSION['modal_warning'])): ?>
+    <!-- Security Key Section -->
+    <div id="deleteSecuritySection">
         <div class="alert alert-warning" role="alert">
-            <pre class="mb-2"><?= htmlspecialchars($_SESSION['modal_warning']) ?></pre>
-            <form method="POST">
-                <?php foreach ($_SESSION['pending_delete'] as $key => $value): ?>
-                    <input type="hidden" name="<?= htmlspecialchars($key) ?>" value="<?= htmlspecialchars($value) ?>">
-                <?php endforeach; ?>
-                <input type="hidden" name="confirm_delete" value="1">
-                <button type="submit" class="btn btn-danger">Yes, Delete</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            </form>
+            <i class="ri-shield-keyhole-line me-2"></i>
+            <strong>Security Required:</strong> Enter the delete key to access deletion functions.
         </div>
-        <?php 
-        unset($_SESSION['modal_warning']);
-        unset($_SESSION['pending_delete']);
-        ?>
-    <?php endif; ?>
-                
+        
+        <div class="mb-3">
+            <label class="form-label fw-bold">Delete Access Key</label>
+            <div class="input-group">
+                <input type="password" class="form-control" id="deleteKey" placeholder="Enter delete key..." autocomplete="off">
+                <button type="button" class="btn btn-outline-secondary" id="toggleDeleteKeyVisibility">
+                    <i class="ri-eye-line" id="deleteKeyIcon"></i>
+                </button>
+            </div>
+            <small class="text-muted">Contact administrator if you don't have the delete key.</small>
+        </div>
+        
+        <button type="button" class="btn btn-primary" id="verifyDeleteKey">
+            <i class="ri-key-2-line me-1"></i> Verify Key
+        </button>
+    </div>
+
+    <!-- Delete Form Section (Initially Hidden) -->
+    <div id="deleteFormSection" style="display: none;">
+        <div class="alert alert-success" role="alert">
+            <i class="ri-shield-check-line me-2"></i>
+            <strong>Access Granted:</strong> You can now proceed with deletion.
+            <button type="button" class="btn btn-sm btn-outline-success ms-2" id="lockDeleteAccess">
+                <i class="ri-lock-line me-1"></i> Lock Access
+            </button>
+        </div>
+
+        <form method="POST" id="deleteForm">
+            <!-- Top-level selector: choose delete type -->
+            <h6 class="fw-bold mb-2">Choose Level to Delete</h6>
+            <select class="form-select mb-3" id="delete_level">
+                <option disabled selected>Choose Level...</option>
+                <option value="section">Section</option>
+                <option value="category">Category</option>
+                <option value="subcategory">Subcategory</option>
+                <option value="material">Material</option>
+                <option value="product_type">Product Type</option>
+            </select>
+
+            <div id="delete_selectors">
+                <!-- Section -->
+                <div class="mb-3 level-section" style="display:none;">
+                    <label>Section</label>
+                    <select class="form-select" name="delete_section_id" id="delete_section">
+                        <option disabled selected>Choose Section...</option>
+                        <?php foreach($sections as $sec): ?>
+                            <option value="<?= $sec['section_id'] ?>"><?= htmlspecialchars($sec['section_name']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Category -->
+                <div class="mb-3 level-category" style="display:none;">
+                    <label>Category</label>
+                    <select class="form-select" name="delete_category_id" id="delete_category">
+                        <option disabled selected>Choose Category...</option>
+                    </select>
+                </div>
+
+                <!-- Subcategory -->
+                <div class="mb-3 level-subcategory" style="display:none;">
+                    <label>Subcategory</label>
+                    <select class="form-select" name="delete_subcategory_id" id="delete_subcategory">
+                        <option disabled selected>Choose Subcategory...</option>
+                    </select>
+                </div>
+
+                <!-- Material -->
+                <div class="mb-3 level-material" style="display:none;">
+                    <label>Material</label>
+                    <select class="form-select" name="delete_material_id" id="delete_material">
+                        <option disabled selected>Choose Material...</option>
+                    </select>
+                </div>
+
+                <!-- Product Type -->
+                <div class="mb-3 level-product_type" style="display:none;">
+                    <label>Product Type</label>
+                    <select class="form-select" name="delete_product_type_id" id="delete_product_type">
+                        <option disabled selected>Choose Product Type...</option>
+                    </select>
+                </div>
             </div>
 
+            <button type="submit" class="btn btn-danger w-100">
+                <i class="ri-delete-bin-line me-1"></i> Delete Selected Item
+            </button>
+        </form>
+
+        <!-- Warning Message for Pending Delete -->
+        <?php if (isset($_SESSION['modal_warning'])): ?>
+            <div class="alert alert-warning" role="alert">
+                <pre class="mb-2"><?= htmlspecialchars($_SESSION['modal_warning']) ?></pre>
+                <form method="POST">
+                    <?php foreach ($_SESSION['pending_delete'] as $key => $value): ?>
+                        <input type="hidden" name="<?= htmlspecialchars($key) ?>" value="<?= htmlspecialchars($value) ?>">
+                    <?php endforeach; ?>
+                    <input type="hidden" name="confirm_delete" value="1">
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+            <?php 
+            unset($_SESSION['modal_warning']);
+            unset($_SESSION['pending_delete']);
+            ?>
+        <?php endif; ?>
+    </div>
+</div>
+
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Modal JS for dynamic filtering (Add + Update) -->
+<!-- Select2 Dependencies -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- Modal JS for dynamic filtering with Select2 (Add + Update + Secure Delete) -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
+    // --- DELETE ACCESS SECURITY ---
+    const DELETE_KEY = "DELETE2024"; // Change this to your desired password
+    let deleteAccessGranted = false;
+    
+    const deleteKeyInput = document.getElementById('deleteKey');
+    const verifyDeleteKeyBtn = document.getElementById('verifyDeleteKey');
+    const toggleDeleteKeyVisibilityBtn = document.getElementById('toggleDeleteKeyVisibility');
+    const deleteKeyIcon = document.getElementById('deleteKeyIcon');
+    const deleteSecuritySection = document.getElementById('deleteSecuritySection');
+    const deleteFormSection = document.getElementById('deleteFormSection');
+    const lockDeleteAccessBtn = document.getElementById('lockDeleteAccess');
+
+    // Toggle password visibility
+    if (toggleDeleteKeyVisibilityBtn) {
+        toggleDeleteKeyVisibilityBtn.addEventListener('click', function() {
+            if (deleteKeyInput.type === 'password') {
+                deleteKeyInput.type = 'text';
+                deleteKeyIcon.className = 'ri-eye-off-line';
+            } else {
+                deleteKeyInput.type = 'password';
+                deleteKeyIcon.className = 'ri-eye-line';
+            }
+        });
+    }
+
+    // Verify delete key
+    if (verifyDeleteKeyBtn) {
+        verifyDeleteKeyBtn.addEventListener('click', function() {
+            const enteredKey = deleteKeyInput.value.trim();
+            
+            if (enteredKey === DELETE_KEY) {
+                deleteAccessGranted = true;
+                deleteSecuritySection.style.display = 'none';
+                deleteFormSection.style.display = 'block';
+                
+                // Show success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Access Granted',
+                    text: 'You can now proceed with deletion operations.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                // Clear the input
+                deleteKeyInput.value = '';
+                
+                // Show error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Access Denied',
+                    text: 'Invalid delete key. Please contact your administrator.',
+                    confirmButtonColor: '#dc3545'
+                });
+            }
+        });
+    }
+
+    // Lock delete access
+    if (lockDeleteAccessBtn) {
+        lockDeleteAccessBtn.addEventListener('click', function() {
+            deleteAccessGranted = false;
+            deleteFormSection.style.display = 'none';
+            deleteSecuritySection.style.display = 'block';
+            deleteKeyInput.value = '';
+            
+            // Reset all delete form selections
+            $('#delete_level').val('').trigger('change');
+            Object.values(deleteSelectors).forEach(el => el.style.display = 'none');
+            
+            Swal.fire({
+                icon: 'info',
+                title: 'Access Locked',
+                text: 'Delete access has been locked.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        });
+    }
+
+    // Allow Enter key to verify delete key
+    if (deleteKeyInput) {
+        deleteKeyInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyDeleteKeyBtn.click();
+            }
+        });
+    }
+
+    // --- SELECT2 INITIALIZATION ---
+    const baseCfg = { 
+        width: '100%',
+        placeholder: function() {
+            return $(this).data('placeholder');
+        },
+        allowClear: false,
+        dropdownParent: $('#addSCSMPModal') // Ensure dropdown shows within modal
+    };
+
+    // Initialize Select2 on all dropdowns
+    $('#modal_section').select2(baseCfg).attr('data-placeholder', 'Choose Section for Category...');
+    $('#modal_category').select2(baseCfg).attr('data-placeholder', 'Choose Category for Subcategory...');
+    $('#modal_subcategory').select2(baseCfg).attr('data-placeholder', 'Choose Subcategory for Material...');
+    $('#modal_material').select2(baseCfg).attr('data-placeholder', 'Choose Material for Product Type...');
+
+    $('#update_section').select2(baseCfg).attr('data-placeholder', 'Choose Section...');
+    $('#update_category').select2(baseCfg).attr('data-placeholder', 'Choose Category...');
+    $('#update_subcategory').select2(baseCfg).attr('data-placeholder', 'Choose Subcategory...');
+    $('#update_material').select2(baseCfg).attr('data-placeholder', 'Choose Material...');
+    $('#update_product_type').select2(baseCfg).attr('data-placeholder', 'Choose Product Type...');
+
+    $('#delete_level').select2(baseCfg).attr('data-placeholder', 'Choose Level...');
+    $('#delete_section').select2(baseCfg).attr('data-placeholder', 'Choose Section...');
+    $('#delete_category').select2(baseCfg).attr('data-placeholder', 'Choose Category...');
+    $('#delete_subcategory').select2(baseCfg).attr('data-placeholder', 'Choose Subcategory...');
+    $('#delete_material').select2(baseCfg).attr('data-placeholder', 'Choose Material...');
+    $('#delete_product_type').select2(baseCfg).attr('data-placeholder', 'Choose Product Type...');
 
     // --- ELEMENTS ---
     const modalSection = document.getElementById('modal_section');
@@ -278,84 +439,162 @@ document.addEventListener('DOMContentLoaded', function () {
         product_type: document.querySelector('.level-product_type')
     };
 
-    // --- FETCH OPTIONS ---
+    // --- FIXED FETCH OPTIONS (Returns Promise) ---
     function fetchOptions(type, parent_id, targetSelect, selectedId = null) {
-        fetch(`../private/modal-add-SCSMP-backend.php?ajax=1&type=${type}&parent_id=${parent_id}`)
-            .then(res => res.json())
-            .then(data => {
-                targetSelect.innerHTML = '';
-                const defaultOption = document.createElement('option');
-                defaultOption.disabled = true;
-                defaultOption.selected = true;
-                defaultOption.text = `Choose ${type.replace('_',' ')}...`;
-                targetSelect.appendChild(defaultOption);
+        return new Promise((resolve, reject) => {
+            fetch(`../private/modal-add-SCSMP-backend.php?ajax=1&type=${type}&parent_id=${parent_id}`)
+                .then(res => res.json())
+                .then(data => {
+                    // Clear Select2 and rebuild options
+                    $(targetSelect).empty();
+                    
+                    const defaultOption = new Option(`Choose ${type.replace('_',' ')}...`, '', true, true);
+                    defaultOption.disabled = true;
+                    targetSelect.add(defaultOption);
 
-                data.forEach(item => {
-                    let value, label;
-                    if(type === 'category') { value = item.category_id; label = item.category_name; }
-                    if(type === 'subcategory') { value = item.subcategory_id; label = item.subcategory_name; }
-                    if(type === 'material') { value = item.material_id; label = item.material_name; }
-                    if(type === 'product_type') { value = item.product_type_id; label = item.product_name; }
+                    data.forEach(item => {
+                        let value, label;
+                        if(type === 'category') { value = item.category_id; label = item.category_name; }
+                        if(type === 'subcategory') { value = item.subcategory_id; label = item.subcategory_name; }
+                        if(type === 'material') { value = item.material_id; label = item.material_name; }
+                        if(type === 'product_type') { value = item.product_type_id; label = item.product_name; }
 
-                    const opt = document.createElement('option');
-                    opt.value = value;
-                    opt.textContent = label;
-                    if(selectedId && selectedId == value) opt.selected = true;
-                    targetSelect.appendChild(opt);
+                        const opt = new Option(label, value, false, false);
+                        targetSelect.add(opt);
+                    });
+
+                    // Set selected value if provided
+                    if(selectedId) {
+                        $(targetSelect).val(selectedId).trigger('change');
+                    } else {
+                        $(targetSelect).trigger('change');
+                    }
+
+                    resolve();
+                })
+                .catch(err => {
+                    console.error('Error fetching options:', err);
+                    reject(err);
                 });
-            })
-            .catch(err => {
-                console.error('Error fetching options:', err);
-            });
+        });
     }
 
-    // --- TAB HANDLERS ---
+    // --- TAB HANDLERS (Updated for Select2) ---
     function setupCascade(parentEl, childEl, nextChildEl = null, type) {
         if(parentEl){
-            parentEl.addEventListener('change', () => {
-                fetchOptions(type, parentEl.value, childEl);
-                if(nextChildEl) nextChildEl.innerHTML = `<option disabled selected>Choose ${nextChildEl.id.replace('_',' ')}...</option>`;
+            $(parentEl).on('change', function() {
+                const parentValue = $(this).val();
+                if (parentValue) {
+                    fetchOptions(type, parentValue, childEl);
+                    if(nextChildEl) {
+                        $(nextChildEl).empty();
+                        const nextDefaultOption = new Option(`Choose ${nextChildEl.id.replace('modal_', '').replace('update_', '').replace('delete_', '').replace('_',' ')}...`, '', true, true);
+                        nextDefaultOption.disabled = true;
+                        nextChildEl.add(nextDefaultOption);
+                        $(nextChildEl).trigger('change');
+                    }
+                } else {
+                    // Clear child dropdown if parent is cleared
+                    $(childEl).empty();
+                    const childDefaultOption = new Option(`Choose ${type.replace('_',' ')}...`, '', true, true);
+                    childDefaultOption.disabled = true;
+                    childEl.add(childDefaultOption);
+                    $(childEl).trigger('change');
+                }
             });
         }
     }
 
     // --- ADD TAB ---
     const addValues = <?= json_encode($values) ?>;
-    if(modalSection){
-        if(addValues['section_id']) fetchOptions('category', addValues['section_id'], modalCategory, addValues['category_id']);
-        setupCascade(modalSection, modalCategory, modalSubcategory, 'category');
+    
+    // Setup cascade for ADD tab
+    setupCascade(modalSection, modalCategory, modalSubcategory, 'category');
+    setupCascade(modalCategory, modalSubcategory, modalMaterial, 'subcategory');
+    setupCascade(modalSubcategory, modalMaterial, null, 'material');
+
+    // FIXED: Restore ADD tab values with proper async handling
+    function restoreAddTabValues() {
+        if(modalSection && addValues['section_id']) {
+            // First set the section
+            $(modalSection).val(addValues['section_id']).trigger('change');
+            
+            // Then populate and set category if exists
+            if(addValues['category_id']) {
+                fetchOptions('category', addValues['section_id'], modalCategory, addValues['category_id'])
+                    .then(() => {
+                        // Then populate and set subcategory if exists
+                        if(addValues['subcategory_id']) {
+                            return fetchOptions('subcategory', addValues['category_id'], modalSubcategory, addValues['subcategory_id']);
+                        }
+                    })
+                    .then(() => {
+                        // Finally populate and set material if exists
+                        if(addValues['material_id']) {
+                            return fetchOptions('material', addValues['subcategory_id'], modalMaterial, addValues['material_id']);
+                        }
+                    })
+                    .catch(err => console.error('Error restoring add tab values:', err));
+            }
+        }
     }
-    if(modalCategory){
-        if(addValues['category_id']) fetchOptions('subcategory', addValues['category_id'], modalSubcategory, addValues['subcategory_id']);
-        setupCascade(modalCategory, modalSubcategory, modalMaterial, 'subcategory');
-    }
-    if(modalSubcategory){
-        if(addValues['subcategory_id']) fetchOptions('material', addValues['subcategory_id'], modalMaterial, addValues['material_id']);
-        setupCascade(modalSubcategory, modalMaterial, null, 'material');
-    }
+
+    // Call restore function after a short delay to ensure DOM is ready
+    setTimeout(restoreAddTabValues, 100);
 
     // --- UPDATE TAB ---
     const updateValues = <?= json_encode($values) ?>;
-    if(updateSection){
-        if(updateValues['update_section_id']) fetchOptions('category', updateValues['update_section_id'], updateCategory, updateValues['update_category_id']);
-        setupCascade(updateSection, updateCategory, updateSubcategory, 'category');
-    }
-    if(updateCategory){
-        if(updateValues['update_category_id']) fetchOptions('subcategory', updateValues['update_category_id'], updateSubcategory, updateValues['update_subcategory_id']);
-        setupCascade(updateCategory, updateSubcategory, updateMaterial, 'subcategory');
-    }
-    if(updateSubcategory){
-        if(updateValues['update_subcategory_id']) fetchOptions('material', updateValues['update_subcategory_id'], updateMaterial, updateValues['update_material_id']);
-        setupCascade(updateSubcategory, updateMaterial, updateProductType, 'material');
-    }
-    if(updateMaterial){
-        if(updateValues['update_material_id']) fetchOptions('product_type', updateValues['update_material_id'], updateProductType, updateValues['update_product_type_id']);
-        setupCascade(updateMaterial, updateProductType, null, 'product_type');
+    
+    // Setup cascade for UPDATE tab
+    setupCascade(updateSection, updateCategory, updateSubcategory, 'category');
+    setupCascade(updateCategory, updateSubcategory, updateMaterial, 'subcategory');
+    setupCascade(updateSubcategory, updateMaterial, updateProductType, 'material');
+    setupCascade(updateMaterial, updateProductType, null, 'product_type');
+
+    // FIXED: Restore UPDATE tab values with proper async handling
+    function restoreUpdateTabValues() {
+        if(updateSection && updateValues['update_section_id']) {
+            $(updateSection).val(updateValues['update_section_id']).trigger('change');
+            
+            if(updateValues['update_category_id']) {
+                fetchOptions('category', updateValues['update_section_id'], updateCategory, updateValues['update_category_id'])
+                    .then(() => {
+                        if(updateValues['update_subcategory_id']) {
+                            return fetchOptions('subcategory', updateValues['update_category_id'], updateSubcategory, updateValues['update_subcategory_id']);
+                        }
+                    })
+                    .then(() => {
+                        if(updateValues['update_material_id']) {
+                            return fetchOptions('material', updateValues['update_subcategory_id'], updateMaterial, updateValues['update_material_id']);
+                        }
+                    })
+                    .then(() => {
+                        if(updateValues['update_product_type_id']) {
+                            return fetchOptions('product_type', updateValues['update_material_id'], updateProductType, updateValues['update_product_type_id']);
+                        }
+                    })
+                    .catch(err => console.error('Error restoring update tab values:', err));
+            }
+        }
     }
 
-    // --- DELETE TAB ---
-    deleteLevel.addEventListener('change', () => {
-        const level = deleteLevel.value;
+    // Call restore function after a short delay
+    setTimeout(restoreUpdateTabValues, 100);
+
+    // --- DELETE TAB (Updated for Select2 + Security) ---
+    $(deleteLevel).on('change', function() {
+        if (!deleteAccessGranted) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Access Denied',
+                text: 'Please verify your delete key first.',
+                confirmButtonColor: '#dc3545'
+            });
+            $(this).val('').trigger('change');
+            return;
+        }
+
+        const level = $(this).val();
         Object.values(deleteSelectors).forEach(el => el.style.display = 'none');
 
         if(level === 'section') deleteSelectors.section.style.display = 'block';
@@ -376,72 +615,152 @@ document.addEventListener('DOMContentLoaded', function () {
         deleteForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const level = deleteLevel.value;
+            if (!deleteAccessGranted) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Access Denied',
+                    text: 'Please verify your delete key first.',
+                    confirmButtonColor: '#dc3545'
+                });
+                return;
+            }
+            
+            const level = $(deleteLevel).val();
             let selectedText = '';
             let selectedId = '';
             
             switch(level) {
                 case 'section': 
-                    selectedText = deleteSection.options[deleteSection.selectedIndex]?.text;
-                    selectedId = deleteSection.value;
+                    selectedText = $(deleteSection).find('option:selected').text();
+                    selectedId = $(deleteSection).val();
                     break;
                 case 'category': 
-                    selectedText = deleteCategory.options[deleteCategory.selectedIndex]?.text;
-                    selectedId = deleteCategory.value;
+                    selectedText = $(deleteCategory).find('option:selected').text();
+                    selectedId = $(deleteCategory).val();
                     break;
                 case 'subcategory': 
-                    selectedText = deleteSubcategory.options[deleteSubcategory.selectedIndex]?.text;
-                    selectedId = deleteSubcategory.value;
+                    selectedText = $(deleteSubcategory).find('option:selected').text();
+                    selectedId = $(deleteSubcategory).val();
                     break;
                 case 'material': 
-                    selectedText = deleteMaterial.options[deleteMaterial.selectedIndex]?.text;
-                    selectedId = deleteMaterial.value;
+                    selectedText = $(deleteMaterial).find('option:selected').text();
+                    selectedId = $(deleteMaterial).val();
                     break;
                 case 'product_type': 
-                    selectedText = deleteProductType.options[deleteProductType.selectedIndex]?.text;
-                    selectedId = deleteProductType.value;
+                    selectedText = $(deleteProductType).find('option:selected').text();
+                    selectedId = $(deleteProductType).val();
                     break;
             }
 
             if(!selectedId || !selectedText) {
-                alert('Please select an item to delete!');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Selection Required',
+                    text: 'Please select an item to delete!',
+                    confirmButtonColor: '#ffc107'
+                });
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('delete_level', level);
-            formData.append(`delete_${level}_id`, selectedId);
-            
-            fetch('../private/modal-add-SCSMP-backend.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.warning) {
-                    if(confirm(`${data.message}\n\nAre you sure you want to delete this item?`)) {
-                        formData.append('confirm_delete', '1');
-                        return fetch('../private/modal-add-SCSMP-backend.php', {
-                            method: 'POST',
-                            body: formData
+            // Final confirmation with SweetAlert
+            Swal.fire({
+                title: 'Are you absolutely sure?',
+                html: `You are about to delete:<br><strong>${selectedText}</strong><br><br>This action cannot be undone!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+                focusCancel: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('delete_level', level);
+                    formData.append(`delete_${level}_id`, selectedId);
+                    
+                    // Show loading
+                    Swal.fire({
+                        title: 'Deleting...',
+                        text: 'Please wait while we process the deletion.',
+                        icon: 'info',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    fetch('../private/modal-add-SCSMP-backend.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.warning) {
+                            Swal.fire({
+                                title: 'Confirmation Required',
+                                html: data.message.replace(/\n/g, '<br>'),
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#dc3545',
+                                cancelButtonColor: '#6c757d',
+                                confirmButtonText: 'Yes, Delete All',
+                                cancelButtonText: 'Cancel'
+                            }).then((confirmResult) => {
+                                if (confirmResult.isConfirmed) {
+                                    formData.append('confirm_delete', '1');
+                                    fetch('../private/modal-add-SCSMP-backend.php', {
+                                        method: 'POST',
+                                        body: formData
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if(data.success) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Deleted!',
+                                                text: 'The item has been successfully deleted.',
+                                                confirmButtonColor: '#28a745'
+                                            }).then(() => {
+                                                window.location.reload();
+                                            });
+                                        } else {
+                                            throw new Error(data.error || 'Delete failed');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Delete Failed',
+                                            text: 'An error occurred during deletion: ' + error.message,
+                                            confirmButtonColor: '#dc3545'
+                                        });
+                                    });
+                                }
+                            });
+                        } else if(data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: 'The item has been successfully deleted.',
+                                confirmButtonColor: '#28a745'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            throw new Error(data.error || 'Delete failed');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Delete Failed',
+                            text: 'An error occurred during deletion: ' + error.message,
+                            confirmButtonColor: '#dc3545'
                         });
-                    }
-                }
-                return Promise.reject('Cancelled');
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    alert('Successfully deleted!');
-                    window.location.reload();
-                } else {
-                    throw new Error(data.error || 'Delete failed');
-                }
-            })
-            .catch(error => {
-                if(error !== 'Cancelled') {
-                    console.error('Delete error:', error);
-                    alert('An error occurred during deletion: ' + error.message);
+                    });
                 }
             });
         });
@@ -458,13 +777,37 @@ document.addEventListener('DOMContentLoaded', function () {
             // Reset forms
             const forms = modal.querySelectorAll('form');
             forms.forEach(form => form.reset());
+            
+            // Reset Select2 dropdowns
+            $('.select2').val('').trigger('change');
+            
+            // Reset delete access
+            deleteAccessGranted = false;
+            if(deleteFormSection) deleteFormSection.style.display = 'none';
+            if(deleteSecuritySection) deleteSecuritySection.style.display = 'block';
+            if(deleteKeyInput) deleteKeyInput.value = '';
+            
+            // Hide all delete selectors
+            Object.values(deleteSelectors).forEach(el => {
+                if(el) el.style.display = 'none';
+            });
+        });
+    }
+
+    // --- Handle tab switching ---
+    const deleteTab = document.querySelector('a[href="#deleteTabContent"]');
+    if (deleteTab) {
+        deleteTab.addEventListener('click', function() {
+            // Reset delete access when switching to delete tab
+            if (!deleteAccessGranted) {
+                if(deleteFormSection) deleteFormSection.style.display = 'none';
+                if(deleteSecuritySection) deleteSecuritySection.style.display = 'block';
+            }
         });
     }
 
 });
 </script>
-
-
 
 <!-- Reopen modal after redirect -->
 <script>
