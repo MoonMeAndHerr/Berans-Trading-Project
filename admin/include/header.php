@@ -36,8 +36,6 @@ require_once __DIR__ . '/../private/auth_check.php';
     <link rel="stylesheet" href="assets/libs/sweetalert2/sweetalert2.min.css">
     <!-- NPM Css -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <!-- Choices Css -->
-     <link href="assets/libs/choices.js/public/assets/styles/choices.min.css" rel="stylesheet" type="text/css" />
      <!-- Select Css -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- DataTable Css -->

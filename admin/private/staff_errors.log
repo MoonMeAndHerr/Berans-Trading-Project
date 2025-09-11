@@ -500,3 +500,5 @@
 [10-Sep-2025 00:37:32 Asia/Kuala_Lumpur] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
 [11-Sep-2025 14:40:45 Asia/Kuala_Lumpur] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
 [11-Sep-2025 14:40:45 Asia/Kuala_Lumpur] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[11-Sep-2025 16:32:22 Asia/Kuala_Lumpur] Company fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
+[11-Sep-2025 16:32:22 Asia/Kuala_Lumpur] Staff list fetch error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'beranstrading.company' doesn't exist
