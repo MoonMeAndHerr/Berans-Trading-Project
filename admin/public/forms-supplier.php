@@ -3,7 +3,9 @@
     include __DIR__ . '/../include/header.php';
 ?>
 
- 
+ <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
         <!-- ============================================================== -->
         <!-- Start right Content here -->
@@ -595,6 +597,46 @@
     <script src="assets/libs/prismjs/prism.js"></script>
 
     <script src="assets/js/app.js"></script>
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Destroy previous Choices instances if re-initializing
+            if (window.updateSupplierChoices) window.updateSupplierChoices.destroy();
+            if (window.deleteSupplierChoices) window.deleteSupplierChoices.destroy();
+
+            // Initialize Choices.js for Update tab
+            window.updateSupplierChoices = new Choices('#supplierSelectUpdate', {
+                searchEnabled: true,
+                searchPlaceholderValue: 'Search supplier...',
+                placeholder: true,
+                placeholderValue: '-- Select a supplier (optional) --',
+                itemSelectText: '',
+                removeItemButton: false,
+                shouldSort: false
+            });
+
+            // Initialize Choices.js for Delete tab
+            window.deleteSupplierChoices = new Choices('#deleteSupplierSelect', {
+                searchEnabled: true,
+                searchPlaceholderValue: 'Search supplier...',
+                placeholder: true,
+                placeholderValue: '-- Select a supplier --',
+                itemSelectText: '',
+                removeItemButton: false,
+                shouldSort: false
+            });
+
+            // Optional: Reset selection when tab is changed
+            document.querySelector('a[href="#animation-profile"]').addEventListener('click', function() {
+                window.updateSupplierChoices.removeActiveItems();
+            });
+            document.querySelector('a[href="#animation-messages"]').addEventListener('click', function() {
+                window.deleteSupplierChoices.removeActiveItems();
+            });
+        });
+    </script>
 
 </body>
 

@@ -142,7 +142,7 @@ include __DIR__ . '/../include/header.php';
 
                                 <div class="col-sm-6">
                                     <label class="form-label">Supplier</label>
-                                    <select class="form-control" name="supplier_id" id="update_supplier">
+                                    <select class="form-select" name="supplier_id" id="update_supplier">
                                         <option value="">Select Supplier...</option>
                                         <?php foreach($suppliers as $supplier): ?>
                                             <option value="<?= $supplier['supplier_id'] ?>"><?= htmlspecialchars($supplier['supplier_name']) ?></option>
@@ -458,6 +458,24 @@ include __DIR__ . '/../include/header.php';
     <script>
         let updateAdditionalCount = 0;
         const updateMaxAdditional = 6;
+        let updateSupplierChoices = null;
+
+        function initUpdateSupplierChoices() {
+            if (updateSupplierChoices) {
+                updateSupplierChoices.destroy();
+                updateSupplierChoices = null;
+            }
+            updateSupplierChoices = new Choices('#update_supplier', {
+                searchEnabled: true,
+                shouldSort: false,
+                allowHTML: false,
+                placeholder: true,
+                placeholderValue: 'Select Supplier...',
+                searchPlaceholderValue: 'Search supplier...',
+                itemSelectText: '',
+                removeItemButton: false
+            });
+        }
 
         // Wait for DOM to be ready
         $(document).ready(function() {
@@ -588,6 +606,20 @@ include __DIR__ . '/../include/header.php';
                     }
                 });
             });
+
+            initUpdateSupplierChoices();
+
+            // Re-init when modal is shown (ensures correct rendering)
+            $('#updateProductModal').on('shown.bs.modal', function () {
+                initUpdateSupplierChoices();
+            });
+
+            // Optional: clean up when hidden
+            $('#updateProductModal').on('hidden.bs.modal', function () {
+                if (updateSupplierChoices) {
+                    updateSupplierChoices.removeActiveItems(); // reset selection
+                }
+            });
         });
 
         // CBM Calculation functions
@@ -638,9 +670,15 @@ include __DIR__ . '/../include/header.php';
             $('#update_material_display').val(product.material_name || '');
             $('#update_product_type_display').val(product.product_type_name || '');
             
-            // Set supplier dropdown value (now updatable)
-            if (product.supplier_id) {
-                $('#update_supplier').val(product.supplier_id);
+            // Set supplier value with Choices.js
+            if (updateSupplierChoices) {
+                updateSupplierChoices.removeActiveItems();
+                if (product.supplier_id) {
+                    updateSupplierChoices.setChoiceByValue(String(product.supplier_id));
+                }
+            } else {
+                // Fallback
+                $('#update_supplier').val(product.supplier_id || '');
             }
 
             // Handle sizes with metrics (parse combined values like "10 cm")
