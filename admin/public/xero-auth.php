@@ -1,5 +1,5 @@
 <?php
-require 'vendor/autoload.php';
+require_once __DIR__ . '/../../global/main_configuration.php';
 
 use XeroAPI\XeroPHP\XeroPHP;
 use League\OAuth2\Client\Provider\GenericProvider;

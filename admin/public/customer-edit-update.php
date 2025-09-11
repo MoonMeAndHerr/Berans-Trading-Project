@@ -1,6 +1,5 @@
 <?php
 use GuzzleHttp\Client;
-require 'vendor/autoload.php';
 use League\OAuth2\Client\Provider\GenericProvider;
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -79,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tenantId    = $xeroAuth['tenant_id'];
             
             $client = new Client();
-            $response = $client->post('https://api.xero.com/api.xro/2.0/Contacts/$contactId', [
+            $response = $client->post("https://api.xero.com/api.xro/2.0/Contacts/$contactId", [
                 'headers' => [
                     'Authorization'   => 'Bearer ' . $accessToken,
                     'Accept'          => 'application/json',
@@ -89,8 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'json' => [
                     'ContactID' => $xero_relation,
                     'Name'       => $customer_name,
-                    "IsSupplier"=> false,
-                    "IsCustomer"=> true,
                     'Phones' => [
                         [
                             'PhoneType'    => 'MOBILE',
@@ -217,6 +214,9 @@ if (isset($_SESSION['errors'])) {
             <!-- Show Success -->
             <?php if ($success): ?>
                 <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+                <?php 
+                echo '<pre>'; print_r($errors); echo '</pre>';
+                ?>
             <?php endif; ?>
 
             <!-- Edit Customer Form -->

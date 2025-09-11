@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_supplier_id']
                 $tenantId    = $xeroAuth['tenant_id'];
                 
                 $client = new Client();
-                $response = $client->post('https://api.xero.com/api.xro/2.0/Contacts/$xero_relation', [
+                $response = $client->post("https://api.xero.com/api.xro/2.0/Contacts/$xero_relation", [
                     'headers' => [
                         'Authorization'   => 'Bearer ' . $accessToken,
                         'Accept'          => 'application/json',

@@ -1,7 +1,6 @@
 <?php
 // ✅ Start session and include configs
 use GuzzleHttp\Client;
-require 'vendor/autoload.php';
 use League\OAuth2\Client\Provider\GenericProvider;
 require_once __DIR__ . '/../../global/main_configuration.php';
 require_once __DIR__ . '/../private/auth_check.php';
