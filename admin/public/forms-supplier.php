@@ -3,10 +3,6 @@
     include __DIR__ . '/../include/header.php';
 ?>
 
- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
@@ -582,6 +578,79 @@
 
     <?php include __DIR__ . '/../include/themesetting.php';?>
 
+    <!-- jQuery FIRST -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Select2 for searchable dropdowns -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <!-- Custom Select2 Bootstrap styling -->
+    <style>
+        .select2-container--default .select2-selection--single {
+            height: 38px;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            padding: 6px 12px;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            background-image: none;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #495057;
+            line-height: 26px;
+            padding-left: 0;
+            padding-right: 20px;
+        }
+        
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px;
+            right: 8px;
+        }
+        
+        .select2-container--default .select2-selection--single:focus,
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #86b7fe;
+            outline: 0;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        
+        .select2-dropdown {
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #0d6efd;
+            color: white;
+        }
+        
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+        
+        .select2-container {
+            width: 100% !important;
+        }
+        
+        .select2-dropdown {
+            max-width: 100%;
+            min-width: 300px;
+        }
+        
+        .select2-results {
+            max-height: 200px;
+        }
+    </style>
+
     <!-- JAVASCRIPT -->
     <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="assets/libs/simplebar/simplebar.min.js"></script>
@@ -590,50 +659,142 @@
     <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="assets/js/plugins.js"></script>
     <script src="../private/js/forms-supplier.js"></script>
-  
-</script>
 
     <!-- prismjs plugin -->
     <script src="assets/libs/prismjs/prism.js"></script>
 
     <script src="assets/js/app.js"></script>
 
-
-
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Destroy previous Choices instances if re-initializing
-            if (window.updateSupplierChoices) window.updateSupplierChoices.destroy();
-            if (window.deleteSupplierChoices) window.deleteSupplierChoices.destroy();
-
-            // Initialize Choices.js for Update tab
-            window.updateSupplierChoices = new Choices('#supplierSelectUpdate', {
-                searchEnabled: true,
-                searchPlaceholderValue: 'Search supplier...',
-                placeholder: true,
-                placeholderValue: '-- Select a supplier (optional) --',
-                itemSelectText: '',
-                removeItemButton: false,
-                shouldSort: false
+        $(document).ready(function() {
+            // Initialize Select2 for Update dropdown
+            $('#supplierSelectUpdate').select2({
+                placeholder: "-- Select a supplier (optional) --",
+                allowClear: true,
+                width: '100%',
+                theme: 'default',
+                language: {
+                    noResults: function() {
+                        return "No suppliers found";
+                    },
+                    searching: function() {
+                        return "Searching...";
+                    }
+                }
             });
 
-            // Initialize Choices.js for Delete tab
-            window.deleteSupplierChoices = new Choices('#deleteSupplierSelect', {
-                searchEnabled: true,
-                searchPlaceholderValue: 'Search supplier...',
-                placeholder: true,
-                placeholderValue: '-- Select a supplier --',
-                itemSelectText: '',
-                removeItemButton: false,
-                shouldSort: false
+            // Initialize Select2 for Delete dropdown
+            $('#deleteSupplierSelect').select2({
+                placeholder: "-- Select a supplier to delete --",
+                allowClear: true,
+                width: '100%',
+                theme: 'default',
+                language: {
+                    noResults: function() {
+                        return "No suppliers found";
+                    },
+                    searching: function() {
+                        return "Searching...";
+                    }
+                }
             });
 
-            // Optional: Reset selection when tab is changed
-            document.querySelector('a[href="#animation-profile"]').addEventListener('click', function() {
-                window.updateSupplierChoices.removeActiveItems();
+            // Populate Update fields when supplier is selected
+            $('#supplierSelectUpdate').on('select2:select', function(e) {
+                const selectedValue = e.params.data.id;
+                const selectedOption = $(this).find('option[value="' + selectedValue + '"]');
+                
+                if (selectedValue) {
+                    $('#update_supplier_id').val(selectedValue);
+                    $('#update_supplier_name').val(selectedOption.data('name') || '');
+                    $('#update_supplier_contact').val(selectedOption.data('contact') || '');
+                    $('#update_supplier_phone').val(selectedOption.data('phone') || '');
+                    $('#update_supplier_email').val(selectedOption.data('email') || '');
+                    $('#update_supplier_address').val(selectedOption.data('address') || '');
+                    $('#update_supplier_city').val(selectedOption.data('city') || '');
+                    $('#update_supplier_region').val(selectedOption.data('region') || '');
+                    $('#update_supplier_postcode').val(selectedOption.data('postcode') || '');
+                    $('#update_supplier_country').val(selectedOption.data('country') || '');
+                    $('#update_supplier_notes').val(selectedOption.data('notes') || '');
+                    $('#update_supplier_xero_relation').val(selectedOption.data('xero') || '');
+                }
             });
-            document.querySelector('a[href="#animation-messages"]').addEventListener('click', function() {
-                window.deleteSupplierChoices.removeActiveItems();
+
+            // Clear Update fields when selection is cleared
+            $('#supplierSelectUpdate').on('select2:clear', function() {
+                $('#update_supplier_id').val('');
+                $('#update_supplier_name').val('');
+                $('#update_supplier_contact').val('');
+                $('#update_supplier_phone').val('');
+                $('#update_supplier_email').val('');
+                $('#update_supplier_address').val('');
+                $('#update_supplier_city').val('');
+                $('#update_supplier_region').val('');
+                $('#update_supplier_postcode').val('');
+                $('#update_supplier_country').val('');
+                $('#update_supplier_notes').val('');
+                $('#update_supplier_xero_relation').val('');
+            });
+
+            // Populate Delete fields when supplier is selected
+            $('#deleteSupplierSelect').on('select2:select', function(e) {
+                const selectedValue = e.params.data.id;
+                const selectedOption = $(this).find('option[value="' + selectedValue + '"]');
+                
+                if (selectedValue) {
+                    $('#delete_supplier_id').val(selectedValue);
+                    $('#delete_supplier_name').val(selectedOption.data('name') || '');
+                    $('#delete_supplier_contact').val(selectedOption.data('contact') || '');
+                    $('#delete_supplier_phone').val(selectedOption.data('phone') || '');
+                    $('#delete_supplier_email').val(selectedOption.data('email') || '');
+                    $('#delete_supplier_address').val(selectedOption.data('address') || '');
+                    $('#delete_supplier_city').val(selectedOption.data('city') || '');
+                    $('#delete_supplier_region').val(selectedOption.data('region') || '');
+                    $('#delete_supplier_postcode').val(selectedOption.data('postcode') || '');
+                    $('#delete_supplier_country').val(selectedOption.data('country') || '');
+                    $('#delete_supplier_notes').val(selectedOption.data('notes') || '');
+                }
+            });
+
+            // Clear Delete fields when selection is cleared
+            $('#deleteSupplierSelect').on('select2:clear', function() {
+                $('#delete_supplier_id').val('');
+                $('#delete_supplier_name').val('');
+                $('#delete_supplier_contact').val('');
+                $('#delete_supplier_phone').val('');
+                $('#delete_supplier_email').val('');
+                $('#delete_supplier_address').val('');
+                $('#delete_supplier_city').val('');
+                $('#delete_supplier_region').val('');
+                $('#delete_supplier_postcode').val('');
+                $('#delete_supplier_country').val('');
+                $('#delete_supplier_notes').val('');
+            });
+
+            // Re-initialize Select2 when tabs are changed to ensure proper display
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                const target = $(e.target).attr('href');
+                if (target === '#animation-profile') {
+                    // Update tab - reinitialize
+                    setTimeout(() => {
+                        $('#supplierSelectUpdate').select2('destroy').select2({
+                            placeholder: "-- Select a supplier (optional) --",
+                            allowClear: true,
+                            width: '100%',
+                            theme: 'default'
+                        });
+                    }, 100);
+                } else if (target === '#animation-messages') {
+                    // Delete tab - reinitialize
+                    setTimeout(() => {
+                        $('#deleteSupplierSelect').select2('destroy').select2({
+                            placeholder: "-- Select a supplier to delete --",
+                            allowClear: true,
+                            width: '100%',
+                            theme: 'default'
+                        });
+                    }, 100);
+                }
             });
         });
     </script>

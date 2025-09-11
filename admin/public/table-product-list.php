@@ -110,7 +110,7 @@ include __DIR__ . '/../include/header.php';
                     <h5 class="modal-title" id="updateProductModalLabel">Update Product & Carton Info</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="GET" id="updateProductForm" enctype="multipart/form-data">
+                <form method="POST" id="updateProductForm" enctype="multipart/form-data">
                     <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                         <div class="row g-3">
                             <!-- Product Hierarchy Selection - READONLY -->
@@ -445,6 +445,7 @@ include __DIR__ . '/../include/header.php';
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
+
     <!-- jQuery FIRST -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
@@ -554,9 +555,9 @@ include __DIR__ . '/../include/header.php';
 
                 console.log('Sending AJAX request...'); // Debug log
 
-                // Submit form
+                // Submit form directly to backend to ensure pure JSON response
                 $.ajax({
-                    url: window.location.href,
+                    url: '../private/table-product-list-backend.php',
                     type: 'POST',
                     data: formData,
                     processData: false,
@@ -609,9 +610,13 @@ include __DIR__ . '/../include/header.php';
 
             initUpdateSupplierChoices();
 
-            // Re-init when modal is shown (ensures correct rendering)
+            // Re-init when modal is shown, then reapply current selection so it stays preloaded
             $('#updateProductModal').on('shown.bs.modal', function () {
                 initUpdateSupplierChoices();
+                const currentSupplier = $('#update_supplier').val();
+                if (updateSupplierChoices && currentSupplier) {
+                    updateSupplierChoices.setChoiceByValue(String(currentSupplier));
+                }
             });
 
             // Optional: clean up when hidden
@@ -670,16 +675,14 @@ include __DIR__ . '/../include/header.php';
             $('#update_material_display').val(product.material_name || '');
             $('#update_product_type_display').val(product.product_type_name || '');
             
-            // Set supplier value with Choices.js
-            if (updateSupplierChoices) {
-                updateSupplierChoices.removeActiveItems();
-                if (product.supplier_id) {
+            // Set supplier value on native select
+            $('#update_supplier').val(product.supplier_id || '');
+            // After Choices.js is initialized, set the value again
+            setTimeout(function() {
+                if (updateSupplierChoices && product.supplier_id) {
                     updateSupplierChoices.setChoiceByValue(String(product.supplier_id));
                 }
-            } else {
-                // Fallback
-                $('#update_supplier').val(product.supplier_id || '');
-            }
+            }, 100);
 
             // Handle sizes with metrics (parse combined values like "10 cm")
             for (let i = 1; i <= 3; i++) {

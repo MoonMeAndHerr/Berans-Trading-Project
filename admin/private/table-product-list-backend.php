@@ -43,6 +43,10 @@ if(isset($_GET['ajax'], $_GET['type'], $_GET['parent_id'])){
 // Handle product update
 if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
     try {
+        // If this is an AJAX update, buffer any accidental output to keep JSON clean
+        if (isset($_POST['ajax_update'])) {
+            if (ob_get_level() === 0) { ob_start(); }
+        }
         $pdo->beginTransaction();
         
         $product_id = $_POST['product_id'];
@@ -53,17 +57,16 @@ if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
         $size3 = !empty($_POST['size_3']) && !empty($_POST['metric_3']) ? $_POST['size_3'].' '.$_POST['metric_3'] : null;
 
         if (!empty($_FILES['product_image']['name'])) {
-
             $ext = pathinfo($_FILES['product_image']['name'], PATHINFO_EXTENSION);
             $product_image = 'product_' . time() . '.' . $ext;
-            move_uploaded_file($_FILES['product_image']['tmp_name'], $uploadDir . $logo_name);
+            $uploadDir = __DIR__ . '/../../media/';
+            if (!is_dir($uploadDir)) { @mkdir($uploadDir, 0775, true); }
+            @move_uploaded_file($_FILES['product_image']['tmp_name'], $uploadDir . $product_image);
 
-            $pdo = openDB();
             $stmt = $pdo->prepare("UPDATE product SET image_url = :product_image WHERE product_id = :product_id");
-            $stmt->bindParam(':product_image', $logo_name);
+            $stmt->bindParam(':product_image', $product_image);
             $stmt->bindParam(':product_id', $product_id);
             $stmt->execute();
-
         }
 
             $productName = $_POST['material_name'].' '.$_POST['product_type_name'].' '.$size1.'*'.$size2.'*'.$size3.' '.$_POST['variant'];
@@ -92,9 +95,8 @@ if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
 
 
         } catch (Exception $e) {
-            // Log error but continue
-            $output = var_export($e->getMessage(), true);
-            echo "<script>console.log('Problem: " . $output . "' );</script>";
+            // Log error but continue (avoid echoing HTML which breaks JSON)
+            error_log('[Xero Item Update Error] ' . $e->getMessage());
         }
         
         $updateStmt = $pdo->prepare("
@@ -201,6 +203,8 @@ if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
     
     // Return JSON response for AJAX
     if (isset($_POST['ajax_update'])) {
+        // Discard any buffered output to ensure clean JSON
+        if (ob_get_level() > 0) { ob_clean(); }
         header('Content-Type: application/json');
         echo json_encode([
             'status' => $success ? 'success' : 'error', 
