@@ -134,20 +134,6 @@
                             <a class="dropdown-item" href="pages-profile.php"><i
                                     class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span
                                     class="align-middle">Profile</span></a>
-                            <a class="dropdown-item" href="apps-tasks-kanban.html"><i
-                                    class="mdi mdi-calendar-check-outline text-muted fs-16 align-middle me-1"></i> <span
-                                    class="align-middle">Taskboard</span></a>
-                            <a class="dropdown-item" href="pages-faqs.html"><i
-                                    class="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1"></i> <span
-                                    class="align-middle">Help</span></a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="pages-profile-settings.html"><span
-                                    class="badge bg-soft-success text-success mt-1 float-end">New</span><i
-                                    class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span
-                                    class="align-middle">Settings</span></a>
-                            <a class="dropdown-item" href="auth-lockscreen-basic.html"><i
-                                    class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span
-                                    class="align-middle">Lock screen</span></a>
                             <a class="dropdown-item" href="../private/logout.php">
                                     <i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i>
                                     <span class="align-middle" data-key="t-logout">Logout</span>
@@ -203,6 +189,28 @@
                             </li>
 
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Public Relation</span></li>
+
+                                <!-- ===== Roles ===== -->
+                                <li class="nav-item">
+                                    <a class="nav-link menu-link" href="#sidebarTablesRoles" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="false" aria-controls="sidebarTablesRoles">
+                                        <i class="bx bx-group"></i>
+                                        <span data-key="t-tables">Roles</span>
+                                    </a>
+                                    <div class="collapse menu-dropdown" id="sidebarTablesRoles">
+                                        <ul class="nav nav-sm flex-column">
+                                            <li class="nav-item">
+                                            <a href="manage-roles.php" 
+                                                class="nav-link" 
+                                                data-allowed-roles='["admin"]' 
+                                                data-key="t-basic-tables">
+                                                Manage Roles
+                                            </a>
+                                            </li>
+                                            <!-- Add more staff links here if needed -->
+                                        </ul>
+                                    </div>
+                                </li>
                     
                                 <!-- ===== Staff ===== -->
                                 <li class="nav-item">
