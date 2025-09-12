@@ -103,6 +103,36 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
             }
             break;
             
+        case 'get_staff_commission_summary':
+            $dateFrom = $_GET['date_from'] ?? null;
+            $dateTo = $_GET['date_to'] ?? null;
+            $staffId = $_GET['staff_id'] ?? null;
+            
+            if($dateFrom && $dateTo) {
+                $result = getStaffCommissionSummary($pdo, $dateFrom, $dateTo, $staffId);
+                echo json_encode($result);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Date range required']);
+            }
+            break;
+            
+        case 'pay_staff_commission':
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $invoiceId = $_POST['invoice_id'] ?? null;
+                $amount = $_POST['amount'] ?? null;
+                $notes = $_POST['notes'] ?? '';
+                
+                if($invoiceId && $amount) {
+                    $result = payStaffCommission($pdo, $invoiceId, $amount, $notes);
+                    echo json_encode($result);
+                } else {
+                    echo json_encode(['success' => false, 'error' => 'Invoice ID and amount required']);
+                }
+            } else {
+                echo json_encode(['success' => false, 'error' => 'POST method required']);
+            }
+            break;
+            
         default:
             echo json_encode(['success' => false, 'error' => 'Invalid action']);
     }
@@ -174,6 +204,8 @@ function getProfitLossOrders($pdo) {
                 -- Staff commission data
                 i.commission_staff_id,
                 i.commission_percentage,
+                i.commission_paid_amount,
+                i.commission_payment_date,
                 s.staff_name,
                 -- Calculate total supplier cost using new_unit_price_yen (same as modal)
                 COALESCE((
@@ -191,7 +223,7 @@ function getProfitLossOrders($pdo) {
                 ), 0) as total_shipping_cost_rm,
                 -- Calculate theoretical profit (revenue - theoretical costs)
                 (i.total_amount - COALESCE((
-                    SELECT SUM((p.new_unit_price_yen * COALESCE(p.new_conversion_rate, 0.032) + p.new_unit_freight_cost_rm) * ii.quantity) 
+                    SELECT SUM((p.new_unit_price_yen / COALESCE(p.new_conversion_rate, 0.032) + p.new_unit_freight_cost_rm) * ii.quantity) 
                     FROM invoice_item ii 
                     JOIN price p ON p.product_id = ii.product_id 
                     WHERE ii.invoice_id = i.invoice_id
@@ -199,13 +231,20 @@ function getProfitLossOrders($pdo) {
                 -- Calculate ACTUAL profit (revenue - actual payments made)
                 -- Convert supplier payments from yen to RM using average conversion rate, then subtract both payments from revenue
                 (i.total_amount - (
-                    COALESCE(i.supplier_payments_total, 0) * COALESCE((
+                    COALESCE(i.supplier_payments_total, 0) / COALESCE((
                         SELECT AVG(p.new_conversion_rate) 
                         FROM invoice_item ii 
                         JOIN price p ON p.product_id = ii.product_id 
                         WHERE ii.invoice_id = i.invoice_id AND p.new_conversion_rate > 0
                     ), 0.032) + COALESCE(i.shipping_payments_total, 0)
-                )) as actual_profit_loss
+                )) as actual_profit_loss,
+                -- Add average conversion rate for frontend calculations
+                COALESCE((
+                    SELECT AVG(p.new_conversion_rate) 
+                    FROM invoice_item ii 
+                    JOIN price p ON p.product_id = ii.product_id 
+                    WHERE ii.invoice_id = i.invoice_id AND p.new_conversion_rate > 0
+                ), 0.032) as avg_conversion_rate
             FROM invoice i
             LEFT JOIN customer c ON i.customer_id = c.customer_id
             LEFT JOIN staff s ON i.commission_staff_id = s.staff_id
@@ -276,9 +315,11 @@ function getOrderProfitDetails($pdo, $invoiceId) {
                 c.customer_name,
                 c.customer_company_name,
                 c.customer_phone,
-                c.customer_address
+                c.customer_address,
+                s.staff_name
             FROM invoice i
             LEFT JOIN customer c ON i.customer_id = c.customer_id
+            LEFT JOIN staff s ON i.commission_staff_id = s.staff_id
             WHERE i.invoice_id = ? AND c.deleted_at IS NULL
         ";
         
@@ -303,8 +344,8 @@ function getOrderProfitDetails($pdo, $invoiceId) {
                 COALESCE(p.new_conversion_rate, 0.032) as conversion_rate,
                 (ii.quantity * COALESCE(p.new_unit_price_yen, 0)) as total_supplier_cost_yen,
                 (ii.quantity * COALESCE(p.new_unit_freight_cost_rm, 0)) as total_shipping_cost_rm,
-                (ii.quantity * COALESCE(p.new_unit_price_yen, 0) * COALESCE(p.new_conversion_rate, 0.032)) + (ii.quantity * COALESCE(p.new_unit_freight_cost_rm, 0)) as total_cost_rm,
-                (ii.quantity * ii.unit_price) - ((ii.quantity * COALESCE(p.new_unit_price_yen, 0) * COALESCE(p.new_conversion_rate, 0.032)) + (ii.quantity * COALESCE(p.new_unit_freight_cost_rm, 0))) as item_profit,
+                (ii.quantity * COALESCE(p.new_unit_price_yen, 0) / COALESCE(p.new_conversion_rate, 0.032)) + (ii.quantity * COALESCE(p.new_unit_freight_cost_rm, 0)) as total_cost_rm,
+                (ii.quantity * ii.unit_price) - ((ii.quantity * COALESCE(p.new_unit_price_yen, 0) / COALESCE(p.new_conversion_rate, 0.032)) + (ii.quantity * COALESCE(p.new_unit_freight_cost_rm, 0))) as item_profit,
                 COALESCE(pr.product_code, 'Unknown Product') as product_name
             FROM invoice_item ii
             LEFT JOIN price p ON p.product_id = ii.product_id
@@ -336,6 +377,22 @@ function getOrderProfitDetails($pdo, $invoiceId) {
         $totalShippingCostRm = array_sum(array_column($items, 'total_shipping_cost_rm'));
         $totalProfit = array_sum(array_column($items, 'item_profit'));
         
+        // Calculate actual profit/loss (revenue - actual payments made)
+        $supplierPaymentsMade = $order['supplier_payments_total'] ?: 0;
+        $shippingPaymentsMade = $order['shipping_payments_total'] ?: 0;
+        
+        // Convert supplier payments from yen to RM using average conversion rate
+        $avgConversionRate = 0.032; // Default rate
+        if (!empty($items)) {
+            $rates = array_column($items, 'conversion_rate');
+            $validRates = array_filter($rates, function($rate) { return $rate > 0; });
+            if (!empty($validRates)) {
+                $avgConversionRate = array_sum($validRates) / count($validRates);
+            }
+        }
+        
+        $actualProfitLoss = $totalRevenue - ($supplierPaymentsMade / $avgConversionRate + $shippingPaymentsMade);
+        
         return [
             'success' => true,
             'order' => $order,
@@ -346,10 +403,12 @@ function getOrderProfitDetails($pdo, $invoiceId) {
                 'total_supplier_cost_yen' => $totalSupplierCostYen,
                 'total_shipping_cost_rm' => $totalShippingCostRm, // Correctly named as RM
                 'total_profit' => $totalProfit,
-                'supplier_payments_made' => $order['supplier_payments_total'] ?: 0,
-                'shipping_payments_made' => $order['shipping_payments_total'] ?: 0,
-                'supplier_balance' => $totalSupplierCostYen - ($order['supplier_payments_total'] ?: 0),
-                'shipping_balance' => $totalShippingCostRm - ($order['shipping_payments_total'] ?: 0)
+                'actual_profit_loss' => $actualProfitLoss,
+                'supplier_payments_made' => $supplierPaymentsMade,
+                'shipping_payments_made' => $shippingPaymentsMade,
+                'supplier_balance' => $totalSupplierCostYen - $supplierPaymentsMade,
+                'shipping_balance' => $totalShippingCostRm - $shippingPaymentsMade,
+                'avg_conversion_rate' => $avgConversionRate // Add average conversion rate
             ]
         ];
         
@@ -364,6 +423,25 @@ function getOrderProfitDetails($pdo, $invoiceId) {
  */
 function addSupplierPayment($pdo, $invoiceId, $amount, $description = null) {
     try {
+        // Get invoice items to calculate average conversion rate
+        $stmt = $pdo->prepare("
+            SELECT COALESCE(p.new_conversion_rate, 0.032) as conversion_rate
+            FROM invoice_item ii 
+            LEFT JOIN price p ON p.product_id = ii.product_id 
+            WHERE ii.invoice_id = ? AND p.new_conversion_rate > 0
+        ");
+        $stmt->execute([$invoiceId]);
+        $rates = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        
+        // Calculate average conversion rate
+        $avgConversionRate = 0.032; // Default rate
+        if (!empty($rates)) {
+            $avgConversionRate = array_sum($rates) / count($rates);
+        }
+        
+        // Convert RM to Yen for storage (since user now enters RM but DB stores Yen)
+        $amountYen = $amount * $avgConversionRate; // FIXED: RM × conversion_rate = Yen
+        
         // Get current payment history
         $stmt = $pdo->prepare("SELECT payment_history_json, supplier_payments_total FROM invoice WHERE invoice_id = ?");
         $stmt->execute([$invoiceId]);
@@ -379,18 +457,20 @@ function addSupplierPayment($pdo, $invoiceId, $amount, $description = null) {
             $paymentHistory = json_decode($current['payment_history_json'], true) ?: [];
         }
         
-        // Add new payment to history
+        // Add new payment to history (store Yen in history for consistency)
         $newPayment = [
             'type' => 'supplier',
-            'amount' => $amount,
+            'amount' => $amountYen, // Store as Yen
+            'amount_rm' => $amount, // Also store original RM amount for reference
+            'conversion_rate' => $avgConversionRate, // Store the conversion rate used
             'description' => $description,
             'date' => date('Y-m-d H:i:s'),
             'timestamp' => time()
         ];
         $paymentHistory[] = $newPayment;
         
-        // Update totals
-        $newTotal = ($current['supplier_payments_total'] ?: 0) + $amount;
+        // Update totals (store Yen)
+        $newTotal = ($current['supplier_payments_total'] ?: 0) + $amountYen;
         
         // Update database
         $query = "
@@ -401,7 +481,7 @@ function addSupplierPayment($pdo, $invoiceId, $amount, $description = null) {
             WHERE invoice_id = ?
         ";
         
-        $note = date('Y-m-d H:i:s') . " - Supplier payment: ¥" . number_format($amount, 2) . 
+        $note = date('Y-m-d H:i:s') . " - Supplier payment: RM " . number_format($amount, 2) . " (¥" . number_format($amountYen, 2) . " @ rate " . number_format($avgConversionRate, 4) . ")" .
                 ($description ? " - " . $description : "");
         
         $stmt = $pdo->prepare($query);
@@ -413,9 +493,7 @@ function addSupplierPayment($pdo, $invoiceId, $amount, $description = null) {
         error_log("Error adding supplier payment: " . $e->getMessage());
         return ['success' => false, 'error' => 'Database error: ' . $e->getMessage()];
     }
-}
-
-/**
+}/**
  * Add shipping payment
  */
 function addShippingPayment($pdo, $invoiceId, $amount, $description = null) {
@@ -579,6 +657,218 @@ function deleteOrder($pdo, $invoiceId) {
     } catch(PDOException $e) {
         $pdo->rollBack();
         error_log("Error deleting order: " . $e->getMessage());
+        return ['success' => false, 'error' => 'Database error: ' . $e->getMessage()];
+    }
+}
+
+/**
+ * Get staff commission summary for a date range
+ */
+function getStaffCommissionSummary($pdo, $dateFrom, $dateTo, $staffId = null) {
+    try {
+        $whereConditions = ["i.created_at >= ?", "i.created_at <= ?"];
+        $queryParams = [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59'];
+        
+        // If specific staff selected, filter by that staff
+        if ($staffId) {
+            $whereConditions[] = "i.commission_staff_id = ?";
+            $queryParams[] = $staffId;
+        }
+        
+        $whereClause = implode(' AND ', $whereConditions);
+        
+        $query = "
+            SELECT 
+                s.staff_id,
+                s.staff_name,
+                COUNT(i.invoice_id) as total_orders,
+                SUM(i.total_amount) as total_revenue,
+                SUM(
+                    (i.total_amount - (
+                        COALESCE(i.supplier_payments_total, 0) * COALESCE((
+                            SELECT AVG(p.new_conversion_rate) 
+                            FROM invoice_item ii 
+                            JOIN price p ON p.product_id = ii.product_id 
+                            WHERE ii.invoice_id = i.invoice_id AND p.new_conversion_rate > 0
+                        ), 0.032) + COALESCE(i.shipping_payments_total, 0)
+                    ))
+                ) as total_profit,
+                SUM(
+                    CASE WHEN i.commission_percentage > 0 
+                    THEN (i.total_amount - COALESCE((
+                        SELECT SUM((p.new_unit_price_yen / COALESCE(p.new_conversion_rate, 0.032) + p.new_unit_freight_cost_rm) * ii.quantity) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id
+                    ), 0)) * (i.commission_percentage / 100)
+                    ELSE 0 END
+                ) as total_commission_due,
+                SUM(COALESCE(i.commission_paid_amount, 0)) as total_commission_paid,
+                SUM(
+                    CASE WHEN i.commission_percentage > 0 
+                    THEN ((i.total_amount - COALESCE((
+                        SELECT SUM((p.new_unit_price_yen / COALESCE(p.new_conversion_rate, 0.032) + p.new_unit_freight_cost_rm) * ii.quantity) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id
+                    ), 0)) * (i.commission_percentage / 100)) - COALESCE(i.commission_paid_amount, 0)
+                    ELSE 0 END
+                ) as total_commission_remaining
+            FROM invoice i
+            LEFT JOIN staff s ON i.commission_staff_id = s.staff_id
+            WHERE $whereClause AND i.commission_staff_id IS NOT NULL
+            GROUP BY s.staff_id, s.staff_name
+            ORDER BY total_commission_remaining DESC
+        ";
+        
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($queryParams);
+        $staffSummary = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Get overall summary
+        $summaryQuery = "
+            SELECT 
+                COUNT(i.invoice_id) as total_orders,
+                SUM(i.total_amount) as total_revenue,
+                SUM(
+                    (i.total_amount - (
+                        COALESCE(i.supplier_payments_total, 0) * COALESCE((
+                            SELECT AVG(p.new_conversion_rate) 
+                            FROM invoice_item ii 
+                            JOIN price p ON p.product_id = ii.product_id 
+                            WHERE ii.invoice_id = i.invoice_id AND p.new_conversion_rate > 0
+                        ), 0.032) + COALESCE(i.shipping_payments_total, 0)
+                    ))
+                ) as total_profit,
+                SUM(
+                    CASE WHEN i.commission_percentage > 0 
+                    THEN (i.total_amount - COALESCE((
+                        SELECT SUM((p.new_unit_price_yen * COALESCE(p.new_conversion_rate, 0.032) + p.new_unit_freight_cost_rm) * ii.quantity) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id
+                    ), 0)) * (i.commission_percentage / 100)
+                    ELSE 0 END
+                ) as total_commission_due,
+                SUM(COALESCE(i.commission_paid_amount, 0)) as total_commission_paid
+            FROM invoice i
+            WHERE $whereClause AND i.commission_staff_id IS NOT NULL
+        ";
+        
+        $summaryStmt = $pdo->prepare($summaryQuery);
+        $summaryStmt->execute($queryParams);
+        $overallSummary = $summaryStmt->fetch(PDO::FETCH_ASSOC);
+        
+        return [
+            'success' => true,
+            'staff_summary' => $staffSummary,
+            'overall_summary' => $overallSummary,
+            'date_range' => ['from' => $dateFrom, 'to' => $dateTo]
+        ];
+        
+    } catch(PDOException $e) {
+        error_log("Error getting staff commission summary: " . $e->getMessage());
+        return ['success' => false, 'error' => 'Database error: ' . $e->getMessage()];
+    }
+}
+
+/**
+ * Pay staff commission for a specific order
+ */
+function payStaffCommission($pdo, $invoiceId, $amount, $notes = '') {
+    try {
+        // First get the order details to validate commission
+        $stmt = $pdo->prepare("
+            SELECT 
+                i.commission_staff_id, 
+                i.commission_percentage, 
+                i.commission_paid_amount,
+                i.total_amount,
+                i.supplier_payments_total,
+                i.shipping_payments_total,
+                -- Calculate theoretical profit (revenue - theoretical costs)
+                (i.total_amount - COALESCE((
+                    SELECT SUM((p.new_unit_price_yen * COALESCE(p.new_conversion_rate, 0.032) + p.new_unit_freight_cost_rm) * ii.quantity) 
+                    FROM invoice_item ii 
+                    JOIN price p ON p.product_id = ii.product_id 
+                    WHERE ii.invoice_id = i.invoice_id
+                ), 0)) as theoretical_profit,
+                -- Calculate ACTUAL profit (revenue - actual payments made)
+                (i.total_amount - (
+                    COALESCE(i.supplier_payments_total, 0) * COALESCE((
+                        SELECT AVG(p.new_conversion_rate) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id AND p.new_conversion_rate > 0
+                    ), 0.032) + COALESCE(i.shipping_payments_total, 0)
+                )) as actual_profit_loss,
+                s.staff_name
+            FROM invoice i 
+            LEFT JOIN staff s ON i.commission_staff_id = s.staff_id 
+            WHERE i.invoice_id = ?
+        ");
+        $stmt->execute([$invoiceId]);
+        $order = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$order) {
+            return ['success' => false, 'error' => 'Order not found'];
+        }
+        
+        if (!$order['commission_staff_id']) {
+            return ['success' => false, 'error' => 'No staff assigned to this order'];
+        }
+        
+        // Calculate commission amounts based on theoretical profit (fixed amount)
+        $commissionDue = $order['theoretical_profit'] * ($order['commission_percentage'] / 100);
+        $alreadyPaid = floatval($order['commission_paid_amount']);
+        $newTotalPaid = $alreadyPaid + floatval($amount);
+        
+        // Get current payment history
+        $historyStmt = $pdo->prepare("SELECT payment_history_json FROM invoice WHERE invoice_id = ?");
+        $historyStmt->execute([$invoiceId]);
+        $historyData = $historyStmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Parse existing payment history
+        $paymentHistory = [];
+        if (!empty($historyData['payment_history_json'])) {
+            $paymentHistory = json_decode($historyData['payment_history_json'], true) ?: [];
+        }
+        
+        // Add new commission payment to history
+        $newPayment = [
+            'type' => 'commission',
+            'amount' => floatval($amount),
+            'description' => $notes,
+            'staff_name' => $order['staff_name'],
+            'date' => date('Y-m-d H:i:s'),
+            'timestamp' => time()
+        ];
+        $paymentHistory[] = $newPayment;
+        
+        // Update the commission payment and payment history
+        $updateStmt = $pdo->prepare("
+            UPDATE invoice 
+            SET commission_paid_amount = ?, 
+                commission_payment_date = NOW(),
+                commission_payment_notes = ?,
+                payment_history_json = ?
+            WHERE invoice_id = ?
+        ");
+        
+        $updateStmt->execute([$newTotalPaid, $notes, json_encode($paymentHistory), $invoiceId]);
+        
+        return [
+            'success' => true,
+            'message' => 'Commission payment recorded successfully',
+            'staff_name' => $order['staff_name'],
+            'payment_amount' => floatval($amount),
+            'total_paid' => $newTotalPaid,
+            'commission_due' => $commissionDue,
+            'remaining' => $commissionDue - $newTotalPaid
+        ];
+        
+    } catch(PDOException $e) {
+        error_log("Error paying staff commission: " . $e->getMessage());
         return ['success' => false, 'error' => 'Database error: ' . $e->getMessage()];
     }
 }
