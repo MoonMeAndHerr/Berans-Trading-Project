@@ -121,6 +121,44 @@ function getProfitLossOrders($pdo) {
         $limit = 6; // Max 6 records per page
         $offset = ($page - 1) * $limit;
         
+        // Get filter parameters
+        $monthFilter = isset($_GET['month']) ? $_GET['month'] : '';
+        $searchFilter = isset($_GET['search']) ? $_GET['search'] : '';
+        $dateFromFilter = isset($_GET['date_from']) ? $_GET['date_from'] : '';
+        $dateToFilter = isset($_GET['date_to']) ? $_GET['date_to'] : '';
+        
+        // Build WHERE conditions
+        $whereConditions = ["c.deleted_at IS NULL"];
+        $queryParams = [];
+        
+        // Month filter
+        if (!empty($monthFilter)) {
+            $whereConditions[] = "DATE_FORMAT(i.created_at, '%Y-%m') = ?";
+            $queryParams[] = $monthFilter;
+        }
+        
+        // Date range filter
+        if (!empty($dateFromFilter)) {
+            $whereConditions[] = "DATE(i.created_at) >= ?";
+            $queryParams[] = $dateFromFilter;
+        }
+        if (!empty($dateToFilter)) {
+            $whereConditions[] = "DATE(i.created_at) <= ?";
+            $queryParams[] = $dateToFilter;
+        }
+        
+        // Search filter
+        if (!empty($searchFilter)) {
+            $whereConditions[] = "(i.invoice_number LIKE ? OR c.customer_name LIKE ? OR c.customer_company_name LIKE ? OR DATE_FORMAT(i.created_at, '%Y-%m-%d') LIKE ?)";
+            $searchTerm = '%' . $searchFilter . '%';
+            $queryParams[] = $searchTerm;
+            $queryParams[] = $searchTerm;
+            $queryParams[] = $searchTerm;
+            $queryParams[] = $searchTerm;
+        }
+        
+        $whereClause = implode(' AND ', $whereConditions);
+        
         $query = "
             SELECT 
                 i.invoice_id,
@@ -133,6 +171,10 @@ function getProfitLossOrders($pdo) {
                 c.customer_name,
                 c.customer_company_name,
                 c.customer_phone,
+                -- Staff commission data
+                i.commission_staff_id,
+                i.commission_percentage,
+                s.staff_name,
                 -- Calculate total supplier cost using new_unit_price_yen (same as modal)
                 COALESCE((
                     SELECT SUM(p.new_unit_price_yen * ii.quantity) 
@@ -147,33 +189,45 @@ function getProfitLossOrders($pdo) {
                     JOIN price p ON p.product_id = ii.product_id 
                     WHERE ii.invoice_id = i.invoice_id
                 ), 0) as total_shipping_cost_rm,
-                -- No total due calculation - keep separate like modal
-                0 as total_due_yen,
-                -- Calculate profit (revenue in RM - costs converted to RM)
+                -- Calculate theoretical profit (revenue - theoretical costs)
                 (i.total_amount - COALESCE((
-                    SELECT SUM((p.new_unit_price_yen * p.conversion_rate + p.new_unit_freight_cost_rm) * ii.quantity) 
+                    SELECT SUM((p.new_unit_price_yen * COALESCE(p.new_conversion_rate, 0.032) + p.new_unit_freight_cost_rm) * ii.quantity) 
                     FROM invoice_item ii 
                     JOIN price p ON p.product_id = ii.product_id 
                     WHERE ii.invoice_id = i.invoice_id
-                ), 0)) as total_profit
+                ), 0)) as theoretical_profit,
+                -- Calculate ACTUAL profit (revenue - actual payments made)
+                -- Convert supplier payments from yen to RM using average conversion rate, then subtract both payments from revenue
+                (i.total_amount - (
+                    COALESCE(i.supplier_payments_total, 0) * COALESCE((
+                        SELECT AVG(p.new_conversion_rate) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id AND p.new_conversion_rate > 0
+                    ), 0.032) + COALESCE(i.shipping_payments_total, 0)
+                )) as actual_profit_loss
             FROM invoice i
             LEFT JOIN customer c ON i.customer_id = c.customer_id
-            WHERE c.deleted_at IS NULL
+            LEFT JOIN staff s ON i.commission_staff_id = s.staff_id
+            WHERE $whereClause
             ORDER BY i.created_at DESC
             LIMIT $limit OFFSET $offset
         ";
         
-        $stmt = $pdo->query($query);
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($queryParams);
         $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Get total count for pagination
+        // Get total count for pagination with same filters
         $countQuery = "
             SELECT COUNT(*) as total
             FROM invoice i
             LEFT JOIN customer c ON i.customer_id = c.customer_id
-            WHERE c.deleted_at IS NULL
+            LEFT JOIN staff s ON i.commission_staff_id = s.staff_id
+            WHERE $whereClause
         ";
-        $countStmt = $pdo->query($countQuery);
+        $countStmt = $pdo->prepare($countQuery);
+        $countStmt->execute($queryParams);
         $totalRecords = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
         $totalPages = ceil($totalRecords / $limit);
         
@@ -263,6 +317,13 @@ function getOrderProfitDetails($pdo, $invoiceId) {
         $stmt->execute([$invoiceId]);
         $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
+        // Debug: Log the first item to see actual values
+        if (!empty($items)) {
+            error_log("Debug - First item data: " . json_encode($items[0]));
+            error_log("Debug - Unit shipping cost: " . ($items[0]['unit_shipping_cost_rm'] ?? 'NULL'));
+            error_log("Debug - Total cost: " . ($items[0]['total_cost_rm'] ?? 'NULL'));
+        }
+        
         // Get payment history from JSON field
         $payments = [];
         if (!empty($order['payment_history_json'])) {
@@ -283,7 +344,7 @@ function getOrderProfitDetails($pdo, $invoiceId) {
             'summary' => [
                 'total_revenue' => $totalRevenue,
                 'total_supplier_cost_yen' => $totalSupplierCostYen,
-                'total_shipping_cost_yen' => $totalShippingCostRm, // Actually in RM but keeping the key name for frontend compatibility
+                'total_shipping_cost_rm' => $totalShippingCostRm, // Correctly named as RM
                 'total_profit' => $totalProfit,
                 'supplier_payments_made' => $order['supplier_payments_total'] ?: 0,
                 'shipping_payments_made' => $order['shipping_payments_total'] ?: 0,

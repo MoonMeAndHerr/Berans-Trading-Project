@@ -267,6 +267,8 @@ $products = $pdo->query("
         sup.supplier_name,
         sup.supplier_id,
         pr.new_selling_price,
+        pr.new_unit_price_rm,
+        pr.new_unit_profit_rm,
         pr.carton_width, pr.carton_height, pr.carton_length, pr.pcs_per_carton, pr.carton_weight, pr.cbm_carton,
         pr.add_carton1_width, pr.add_carton1_height, pr.add_carton1_length, pr.add_carton1_pcs, pr.add_carton1_weight, pr.add_carton1_total_cbm,
         pr.add_carton2_width, pr.add_carton2_height, pr.add_carton2_length, pr.add_carton2_pcs, pr.add_carton2_weight, pr.add_carton2_total_cbm,

@@ -37,7 +37,6 @@ require_once __DIR__ . '/../private/auth_check.php';
     <!-- Begin page -->
     <div id="layout-wrapper">
         <?php 
-        include __DIR__ . '/../include/header.php';
         include __DIR__ . '/../include/sidebar.php'; 
         ?>
 
@@ -47,6 +46,20 @@ require_once __DIR__ . '/../private/auth_check.php';
         <div class="main-content">
                 <div class="page-content">
                     <div class="container-fluid">
+                                                <!-- Page Title -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                                    <h4 class="mb-sm-0">Basic Elements</h4>
+                                    <div class="page-title-right">
+                                        <ol class="breadcrumb m-0">
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Forms</a></li>
+                                            <li class="breadcrumb-item active">Basic Elements</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         
                         <!-- Clean Security Access -->
                         <div id="securitySection">
@@ -79,31 +92,74 @@ require_once __DIR__ . '/../private/auth_check.php';
                         <!-- Main Content -->
                         <div id="mainContent" style="display: none;">
                             
-                            <!-- Clean Page Header -->
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <div>
-                                    <h1 class="page-title">Profit & Loss Management</h1>
-                                    <p class="page-subtitle">Track order profitability and manage payments</p>
+
+
+                            <!-- Filter Controls -->
+                            <div class="card mb-4">
+                                <div class="card-body py-3">
+                                    <div class="row g-3 align-items-end">
+                                        <!-- Clean Page Header -->
+                                        <div class="d-flex justify-content-between align-items-center ">
+                                            <div>
+                                                <h1 class="page-title">Profit & Loss Management</h1>
+                                                <p class="page-subtitle">Track order profitability and manage payments</p>
+                                            </div>
+                                            <button class="btn btn-clean" onclick="loadProfitLossData()">
+                                                <i class="ri-refresh-line me-2"></i>Refresh Data
+                                            </button>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-medium text-muted">Filter by Month</label>
+                                            <input type="month" id="monthFilter" class="form-control" placeholder="Select month">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-medium text-muted">Search Orders</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light border-end-0">
+                                                    <i class="ri-search-line text-muted"></i>
+                                                </span>
+                                                <input type="text" id="searchInput" class="form-control border-start-0" 
+                                                       placeholder="Search by order number, customer name, or date...">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-medium text-muted">Date Range</label>
+                                            <div class="input-group">
+                                                <input type="date" id="dateFromFilter" class="form-control" placeholder="From">
+                                                <span class="input-group-text bg-light px-2">to</span>
+                                                <input type="date" id="dateToFilter" class="form-control" placeholder="To">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="d-flex gap-1">
+                                                <button class="btn btn-clean btn-sm" onclick="applyFilters()" title="Apply Filters">
+                                                    <i class="ri-filter-line"></i> Filter
+                                                </button>
+                                                <button class="btn btn-clean-outline btn-sm" onclick="clearFilters()" title="Clear Filters">
+                                                    <i class="ri-close-line"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <button class="btn btn-clean" onclick="loadProfitLossData()">
-                                    <i class="ri-refresh-line me-2"></i>Refresh Data
-                                </button>
                             </div>
 
                             <!-- Clean Orders Table -->
-                            <div class="table-wrapper">
-                                <div class="table-responsive">
-                                    <table class="table" id="profitLossTable">
+                            <div class="card">
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0" id="profitLossTable">
                                         <thead>
                                             <tr>
-                                                <th style="width: 10%">Order #</th>
-                                                <th style="width: 18%">Customer</th>
-                                                <th style="width: 12%">Order Date</th>
-                                                <th style="width: 15%">Total Due</th>
-                                                <th style="width: 15%">Total Paid</th>
-                                                <th style="width: 12%">Remaining</th>
-                                                <th style="width: 10%">Status</th>
-                                                <th style="width: 8%">Actions</th>
+                                                <th style="width: 9%">Order #</th>
+                                                <th style="width: 16%">Customer</th>
+                                                <th style="width: 11%">Order Date</th>
+                                                <th style="width: 13%">Profit/Loss</th>
+                                                <th style="width: 13%">Total Paid</th>
+                                                <th style="width: 11%">Remaining</th>
+                                                <th style="width: 12%">Staff Commission</th>
+                                                <th style="width: 9%">Status</th>
+                                                <th style="width: 6%">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody id="profitLossTableBody">
@@ -119,15 +175,17 @@ require_once __DIR__ . '/../private/auth_check.php';
                                 </div>
                                 
                                 <!-- Pagination -->
-                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                    <div id="paginationInfo" class="text-muted">
-                                        <!-- Will be populated by JavaScript -->
-                                    </div>
-                                    <nav aria-label="Page navigation">
-                                        <ul class="pagination pagination-sm mb-0" id="paginationControls">
+                                <div class="card-footer bg-light border-top-0 py-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div id="paginationInfo" class="text-muted">
                                             <!-- Will be populated by JavaScript -->
-                                        </ul>
-                                    </nav>
+                                        </div>
+                                        <nav aria-label="Page navigation">
+                                            <ul class="pagination pagination-sm mb-0" id="paginationControls">
+                                                <!-- Will be populated by JavaScript -->
+                                            </ul>
+                                        </nav>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -486,22 +544,28 @@ require_once __DIR__ . '/../private/auth_check.php';
             });
 
             // Toggle password visibility
-            if (toggleKeyVisibilityBtn) {
+            if (toggleKeyVisibilityBtn && accessKeyInput && keyIcon) {
                 console.log('Setting up toggle button listener');
                 toggleKeyVisibilityBtn.addEventListener('click', function() {
                     console.log('Toggle button clicked');
+                    console.log('Current input type:', accessKeyInput.type);
+                    
                     if (accessKeyInput.type === 'password') {
                         accessKeyInput.type = 'text';
                         keyIcon.className = 'ri-eye-off-line';
-                        console.log('Changed to text');
+                        console.log('Changed to text - showing password');
                     } else {
                         accessKeyInput.type = 'password';
                         keyIcon.className = 'ri-eye-line';
-                        console.log('Changed to password');
+                        console.log('Changed to password - hiding text');
                     }
                 });
             } else {
-                console.log('Toggle button not found!');
+                console.log('Toggle elements not found!', {
+                    toggleBtn: !!toggleKeyVisibilityBtn,
+                    input: !!accessKeyInput,
+                    icon: !!keyIcon
+                });
             }
 
             // Verify access key
@@ -736,23 +800,24 @@ require_once __DIR__ . '/../private/auth_check.php';
             const accessKeyInput = document.getElementById('accessKey');
             const keyIcon = document.getElementById('keyIcon');
             
-            if (accessKeyInput.type === 'password') {
-                accessKeyInput.type = 'text';
-                keyIcon.className = 'ri-eye-off-line';
-            } else {
-                accessKeyInput.type = 'password';
-                keyIcon.className = 'ri-eye-line';
+            console.log('togglePasswordVisibility called');
+            console.log('Current type:', accessKeyInput ? accessKeyInput.type : 'input not found');
+            
+            if (accessKeyInput && keyIcon) {
+                if (accessKeyInput.type === 'password') {
+                    accessKeyInput.type = 'text';
+                    keyIcon.className = 'ri-eye-off-line';
+                    console.log('Password revealed');
+                } else {
+                    accessKeyInput.type = 'password';
+                    keyIcon.className = 'ri-eye-line';
+                    console.log('Password hidden');
+                }
             }
         }
 
         // Initialize event listeners when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            // Set up toggle password visibility
-            const toggleBtn = document.getElementById('toggleKeyVisibility');
-            if (toggleBtn) {
-                toggleBtn.addEventListener('click', togglePasswordVisibility);
-            }
-            
             // Set up payment form listeners
             const supplierForm = document.getElementById('supplierPaymentForm');
             const shippingForm = document.getElementById('shippingPaymentForm');
@@ -979,14 +1044,39 @@ require_once __DIR__ . '/../private/auth_check.php';
 
         // Helper functions
         function formatCurrency(amount) {
-            return new Intl.NumberFormat('ja-JP').format(amount);
+            // Handle null, undefined, empty string, or NaN values
+            if (amount === null || amount === undefined || amount === '' || isNaN(amount)) {
+                return '0';
+            }
+            
+            const numValue = parseFloat(amount);
+            
+            // Check if the parsed value is still NaN
+            if (isNaN(numValue)) {
+                return '0';
+            }
+            
+            return new Intl.NumberFormat('ja-JP').format(numValue);
         }
 
         function formatNumber(value) {
-            return new Intl.NumberFormat().format(value);
+            // Handle null, undefined, empty string, or NaN values
+            if (value === null || value === undefined || value === '' || isNaN(value)) {
+                return '0';
+            }
+            
+            const numValue = parseFloat(value);
+            
+            // Check if the parsed value is still NaN
+            if (isNaN(numValue)) {
+                return '0';
+            }
+            
+            return new Intl.NumberFormat().format(numValue);
         }
 
         let currentPage = 1;
+        let currentFilters = {};
         
         function loadProfitLossData(page = 1) {
             currentPage = page;
@@ -1003,7 +1093,19 @@ require_once __DIR__ . '/../private/auth_check.php';
                 </tr>
             `;
             
-            fetch(`../private/profit_loss_backend.php?action=get_orders&page=${page}`)
+            // Build query string with filters
+            let queryParams = new URLSearchParams();
+            queryParams.append('action', 'get_orders');
+            queryParams.append('page', page);
+            
+            // Add filters to query
+            Object.keys(currentFilters).forEach(key => {
+                if (currentFilters[key]) {
+                    queryParams.append(key, currentFilters[key]);
+                }
+            });
+            
+            fetch(`../private/profit_loss_backend.php?${queryParams.toString()}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.orders) {
@@ -1031,6 +1133,40 @@ require_once __DIR__ . '/../private/auth_check.php';
                 `;
                 clearPagination();
             });
+        }
+
+        function applyFilters() {
+            const monthFilter = document.getElementById('monthFilter').value;
+            const searchFilter = document.getElementById('searchInput').value;
+            const dateFromFilter = document.getElementById('dateFromFilter').value;
+            const dateToFilter = document.getElementById('dateToFilter').value;
+            
+            // Update current filters
+            currentFilters = {
+                month: monthFilter,
+                search: searchFilter,
+                date_from: dateFromFilter,
+                date_to: dateToFilter
+            };
+            
+            // Reset to first page when applying filters
+            currentPage = 1;
+            loadProfitLossData(1);
+        }
+
+        function clearFilters() {
+            // Clear all filter inputs
+            document.getElementById('monthFilter').value = '';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('dateFromFilter').value = '';
+            document.getElementById('dateToFilter').value = '';
+            
+            // Clear current filters
+            currentFilters = {};
+            
+            // Reset to first page
+            currentPage = 1;
+            loadProfitLossData(1);
         }
 
         function displayPagination(pagination) {
@@ -1160,11 +1296,11 @@ require_once __DIR__ . '/../private/auth_check.php';
                             <div style="color: #374151;">${formatDate(order.order_date)}</div>
                         </td>
                         <td>
-                            <div style="font-weight: 500; color: #374151;">
-                                ¥${formatNumber(supplierCostYen)} + RM${formatNumber(shippingCostRm)}
+                            <div style="font-weight: 600; color: ${order.actual_profit_loss >= 0 ? '#059669' : '#dc2626'};">
+                                RM${formatNumber(order.actual_profit_loss)}
                             </div>
                             <div style="font-size: 12px; color: #6b7280;">
-                                Supplier + Shipping (separate currencies)
+                                ${order.actual_profit_loss >= 0 ? 'Profit' : 'Loss'}
                             </div>
                         </td>
                         <td>
@@ -1182,6 +1318,16 @@ require_once __DIR__ . '/../private/auth_check.php';
                             <div style="font-size: 12px; color: #6b7280;">
                                 Remaining amounts
                             </div>
+                        </td>
+                        <td>
+                            ${order.staff_name ? `
+                                <div style="font-weight: 500; color: #374151;">${order.staff_name}</div>
+                                <div style="font-size: 12px; color: #059669;">
+                                    ${order.commission_percentage}% = RM${formatNumber((order.actual_profit_loss * (order.commission_percentage / 100)))}
+                                </div>
+                            ` : `
+                                <div style="color: #6b7280; font-style: italic;">No commission</div>
+                            `}
                         </td>
                         <td>
                             <span class="status-badge status-${status}">${statusText}</span>
@@ -1211,10 +1357,30 @@ require_once __DIR__ . '/../private/auth_check.php';
 
         // Utility Functions
         function formatNumber(value) {
+            // Handle null, undefined, empty string, or NaN values
+            if (value === null || value === undefined || value === '' || isNaN(value)) {
+                return '0.00';
+            }
+            
+            const numValue = parseFloat(value);
+            
+            // Check if the parsed value is still NaN
+            if (isNaN(numValue)) {
+                return '0.00';
+            }
+            
+            // For very small values, use more decimal places to avoid showing 0.00
+            if (Math.abs(numValue) > 0 && Math.abs(numValue) < 0.01) {
+                return new Intl.NumberFormat('en-MY', {
+                    minimumFractionDigits: 4,
+                    maximumFractionDigits: 4
+                }).format(numValue);
+            }
+            
             return new Intl.NumberFormat('en-MY', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
-            }).format(parseFloat(value) || 0);
+            }).format(numValue);
         }
 
         function formatDate(dateString) {
@@ -1259,7 +1425,40 @@ require_once __DIR__ . '/../private/auth_check.php';
             fetch(`../private/profit_loss_backend.php?action=get_order_details&invoice_id=${invoiceId}`)
             .then(response => response.json())
             .then(data => {
+                console.log('Raw profit details data:', data); // Debug log
+                
+                // ENHANCED DEBUGGING - Show actual values received from backend
+                if (data.success && data.items && data.items.length > 0) {
+                    const item = data.items[0];
+                    
+                    // Show comprehensive debug info
+                    const debugInfo = `DEBUGGING - BACKEND RESPONSE VALUES:
+                    
+Unit Shipping Cost RM: "${item.unit_shipping_cost_rm}" (type: ${typeof item.unit_shipping_cost_rm})
+Total Shipping Cost RM: "${item.total_shipping_cost_rm}" (type: ${typeof item.total_shipping_cost_rm})
+Total Cost RM: "${item.total_cost_rm}" (type: ${typeof item.total_cost_rm})
+Product ID: "${item.product_id}"
+
+After parseFloat conversion:
+- parseFloat(unit_shipping_cost_rm): ${parseFloat(item.unit_shipping_cost_rm || 0)}
+- parseFloat(total_cost_rm): ${parseFloat(item.total_cost_rm || 0)}
+
+After formatNumber:
+- formatNumber(unit_shipping_cost): ${formatNumber(parseFloat(item.unit_shipping_cost_rm || 0))}
+- formatNumber(total_cost): ${formatNumber(parseFloat(item.total_cost_rm || 0))}
+
+This shows the RAW values from backend vs final display values.`;
+                    
+                    alert(debugInfo);
+                }
+                
                 if (data.success) {
+                    // Log individual items for debugging
+                    if (data.items && data.items.length > 0) {
+                        console.log('First item details:', data.items[0]);
+                        console.log('Unit shipping cost from first item:', data.items[0].unit_shipping_cost_rm);
+                        console.log('Total cost from first item:', data.items[0].total_cost_rm);
+                    }
                     displayProfitDetails(data);
                 } else {
                     document.getElementById('profitDetailsContent').innerHTML = 
@@ -1408,21 +1607,35 @@ require_once __DIR__ . '/../private/auth_check.php';
                 const itemProfit = parseFloat(item.item_profit || 0);
                 const profitClass = itemProfit >= 0 ? 'text-success' : 'text-danger';
                 
+                // Safely extract and format values
+                const quantity = parseFloat(item.quantity || 0);
+                const unitPrice = parseFloat(item.unit_price || 0);
+                const itemRevenue = parseFloat(item.item_revenue || 0);
+                const unitSupplierCost = parseFloat(item.unit_supplier_cost_yen || 0);
+                const unitShippingCost = parseFloat(item.unit_shipping_cost_rm || 0);
+                const totalCostRm = parseFloat(item.total_cost_rm || 0);
+                
                 itemsHtml += `
                     <tr>
                         <td>${item.product_name || 'N/A'}</td>
-                        <td>${formatNumber(item.quantity)}</td>
-                        <td>RM ${formatNumber(item.unit_price)}</td>
-                        <td>RM ${formatNumber(item.item_revenue)}</td>
-                        <td>¥${formatNumber(item.unit_supplier_cost_yen || 0)}</td>
-                        <td>RM ${formatNumber(item.unit_shipping_cost_rm || 0)}</td>
-                        <td>RM ${formatNumber(item.total_cost_rm || 0)}</td>
+                        <td>${formatNumber(quantity)}</td>
+                        <td>RM ${formatNumber(unitPrice)}</td>
+                        <td>RM ${formatNumber(itemRevenue)}</td>
+                        <td>¥${formatNumber(unitSupplierCost)}</td>
+                        <td>RM ${formatNumber(unitShippingCost)}</td>
+                        <td>RM ${formatNumber(totalCostRm)}</td>
                         <td class="${profitClass}">RM ${formatNumber(Math.abs(itemProfit))}</td>
                     </tr>
                 `;
             });
 
             const totalProfitClass = (summary?.total_profit || 0) >= 0 ? 'text-success' : 'text-danger';
+            
+            // Safely extract summary values
+            const totalRevenue = parseFloat(summary?.total_revenue || 0);
+            const totalSupplierCost = parseFloat(summary?.total_supplier_cost_yen || 0);
+            const totalShippingCost = parseFloat(summary?.total_shipping_cost_rm || 0);
+            const totalProfit = parseFloat(summary?.total_profit || 0);
             
             const html = `
                 <div class="row mb-4">
@@ -1435,10 +1648,10 @@ require_once __DIR__ . '/../private/auth_check.php';
                     </div>
                     <div class="col-md-6">
                         <h6 class="fw-bold">Financial Summary</h6>
-                        <p><strong>Total Revenue:</strong> RM ${formatNumber(summary?.total_revenue || 0)}</p>
-                        <p><strong>Supplier Cost:</strong> ¥${formatNumber(summary?.total_supplier_cost_yen || 0)}</p>
-                        <p><strong>Shipping Cost:</strong> RM ${formatNumber(summary?.total_shipping_cost_rm || 0)}</p>
-                        <p><strong>Total Profit:</strong> <span class="${totalProfitClass}">RM ${formatNumber(Math.abs(summary?.total_profit || 0))}</span></p>
+                        <p><strong>Total Revenue:</strong> RM ${formatNumber(totalRevenue)}</p>
+                        <p><strong>Supplier Cost:</strong> ¥${formatNumber(totalSupplierCost)}</p>
+                        <p><strong>Shipping Cost:</strong> RM ${formatNumber(totalShippingCost)}</p>
+                        <p><strong>Total Profit:</strong> <span class="${totalProfitClass}">RM ${formatNumber(Math.abs(totalProfit))}</span></p>
                     </div>
                 </div>
                 
@@ -1541,76 +1754,6 @@ require_once __DIR__ . '/../private/auth_check.php';
             profitLossList.innerHTML = ordersHtml;
         }
 
-        function displayProfitDetails(data) {
-            const order = data.order;
-            const items = data.items;
-            const summary = data.summary;
-            
-            let itemsHtml = '';
-            items.forEach(item => {
-                const itemProfit = parseFloat(item.item_profit || 0);
-                const profitClass = itemProfit >= 0 ? 'text-success' : 'text-danger';
-                
-                itemsHtml += `
-                    <tr>
-                        <td>${item.product_name || 'N/A'}</td>
-                        <td>${formatNumber(item.quantity)}</td>
-                        <td>RM ${formatCurrency(item.unit_price)}</td>
-                        <td>RM ${formatCurrency(item.item_revenue)}</td>
-                        <td>¥${formatCurrency(item.unit_supplier_cost_yen)}</td>
-                        <td>¥${formatCurrency(item.unit_shipping_cost_yen)}</td>
-                        <td>¥${formatCurrency(item.total_cost_yen)}</td>
-                        <td class="${profitClass}">RM ${formatCurrency(Math.abs(itemProfit))}</td>
-                    </tr>
-                `;
-            });
-
-            const totalProfitClass = summary.total_profit >= 0 ? 'text-success' : 'text-danger';
-            
-            const html = `
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h6 class="fw-bold">Order Information</h6>
-                        <p><strong>Invoice:</strong> ${order.invoice_number}</p>
-                        <p><strong>Customer:</strong> ${order.customer_name}</p>
-                        <p><strong>Company:</strong> ${order.customer_company_name || 'N/A'}</p>
-                        <p><strong>Status:</strong> <span class="badge bg-${order.status === 'completed' ? 'success' : 'warning'}">${order.status}</span></p>
-                    </div>
-                    <div class="col-md-6">
-                        <h6 class="fw-bold">Financial Summary</h6>
-                        <p><strong>Total Revenue:</strong> RM ${formatCurrency(summary.total_revenue)}</p>
-                        <p><strong>Total Cost:</strong> ¥${formatCurrency(summary.total_cost_yen)}</p>
-                        <p><strong>Total Profit:</strong> <span class="${totalProfitClass}">RM ${formatCurrency(Math.abs(summary.total_profit))}</span></p>
-                        <p><strong>Supplier Paid:</strong> ¥${formatCurrency(summary.supplier_payments_made)}</p>
-                        <p><strong>Shipping Paid:</strong> ¥${formatCurrency(summary.shipping_payments_made)}</p>
-                    </div>
-                </div>
-                
-                <h6 class="fw-bold mb-3">Item-Level Breakdown</h6>
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Qty</th>
-                                <th>Unit Price</th>
-                                <th>Revenue</th>
-                                <th>Supplier Cost</th>
-                                <th>Shipping Cost</th>
-                                <th>Total Cost</th>
-                                <th>Item Profit</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itemsHtml}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            
-            document.getElementById('profitDetailsContent').innerHTML = html;
-        }
-
         function loadPaymentTabsData(invoiceId) {
             // Set invoice IDs for both forms
             document.getElementById('supplierInvoiceId').value = invoiceId;
@@ -1646,9 +1789,9 @@ require_once __DIR__ . '/../private/auth_check.php';
             const summary = orderData.summary;
             const payments = paymentData.payments || [];
             
-            // Calculate due amounts
+            // Calculate due amounts - keep currencies separate like main table
             const supplierDue = summary.total_supplier_cost_yen;
-            const shippingDue = summary.total_shipping_cost_yen;
+            const shippingDue = summary.total_shipping_cost_rm; // Fixed: use RM for shipping
             const supplierPaid = summary.supplier_payments_made;
             const shippingPaid = summary.shipping_payments_made;
             const supplierBalance = supplierDue - supplierPaid;
@@ -1676,20 +1819,20 @@ require_once __DIR__ . '/../private/auth_check.php';
                 </div>
             `;
 
-            // Shipping Summary
+            // Shipping Summary - use RM currency to match main table
             const shippingSummaryHtml = `
                 <div class="mb-3">
                     <p class="mb-1"><strong>Total Due:</strong></p>
-                    <h5 class="text-info">¥${formatCurrency(shippingDue)}</h5>
+                    <h5 class="text-info">RM ${formatNumber(shippingDue)}</h5>
                 </div>
                 <div class="mb-3">
                     <p class="mb-1"><strong>Amount Paid:</strong></p>
-                    <h6 class="text-success">¥${formatCurrency(shippingPaid)}</h6>
+                    <h6 class="text-success">RM ${formatNumber(shippingPaid)}</h6>
                 </div>
                 <div class="mb-3">
                     <p class="mb-1"><strong>Balance:</strong></p>
                     <h6 class="${shippingBalance > 0 ? 'text-danger' : shippingBalance < 0 ? 'text-warning' : 'text-success'}">
-                        ¥${formatCurrency(Math.abs(shippingBalance))}
+                        RM ${formatNumber(Math.abs(shippingBalance))}
                         ${shippingBalance > 0 ? '(Outstanding)' : shippingBalance < 0 ? '(Overpaid)' : '(Paid)'}
                     </h6>
                 </div>
@@ -1763,14 +1906,14 @@ require_once __DIR__ . '/../private/auth_check.php';
                 });
             }
 
-            // Shipping payment calculation
+            // Shipping payment calculation - use RM currency to match main table
             const shippingAmountInput = document.getElementById('shippingPaymentAmount');
             const shippingImpactDiv = document.getElementById('shippingPaymentImpact');
             
             if (shippingAmountInput && shippingImpactDiv) {
                 shippingAmountInput.addEventListener('input', function() {
                     const amount = parseFloat(this.value) || 0;
-                    const due = summary.total_shipping_cost_yen;
+                    const due = summary.total_shipping_cost_rm; // Fixed: use RM field
                     const paid = summary.shipping_payments_made;
                     const newTotal = paid + amount;
                     const difference = newTotal - due;
@@ -1779,9 +1922,9 @@ require_once __DIR__ . '/../private/auth_check.php';
                     if (amount === 0) {
                         impactHtml = 'Enter amount to see impact';
                     } else if (difference > 0) {
-                        impactHtml = `<span class="text-warning">⚠️ Overpayment by ¥${formatCurrency(difference)}<br>This will reduce profit margin</span>`;
+                        impactHtml = `<span class="text-warning">⚠️ Overpayment by RM ${formatNumber(difference)}<br>This will reduce profit margin</span>`;
                     } else if (difference < 0) {
-                        impactHtml = `<span class="text-info">ℹ️ Partial payment: ¥${formatCurrency(Math.abs(difference))} remaining<br>Remaining balance will maintain profit</span>`;
+                        impactHtml = `<span class="text-info">ℹ️ Partial payment: RM ${formatNumber(Math.abs(difference))} remaining<br>Remaining balance will maintain profit</span>`;
                     } else {
                         impactHtml = `<span class="text-success">✅ Full payment: Exact amount due</span>`;
                     }
@@ -1902,8 +2045,66 @@ require_once __DIR__ . '/../private/auth_check.php';
         }
 
         function formatCurrency(amount) {
-            return new Intl.NumberFormat('ja-JP').format(amount);
+            // Handle null, undefined, empty string, or NaN values
+            if (amount === null || amount === undefined || amount === '' || isNaN(amount)) {
+                return '0';
+            }
+            
+            const numValue = parseFloat(amount);
+            
+            // Check if the parsed value is still NaN
+            if (isNaN(numValue)) {
+                return '0';
+            }
+            
+            return new Intl.NumberFormat('ja-JP').format(numValue);
         }
+
+        // Filter Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search input with debounce
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                let searchTimeout;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        applyFilters();
+                    }, 500); // Debounce search for 500ms
+                });
+                
+                // Enter key support for search
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        applyFilters();
+                    }
+                });
+            }
+            
+            // Month filter auto-apply
+            const monthFilter = document.getElementById('monthFilter');
+            if (monthFilter) {
+                monthFilter.addEventListener('change', function() {
+                    applyFilters();
+                });
+            }
+            
+            // Date range filters auto-apply
+            const dateFromFilter = document.getElementById('dateFromFilter');
+            const dateToFilter = document.getElementById('dateToFilter');
+            
+            if (dateFromFilter) {
+                dateFromFilter.addEventListener('change', function() {
+                    applyFilters();
+                });
+            }
+            
+            if (dateToFilter) {
+                dateToFilter.addEventListener('change', function() {
+                    applyFilters();
+                });
+            }
+        });
     </script>
 
 <!-- Profit Details Modal -->

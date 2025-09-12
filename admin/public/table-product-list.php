@@ -46,6 +46,7 @@ include __DIR__ . '/../include/header.php';
                                                     <th>Product Type</th>
                                                     <th>Variant</th>
                                                     <th>Selling Price</th>
+                                                    <th>Profit</th>
                                                     <th>Created</th>
                                                     <th>Actions</th>
                                                 </tr>
@@ -62,6 +63,9 @@ include __DIR__ . '/../include/header.php';
                                                     <td><?= htmlspecialchars($product['variant']) ?></td>
                                                     <td>
                                                         <?= $product['new_selling_price'] ? 'RM ' . number_format($product['new_selling_price'], 2) : 'N/A' ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= $product['new_unit_profit_rm'] ? 'RM ' . number_format($product['new_unit_profit_rm'], 2) : 'Price N/A' ?>
                                                     </td>
                                                     <td><?= date('d/m/Y', strtotime($product['created_at'])) ?></td>
                                                     <td>
@@ -365,6 +369,14 @@ include __DIR__ . '/../include/header.php';
                                             <label class="form-label text-muted">Selling Price</label>
                                             <div id="view_selling_price" class="fw-bold text-success"></div>
                                         </div>
+                                        <div class="col-12">
+                                            <label class="form-label text-muted">Unit Price (RM)</label>
+                                            <div id="view_unit_price_rm" class="fw-bold text-info"></div>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label text-muted">Profit</label>
+                                            <div id="view_profit" class="fw-bold text-primary"></div>
+                                        </div>
                                         <div class="col-6">
                                             <label class="form-label text-muted">Created At</label>
                                             <div id="view_created_at"></div>
@@ -486,9 +498,9 @@ include __DIR__ . '/../include/header.php';
             $('#productTable').DataTable({
                 responsive: true,
                 pageLength: 25,
-                order: [[8, 'desc']], // Order by created date (now column 8)
+                order: [[9, 'desc']], // Order by created date (now column 9)
                 columnDefs: [
-                    { orderable: false, targets: [9] } // Disable sorting on Actions column (now column 9)
+                    { orderable: false, targets: [10] } // Disable sorting on Actions column (now column 10)
                 ]
             });
 
@@ -868,6 +880,8 @@ include __DIR__ . '/../include/header.php';
             $('#view_dimensions').text(product.dimensions || 'N/A');
             $('#view_supplier').text(product.supplier_name || 'N/A');
             $('#view_selling_price').text(product.new_selling_price ? 'RM ' + parseFloat(product.new_selling_price).toFixed(2) : 'N/A');
+            $('#view_unit_price_rm').text(product.new_unit_price_rm ? 'RM ' + parseFloat(product.new_unit_price_rm).toFixed(2) : 'Price N/A');
+            $('#view_profit').text(product.new_unit_profit_rm ? 'RM ' + parseFloat(product.new_unit_profit_rm).toFixed(2) : 'Price N/A');
             $('#view_created_at').text(product.created_at ? new Date(product.created_at).toLocaleString() : 'N/A');
             $('#view_updated_at').text(product.updated_at ? new Date(product.updated_at).toLocaleString() : 'N/A');
             
