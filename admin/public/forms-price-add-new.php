@@ -307,12 +307,93 @@ include __DIR__ . '/../include/header.php';
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
 
+    <!-- Custom CSS for Select2 Bootstrap styling -->
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+        
+        .select2-container--default .select2-selection--single {
+            height: 58px !important;
+            border: 1px solid #dee2e6 !important;
+            border-radius: 0.375rem !important;
+            background-color: #fff !important;
+            padding: 16px 12px 8px 12px !important;
+            font-size: 0.875rem !important;
+            line-height: 1.25rem !important;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+        }
+        
+        .select2-container--default .select2-selection--single:focus,
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #86b7fe !important;
+            outline: 0 !important;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+        }
+        
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #212529 !important;
+            padding: 0 !important;
+            line-height: 1.25rem !important;
+        }
+        
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #6c757d !important;
+        }
+        
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 56px !important;
+            right: 8px !important;
+        }
+        
+        .select2-dropdown {
+            border: 1px solid #dee2e6 !important;
+            border-radius: 0.375rem !important;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        .select2-container--default .select2-results__option {
+            padding: 8px 12px !important;
+            font-size: 0.875rem !important;
+        }
+        
+        .select2-container--default .select2-results__option--highlighted {
+            background-color: #0d6efd !important;
+            color: #fff !important;
+        }
+        
+        .select2-container--default .select2-results__option[aria-selected=true] {
+            background-color: #e7f1ff !important;
+            color: #0d6efd !important;
+        }
+        
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            border: 1px solid #dee2e6 !important;
+            border-radius: 0.375rem !important;
+            padding: 8px 12px !important;
+            font-size: 0.875rem !important;
+        }
+        
+        /* Make it look like floating labels */
+        .form-floating .select2-container {
+            position: relative;
+        }
+        
+        .form-floating .select2-container .select2-selection {
+            background-color: transparent !important;
+        }
+        
+        .form-floating label {
+            z-index: 10;
+        }
+    </style>
+
     <!-- prismjs plugin -->
     <script src="assets/libs/prismjs/prism.js"></script>
 
     <script src="assets/js/app.js"></script>
 <script>
-// --- Cascading Dropdowns with Choices.js & Product Filtering ---
+// --- Cascading Dropdowns with Select2 & Product Filtering ---
 document.addEventListener('DOMContentLoaded', function () {
     const sectionSelect = document.getElementById('section');
     const categorySelect = document.getElementById('category');
@@ -343,36 +424,64 @@ document.addEventListener('DOMContentLoaded', function () {
             supplierName: opt.dataset.supplierName || ''
         }));
 
-    const baseCfg = { searchEnabled: true, shouldSort: false, itemSelectText: '', placeholder: true };
-    const chSection = new Choices(sectionSelect, baseCfg);
-    const chCategory = new Choices(categorySelect, baseCfg);
-    const chSubcat = new Choices(subcategorySelect, baseCfg);
-    const chProduct = new Choices(productSelect, baseCfg);
+    // Initialize Select2 with custom styling
+    function initSelect2() {
+        $('#section').select2({
+            placeholder: 'Choose Section...',
+            allowClear: false,
+            width: '100%'
+        });
+        
+        $('#category').select2({
+            placeholder: 'Choose Category...',
+            allowClear: false,
+            width: '100%'
+        });
+        
+        $('#subcategory').select2({
+            placeholder: 'Choose Subcategory...',
+            allowClear: false,
+            width: '100%'
+        });
+        
+        $('#product').select2({
+            placeholder: 'Choose Product...',
+            allowClear: false,
+            width: '100%'
+        });
+    }
+
+    // Call initialization
+    initSelect2();
 
     function clearProductAndSupplier() {
-        chProduct.removeActiveItems();
-        productSelect.value = '';
+        $('#product').val('').trigger('change');
         supplierNameInput.value = '';
         supplierIdInput.value = '';
     }
 
     function rebuildCategoryChoices() {
         const section = sectionSelect.value;
-        chCategory.clearChoices();
+        $('#category').empty().append('<option value="">Choose Category...</option>');
         const filtered = allCategories.filter(c => !section || c.section === section);
-        chCategory.setChoices([{ value: '', label: 'Choose Category...', disabled: true }], 'value', 'label', false);
-        chCategory.setChoices(filtered.map(c => ({ value: c.value, label: c.label })), 'value', 'label', true);
-        chSubcat.clearChoices();
-        chSubcat.setChoices([{ value: '', label: 'Choose Subcategory...', disabled: true }], 'value', 'label', false);
+        filtered.forEach(c => {
+            $('#category').append(`<option value="${c.value}">${c.label}</option>`);
+        });
+        $('#category').trigger('change');
+        
+        $('#subcategory').empty().append('<option value="">Choose Subcategory...</option>');
+        $('#subcategory').trigger('change');
         clearProductAndSupplier();
     }
 
     function rebuildSubcategoryChoices() {
         const category = categorySelect.value;
-        chSubcat.clearChoices();
+        $('#subcategory').empty().append('<option value="">Choose Subcategory...</option>');
         const filtered = allSubcategories.filter(sc => !category || sc.category === category);
-        chSubcat.setChoices([{ value: '', label: 'Choose Subcategory...', disabled: true }], 'value', 'label', false);
-        chSubcat.setChoices(filtered.map(sc => ({ value: sc.value, label: sc.label })), 'value', 'label', true);
+        filtered.forEach(sc => {
+            $('#subcategory').append(`<option value="${sc.value}">${sc.label}</option>`);
+        });
+        $('#subcategory').trigger('change');
         clearProductAndSupplier();
     }
 
@@ -387,24 +496,28 @@ document.addEventListener('DOMContentLoaded', function () {
             (!subcategory || p.subcategory === subcategory)
         );
 
-        chProduct.clearChoices();
-        chProduct.setChoices([{ value: '', label: 'Choose Product...', disabled: true }], 'value', 'label', false);
-        chProduct.setChoices(filtered.map(p => ({ value: p.value, label: p.label })), 'value', 'label', true);
+        $('#product').empty().append('<option value="">Choose Product...</option>');
+        filtered.forEach(p => {
+            $('#product').append(`<option value="${p.value}">${p.label}</option>`);
+        });
+        $('#product').trigger('change');
         clearProductAndSupplier();
     }
 
-    sectionSelect.addEventListener('change', function () {
+    $('#section').on('change', function () {
         rebuildCategoryChoices();
         rebuildProductChoices();
     });
-    categorySelect.addEventListener('change', function () {
+    
+    $('#category').on('change', function () {
         rebuildSubcategoryChoices();
         rebuildProductChoices();
     });
-    subcategorySelect.addEventListener('change', rebuildProductChoices);
+    
+    $('#subcategory').on('change', rebuildProductChoices);
 
-    productSelect.addEventListener('change', function () {
-        const selectedValue = chProduct.getValue(true);
+    $('#product').on('change', function () {
+        const selectedValue = $(this).val();
         const meta = allProducts.find(p => p.value === selectedValue);
         if (meta) {
             supplierNameInput.value = meta.supplierName || '';
@@ -477,10 +590,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function calculateTotals() {
-        if (!selectedCartonData) return;
+        console.log('calculateTotals called');
+        console.log('selectedCartonData:', selectedCartonData);
+        
+        if (!selectedCartonData) {
+            console.log('No carton data selected');
+            return;
+        }
+        
         const moq = parseInt(moqInput.value) || 0;
-        if (moq <= 0) return;
+        if (moq <= 0) {
+            console.log('MOQ is 0 or negative:', moq);
+            return;
+        }
 
+        console.log('MOQ:', moq);
         calculateUnitPriceYen();
 
         // Calculate total CBM and weight
@@ -496,15 +620,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        console.log('Total CBM:', totalCBM, 'Total Weight:', totalWeight);
+
         totalCbmField.value = totalCBM.toFixed(3);
         totalWeightField.value = totalWeight.toFixed(2);
         displayTotalCBMField.value = totalCBM.toFixed(6);
 
         // Get freight rate from selected option
         const freightOption = freightSelect.selectedOptions[0];
-        if (!freightOption) return;
+        if (!freightOption) {
+            console.log('No freight option selected');
+            return;
+        }
         
         const freightRate = parseFloat(freightOption.dataset.freightRate) || 0;
+        console.log('Freight rate:', freightRate);
         displayCbmRateField.value = freightRate.toFixed(4);
 
         const unitPriceYen = parseFloat(unitPriceYenInput.value) || 0;
@@ -513,6 +643,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Determine if air freight based on shipping code
         const shippingCode = freightOption.value.toLowerCase();
         const isAirFreight = shippingCode.includes('air');
+
+        console.log('Shipping code:', shippingCode, 'Is air freight:', isAirFreight);
 
         // Calculate freight cost based on method
         const totalFreightCost = isAirFreight 
@@ -525,13 +657,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const unitFreightRM = totalFreightCost / moq;
         const unitProfitRM = sellingPrice - unitPriceRM;
 
+        console.log('Final calculations:', {
+            totalFreightCost,
+            totalSupplierPrice,
+            totalPrice,
+            unitPriceRM,
+            unitFreightRM,
+            unitProfitRM
+        });
+
         unitPriceRMField.value = unitPriceRM.toFixed(2);
         unitFreightRMField.value = unitFreightRM.toFixed(2);
         unitProfitRMField.value = unitProfitRM.toFixed(2);
     }
 
-    productSelect.addEventListener('change', function() {
-        const pid = this.value;
+    // Use Select2 event listener instead of regular change event
+    $('#product').on('change', function() {
+        const pid = $(this).val();
         selectedCartonData = productCartonData[pid] || null;
 
         // Clear previous calculations
@@ -554,7 +696,8 @@ document.addEventListener('DOMContentLoaded', () => {
     priceYenInput.addEventListener('input', calculateTotals);
     additionalFeeInput.addEventListener('input', calculateTotals);
     document.querySelector('input[name="new_shipping_moq_yen"]').addEventListener('input', calculateTotals);
-    freightSelect.addEventListener('change', calculateTotals);
+    // Use jQuery for freight select to ensure compatibility
+    $(freightSelect).on('change', calculateTotals);
     sellingPriceField.addEventListener('input', calculateTotals);
 });
 </script>
@@ -614,16 +757,217 @@ if (moq <= 0) {
 }
 </script>
 
-
-
-
-
-
+<script>
+// Pre-populate form data if product_id is passed via URL
+document.addEventListener('DOMContentLoaded', function() {
+    <?php if ($prePopulateData): ?>
+    
+    // Pre-populate data from backend
+    const prePopData = <?= json_encode($prePopulateData) ?>;
+    
+    console.log('Pre-populating data:', prePopData);
+    
+    // Wait for Select2 to initialize
+    setTimeout(function() {
+        console.log('Starting pre-population with data:', prePopData);
+        
+        console.log('Setting section:', prePopData.section_id);
+        if (prePopData.section_id) {
+            $('#section').val(prePopData.section_id).trigger('change');
+        }
+        
+        setTimeout(function() {
+            console.log('Setting category:', prePopData.category_id);
+            if (prePopData.category_id) {
+                $('#category').val(prePopData.category_id).trigger('change');
+            }
+            
+            setTimeout(function() {
+                console.log('Setting subcategory:', prePopData.subcategory_id);
+                if (prePopData.subcategory_id) {
+                    $('#subcategory').val(prePopData.subcategory_id).trigger('change');
+                }
+                
+                setTimeout(function() {
+                    console.log('Setting product:', prePopData.product_id);
+                    if (prePopData.product_id) {
+                        $('#product').val(prePopData.product_id).trigger('change');
+                    }
+                    
+                    // Populate all the pricing fields
+                    setTimeout(function() {
+                        console.log('Populating pricing fields...');
+                        populatePricingFields(prePopData);
+                    }, 500);
+                }, 500);
+            }, 500);
+        }, 500);
+    }, 1000); // Reduced delay since Select2 is simpler than Choices.js
+    
+    function populatePricingFields(data) {
+        console.log('Starting field population with data:', data);
+        
+        // Supplier info
+        const supplierNameInput = document.getElementById('supplier_name');
+        const supplierIdInput = document.getElementById('supplier_id');
+        if (supplierNameInput && data.supplier_name) {
+            supplierNameInput.value = data.supplier_name;
+            console.log('Set supplier name:', data.supplier_name);
+        }
+        if (supplierIdInput && data.supplier_id) {
+            supplierIdInput.value = data.supplier_id;
+            console.log('Set supplier ID:', data.supplier_id);
+        }
+        
+        // Price fields
+        const priceYenInput = document.querySelector('input[name="new_price_yen"]');
+        if (priceYenInput && data.new_price_yen) {
+            priceYenInput.value = data.new_price_yen;
+        }
+        
+        const moqInput = document.querySelector('input[name="new_moq_quantity"]');
+        if (moqInput && data.new_moq_quantity) {
+            moqInput.value = data.new_moq_quantity;
+        }
+        
+        const shippingInput = document.querySelector('input[name="new_shipping_moq_yen"]');
+        if (shippingInput && data.new_shipping_moq_yen) {
+            shippingInput.value = data.new_shipping_moq_yen;
+        }
+        
+        const additionalInput = document.querySelector('input[name="new_additional_price_moq_yen"]');
+        if (additionalInput && data.new_additional_price_moq_yen) {
+            additionalInput.value = data.new_additional_price_moq_yen;
+        }
+        
+        const unitPriceYenInput = document.querySelector('input[name="new_unit_price_yen"]');
+        if (unitPriceYenInput && data.new_unit_price_yen) {
+            unitPriceYenInput.value = data.new_unit_price_yen;
+        }
+        
+        // Freight method
+        const freightSelect = document.getElementById('freight_method');
+        if (freightSelect && data.new_freight_method) {
+            freightSelect.value = data.new_freight_method;
+        }
+        
+        // Freight calculations
+        const totalCbmInput = document.querySelector('input[name="new_total_cbm_moq"]');
+        if (totalCbmInput && data.new_total_cbm_moq) {
+            totalCbmInput.value = data.new_total_cbm_moq;
+        }
+        
+        const totalWeightInput = document.querySelector('input[name="new_total_weight_moq"]');
+        if (totalWeightInput && data.new_total_weight_moq) {
+            totalWeightInput.value = data.new_total_weight_moq;
+        }
+        
+        // Final pricing
+        const sellingPriceInput = document.getElementById('selling_price_unit');
+        if (sellingPriceInput && data.new_selling_price) {
+            sellingPriceInput.value = data.new_selling_price;
+        }
+        
+        const unitPriceRMInput = document.querySelector('input[name="new_unit_price_rm"]');
+        if (unitPriceRMInput && data.new_unit_price_rm) {
+            unitPriceRMInput.value = data.new_unit_price_rm;
+        }
+        
+        const unitFreightRMInput = document.querySelector('input[name="new_unit_freight_cost_rm"]');
+        if (unitFreightRMInput && data.new_unit_freight_cost_rm) {
+            unitFreightRMInput.value = data.new_unit_freight_cost_rm;
+        }
+        
+        const unitProfitRMInput = document.querySelector('input[name="new_unit_profit_rm"]');
+        if (unitProfitRMInput && data.new_unit_profit_rm) {
+            unitProfitRMInput.value = data.new_unit_profit_rm;
+        }
+        
+        // Display fields
+        const displayCbmRateInput = document.getElementById('display_cbm_rate');
+        if (displayCbmRateInput && data.freight_rate) {
+            displayCbmRateInput.value = data.freight_rate;
+        }
+        
+        const displayTotalCBMInput = document.getElementById('display_total_cbm');
+        if (displayTotalCBMInput && data.new_total_cbm_moq) {
+            displayTotalCBMInput.value = data.new_total_cbm_moq;
+        }
+        
+        console.log('Field population completed');
+        
+        // Show success message
+        Swal.fire({
+            title: 'Data Loaded!',
+            text: 'Existing pricing data has been loaded for this product: ' + data.display_name,
+            icon: 'info',
+            confirmButtonText: 'OK',
+            timer: 4000,
+            timerProgressBar: true
+        });
+    }
+    
+    <?php else: ?>
+    
+    // Handle case where product_id is passed but no pricing data exists
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('product_id');
+    
+    if (productId) {
+        console.log('No pricing data found, but auto-selecting product:', productId);
+        // Auto-select the product but show message that no pricing data exists
+        setTimeout(function() {
+            const productSelect = document.getElementById('product');
+            if (productSelect) {
+                const option = productSelect.querySelector(`option[value="${productId}"]`);
+                if (option) {
+                    console.log('Found product option:', option);
+                    // Auto-select hierarchical dropdowns based on product data
+                    const sectionId = option.dataset.section;
+                    const categoryId = option.dataset.category;
+                    const subcategoryId = option.dataset.subcategory;
+                    
+                    console.log('Product hierarchy:', { sectionId, categoryId, subcategoryId });
+                    
+                    if (sectionId) {
+                        $('#section').val(sectionId).trigger('change');
+                    }
+                    
+                    setTimeout(function() {
+                        if (categoryId) {
+                            $('#category').val(categoryId).trigger('change');
+                        }
+                        
+                        setTimeout(function() {
+                            if (subcategoryId) {
+                                $('#subcategory').val(subcategoryId).trigger('change');
+                            }
+                            
+                            setTimeout(function() {
+                                $('#product').val(productId).trigger('change');
+                                
+                                // Show message that this is a new pricing entry
+                                Swal.fire({
+                                    title: 'New Pricing Entry',
+                                    text: 'No existing pricing data found for this product. You can create a new pricing record.',
+                                    icon: 'info',
+                                    confirmButtonText: 'OK',
+                                    timer: 4000,
+                                    timerProgressBar: true
+                                });
+                            }, 500);
+                        }, 500);
+                    }, 500);
+                } else {
+                    console.error('Product option not found for ID:', productId);
+                }
+            }
+        }, 1000);
+    }
+    
+    <?php endif; ?>
+});
+</script>
 
 </body>
-
-
-</html>
-</body>
-
 </html>

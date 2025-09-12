@@ -307,6 +307,9 @@
                                             <li class="nav-item">
                                                 <a href="view_order_tabs.php" class="nav-link" data-key="t-basic-elements">View Order</a>
                                             </li>
+                                            <li class="nav-item">
+                                                <a href="profit_loss.php" class="nav-link" data-key="t-basic-elements">Profit & Loss</a>
+                                            </li>
                                         </ul>
                                     </div>
                                 </li>

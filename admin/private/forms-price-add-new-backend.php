@@ -214,6 +214,43 @@ $subcategories = $pdo->query("SELECT * FROM subcategory")->fetchAll(PDO::FETCH_A
 // Fetch shipping methods - Updated to use simplified structure
 $shipping_methods = $pdo->query("SELECT shipping_price_id, shipping_code, shipping_name, freight_rate FROM price_shipping WHERE freight_rate > 0")->fetchAll(PDO::FETCH_ASSOC);
 
+// Check if we need to pre-populate data for a specific product
+$prePopulateData = null;
+$targetProductId = $_GET['product_id'] ?? null;
+
+if ($targetProductId) {
+    // Fetch the latest pricing data for this product
+    $stmt = $pdo->prepare("
+        SELECT 
+            pr.*,
+            p.section_id,
+            p.category_id, 
+            p.subcategory_id,
+            p.product_code,
+            CONCAT(
+                p.product_code, ' | ',
+                IFNULL(m.material_name, ''), ' ',
+                IFNULL(pt.product_name, ''), ' ',
+                p.size_1, '*', p.size_2, '*', p.size_3, ' ',
+                p.variant
+            ) AS display_name,
+            s.supplier_name,
+            ship.shipping_code,
+            ship.freight_rate
+        FROM price pr
+        JOIN product p ON p.product_id = pr.product_id
+        LEFT JOIN material m ON p.material_id = m.material_id
+        LEFT JOIN product_type pt ON pt.product_type_id = p.product_type_id
+        LEFT JOIN supplier s ON s.supplier_id = pr.supplier_id
+        LEFT JOIN price_shipping ship ON ship.shipping_code = pr.new_freight_method
+        WHERE pr.product_id = :product_id
+        ORDER BY pr.price_id DESC
+        LIMIT 1
+    ");
+    $stmt->execute([':product_id' => $targetProductId]);
+    $prePopulateData = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
 // Fetch products with latest supplier + carton info
 $products = $pdo->query("
     SELECT 
