@@ -58,6 +58,7 @@ $sections = $pdo->query("SELECT section_id, section_name FROM section")->fetchAl
 $categories = $pdo->query("SELECT category_id, category_name, section_id FROM category")->fetchAll(PDO::FETCH_ASSOC);
 $subcategories = $pdo->query("SELECT subcategory_id, subcategory_name, category_id FROM subcategory")->fetchAll(PDO::FETCH_ASSOC);
 $customers = $pdo->query("SELECT customer_id, customer_name FROM customer WHERE deleted_at IS NULL")->fetchAll(PDO::FETCH_ASSOC);
+$staff = $pdo->query("SELECT staff_id, staff_name FROM staff WHERE deleted_at IS NULL ORDER BY staff_name")->fetchAll(PDO::FETCH_ASSOC);
 $products = $pdo->query("
     SELECT 
         p.product_id,
@@ -104,6 +105,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->beginTransaction();
         
         $customer_id = $_POST['customer_id'];
+        $selected_staff_id = $_POST['selected_staff'] ?? null;
+        $staff_commission_percentage = $_POST['staff_commission_percentage'] ?? 0;
         $products = $_POST['products'];
 
         $stmt = $pdo->prepare("SELECT * FROM customer WHERE customer_id = ?");
@@ -166,11 +169,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 customer_id, 
                 company_id, 
                 staff_id,
+                commission_staff_id,
+                commission_percentage,
                 total_amount,
                 created_at,
                 updated_at
             ) VALUES (
-                ?, ?, ?, ?, ?, ?, 
+                ?, ?, ?, ?, ?, ?, ?, ?, 
                 NOW(), 
                 NOW()
             )
@@ -181,7 +186,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $price_id,
             $customer_id, 
             $company_id, 
-            $staff_id, 
+            $staff_id,
+            $selected_staff_id,
+            $staff_commission_percentage,
             $total_amount
         ], true));
 
@@ -191,6 +198,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $customer_id,
             $company_id,
             $staff_id,
+            $selected_staff_id,
+            $staff_commission_percentage,
             $total_amount
         ]);
         

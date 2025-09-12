@@ -158,9 +158,9 @@
                                             <!-- Customer Section -->
                                             <section class="customer-info mb-5">
                                                 <hr class="my-4">
-                                                <h5 class="text-start fw-bold fs-2 mb-3">Customer Information</h5>
+                                                <h5 class="text-start fw-bold fs-2 mb-3">Customer & Staff Information</h5>
                                                 <div class="row g-3">
-                                                    <div class="col-sm-6">
+                                                    <div class="col-sm-4">
                                                         <label for="customer" class="form-label">Customer</label>
                                                         <select class="form-select" id="customer" name="customer_id" required>
                                                             <option value="" disabled selected>Select Customer...</option>
@@ -168,6 +168,23 @@
                                                                 <option value="<?= $c['customer_id'] ?>"><?= $c['customer_name'] ?></option>
                                                             <?php endforeach; ?>
                                                         </select>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <label for="selected_staff" class="form-label">Commission Staff</label>
+                                                        <select class="form-select" id="selected_staff" name="selected_staff">
+                                                            <option value="" disabled selected>Select Staff...</option>
+                                                            <?php foreach ($staff as $s): ?>
+                                                                <option value="<?= $s['staff_id'] ?>"><?= htmlspecialchars($s['staff_name']) ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <label for="staff_commission_percentage" class="form-label">Commission %</label>
+                                                        <div class="input-group">
+                                                            <input type="number" class="form-control" id="staff_commission_percentage" name="staff_commission_percentage" 
+                                                                   min="0" max="100" step="0.1" placeholder="0.0">
+                                                            <span class="input-group-text">%</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </section>
@@ -262,6 +279,7 @@
                 const chSubcat = new Choices(subcategorySelect, baseCfg);
                 const chProduct = new Choices(productSelect, baseCfg);
                 const chCustomer = new Choices('#customer', baseCfg);
+                const chStaff = new Choices('#selected_staff', baseCfg);
 
                 // DOM Elements
                 const moqField = document.getElementById('moq');

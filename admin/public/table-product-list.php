@@ -46,6 +46,7 @@ include __DIR__ . '/../include/header.php';
                                                     <th>Product Type</th>
                                                     <th>Variant</th>
                                                     <th>Selling Price</th>
+                                                    <th>Profit</th>
                                                     <th>Created</th>
                                                     <th>Actions</th>
                                                 </tr>
@@ -62,6 +63,9 @@ include __DIR__ . '/../include/header.php';
                                                     <td><?= htmlspecialchars($product['variant']) ?></td>
                                                     <td>
                                                         <?= $product['new_selling_price'] ? 'RM ' . number_format($product['new_selling_price'], 2) : 'N/A' ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= $product['new_unit_profit_rm'] ? 'RM ' . number_format($product['new_unit_profit_rm'], 2) : 'Price N/A' ?>
                                                     </td>
                                                     <td><?= date('d/m/Y', strtotime($product['created_at'])) ?></td>
                                                     <td>
@@ -110,7 +114,7 @@ include __DIR__ . '/../include/header.php';
                     <h5 class="modal-title" id="updateProductModalLabel">Update Product & Carton Info</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="GET" id="updateProductForm" enctype="multipart/form-data">
+                <form method="POST" id="updateProductForm" enctype="multipart/form-data">
                     <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                         <div class="row g-3">
                             <!-- Product Hierarchy Selection - READONLY -->
@@ -142,7 +146,7 @@ include __DIR__ . '/../include/header.php';
 
                                 <div class="col-sm-6">
                                     <label class="form-label">Supplier</label>
-                                    <select class="form-control" name="supplier_id" id="update_supplier">
+                                    <select class="form-select" name="supplier_id" id="update_supplier">
                                         <option value="">Select Supplier...</option>
                                         <?php foreach($suppliers as $supplier): ?>
                                             <option value="<?= $supplier['supplier_id'] ?>"><?= htmlspecialchars($supplier['supplier_name']) ?></option>
@@ -365,6 +369,14 @@ include __DIR__ . '/../include/header.php';
                                             <label class="form-label text-muted">Selling Price</label>
                                             <div id="view_selling_price" class="fw-bold text-success"></div>
                                         </div>
+                                        <div class="col-12">
+                                            <label class="form-label text-muted">Unit Price (RM)</label>
+                                            <div id="view_unit_price_rm" class="fw-bold text-info"></div>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label text-muted">Profit</label>
+                                            <div id="view_profit" class="fw-bold text-primary"></div>
+                                        </div>
                                         <div class="col-6">
                                             <label class="form-label text-muted">Created At</label>
                                             <div id="view_created_at"></div>
@@ -445,6 +457,7 @@ include __DIR__ . '/../include/header.php';
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
+
     <!-- jQuery FIRST -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
@@ -458,6 +471,24 @@ include __DIR__ . '/../include/header.php';
     <script>
         let updateAdditionalCount = 0;
         const updateMaxAdditional = 6;
+        let updateSupplierChoices = null;
+
+        function initUpdateSupplierChoices() {
+            if (updateSupplierChoices) {
+                updateSupplierChoices.destroy();
+                updateSupplierChoices = null;
+            }
+            updateSupplierChoices = new Choices('#update_supplier', {
+                searchEnabled: true,
+                shouldSort: false,
+                allowHTML: false,
+                placeholder: true,
+                placeholderValue: 'Select Supplier...',
+                searchPlaceholderValue: 'Search supplier...',
+                itemSelectText: '',
+                removeItemButton: false
+            });
+        }
 
         // Wait for DOM to be ready
         $(document).ready(function() {
@@ -467,9 +498,9 @@ include __DIR__ . '/../include/header.php';
             $('#productTable').DataTable({
                 responsive: true,
                 pageLength: 25,
-                order: [[8, 'desc']], // Order by created date (now column 8)
+                order: [[9, 'desc']], // Order by created date (now column 9)
                 columnDefs: [
-                    { orderable: false, targets: [9] } // Disable sorting on Actions column (now column 9)
+                    { orderable: false, targets: [10] } // Disable sorting on Actions column (now column 10)
                 ]
             });
 
@@ -536,9 +567,9 @@ include __DIR__ . '/../include/header.php';
 
                 console.log('Sending AJAX request...'); // Debug log
 
-                // Submit form
+                // Submit form directly to backend to ensure pure JSON response
                 $.ajax({
-                    url: window.location.href,
+                    url: '../private/table-product-list-backend.php',
                     type: 'POST',
                     data: formData,
                     processData: false,
@@ -587,6 +618,24 @@ include __DIR__ . '/../include/header.php';
                         });
                     }
                 });
+            });
+
+            initUpdateSupplierChoices();
+
+            // Re-init when modal is shown, then reapply current selection so it stays preloaded
+            $('#updateProductModal').on('shown.bs.modal', function () {
+                initUpdateSupplierChoices();
+                const currentSupplier = $('#update_supplier').val();
+                if (updateSupplierChoices && currentSupplier) {
+                    updateSupplierChoices.setChoiceByValue(String(currentSupplier));
+                }
+            });
+
+            // Optional: clean up when hidden
+            $('#updateProductModal').on('hidden.bs.modal', function () {
+                if (updateSupplierChoices) {
+                    updateSupplierChoices.removeActiveItems(); // reset selection
+                }
             });
         });
 
@@ -638,10 +687,14 @@ include __DIR__ . '/../include/header.php';
             $('#update_material_display').val(product.material_name || '');
             $('#update_product_type_display').val(product.product_type_name || '');
             
-            // Set supplier dropdown value (now updatable)
-            if (product.supplier_id) {
-                $('#update_supplier').val(product.supplier_id);
-            }
+            // Set supplier value on native select
+            $('#update_supplier').val(product.supplier_id || '');
+            // After Choices.js is initialized, set the value again
+            setTimeout(function() {
+                if (updateSupplierChoices && product.supplier_id) {
+                    updateSupplierChoices.setChoiceByValue(String(product.supplier_id));
+                }
+            }, 100);
 
             // Handle sizes with metrics (parse combined values like "10 cm")
             for (let i = 1; i <= 3; i++) {
@@ -827,6 +880,8 @@ include __DIR__ . '/../include/header.php';
             $('#view_dimensions').text(product.dimensions || 'N/A');
             $('#view_supplier').text(product.supplier_name || 'N/A');
             $('#view_selling_price').text(product.new_selling_price ? 'RM ' + parseFloat(product.new_selling_price).toFixed(2) : 'N/A');
+            $('#view_unit_price_rm').text(product.new_unit_price_rm ? 'RM ' + parseFloat(product.new_unit_price_rm).toFixed(2) : 'Price N/A');
+            $('#view_profit').text(product.new_unit_profit_rm ? 'RM ' + parseFloat(product.new_unit_profit_rm).toFixed(2) : 'Price N/A');
             $('#view_created_at').text(product.created_at ? new Date(product.created_at).toLocaleString() : 'N/A');
             $('#view_updated_at').text(product.updated_at ? new Date(product.updated_at).toLocaleString() : 'N/A');
             

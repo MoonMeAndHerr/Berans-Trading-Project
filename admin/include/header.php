@@ -43,8 +43,7 @@ require_once __DIR__ . '/../private/auth_check.php';
     <!-- Filepond css -->
     <link rel="stylesheet" href="assets/libs/filepond/filepond.min.css" type="text/css" />
     <link rel="stylesheet" href="assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.css">
-
-
+    
 
 </head>
 
