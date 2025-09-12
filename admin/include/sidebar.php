@@ -194,7 +194,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link menu-link" href="#sidebarTablesRoles" data-bs-toggle="collapse" role="button"
                                     aria-expanded="false" aria-controls="sidebarTablesRoles">
-                                        <i class="bx bx-group"></i>
+                                        <i class="bx bx-crown"></i>
                                         <span data-key="t-tables">Roles</span>
                                     </a>
                                     <div class="collapse menu-dropdown" id="sidebarTablesRoles">
