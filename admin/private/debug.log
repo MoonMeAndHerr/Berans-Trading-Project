@@ -550,3 +550,49 @@
 [2025-09-13 23:03:36] Last login updated - {
     "staff_id": "1"
 }
+[2025-09-13 23:54:41] Logout initiated - {
+    "staff_id": "1",
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36"
+}
+[2025-09-13 23:54:41] Database session cleanup - {
+    "staff_id": "1",
+    "sessions_deleted": 0
+}
+[2025-09-13 23:54:41] Logout completed successfully - {
+    "staff_id": "1",
+    "username": "admin"
+}
+[2025-09-13 23:54:43] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-09-13 23:54:47] Login attempt started - {
+    "username": "fahmio",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36"
+}
+[2025-09-13 23:54:47] Attempting database query for user - {
+    "username": "fahmio"
+}
+[2025-09-13 23:54:47] User found in database - {
+    "staff_id": 34,
+    "username": "fahmio"
+}
+[2025-09-13 23:54:47] Password verification successful - {
+    "staff_id": 34
+}
+[2025-09-13 23:54:47] Session created - {
+    "staff_id": 34,
+    "username": "fahmio",
+    "role": "admin"
+}
+[2025-09-13 23:54:47] Session token created in database - {
+    "staff_id": "34",
+    "token": "e55149f30c898a0e693efd01a81f449a"
+}
+[2025-09-13 23:54:47] Last login updated - {
+    "staff_id": "34"
+}
