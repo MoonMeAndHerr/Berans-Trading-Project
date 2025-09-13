@@ -286,7 +286,7 @@
                 const quantityInput = document.getElementById('quantity');
                 const addProductBtn = document.getElementById('addProduct');
                 const productList = document.getElementById('productList').getElementsByTagName('tbody')[0];
-                let productCount = 1;
+                window.productCount = 1; // Make it global so it can be reset
 
                 function clearProductAndMOQ() {
                     chProduct.removeActiveItems();
@@ -421,7 +421,7 @@
                     // Create new row
                     const row = productList.insertRow();
                     row.innerHTML = `
-                        <td>${productCount}</td>
+                        <td>${window.productCount}</td>
                         <td>${productData.label}</td>
                         <td>${unitPrice.toFixed(2)}</td>
                         <td>${quantity}</td>
@@ -441,7 +441,7 @@
                         })}'>
                     `;
 
-                    productCount++;
+                    window.productCount++;
 
                     // Reset form - using Choices.js methods
                     chProduct.setChoiceByValue('');
@@ -508,6 +508,20 @@
                     showCloseButton: true
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Show loading
+                        Swal.fire({
+                            title: 'Creating Invoice...',
+                            text: 'Please wait while we process your request.',
+                            icon: 'info',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        // Prepare products data
                         rows.forEach(row => {
                             const hiddenInput = row.querySelector('input[type="hidden"]');
                             if (hiddenInput) {
@@ -517,12 +531,88 @@
                             }
                         });
 
-                        document.getElementById('productsJson').value = JSON.stringify(products);
-                        document.getElementById('invoiceForm').submit();
+                        // Prepare form data
+                        const formData = new FormData();
+                        
+                        // Send products as individual array elements like the original form method
+                        products.forEach((product, index) => {
+                            formData.append(`products[${index}]`, JSON.stringify(product));
+                        });
+                        
+                        formData.append('customer_id', customerId);
+                        
+                        const selectedStaff = document.getElementById('selected_staff').value;
+                        const commissionPercentage = document.getElementById('staff_commission_percentage').value;
+                        
+                        if (selectedStaff) {
+                            formData.append('selected_staff', selectedStaff);
+                        }
+                        if (commissionPercentage) {
+                            formData.append('staff_commission_percentage', commissionPercentage);
+                        }
+
+                        // Submit via AJAX
+                        fetch('', {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: formData
+                        })
+                        .then(response => {
+                            // Check if response is JSON
+                            const contentType = response.headers.get('content-type');
+                            if (contentType && contentType.includes('application/json')) {
+                                return response.json();
+                            } else {
+                                // If not JSON, get text and throw error
+                                return response.text().then(text => {
+                                    console.error('Non-JSON response:', text);
+                                    throw new Error('Server returned an error. Please check the console for details.');
+                                });
+                            }
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // Success
+                                Swal.fire({
+                                    title: 'Success!',
+                                    text: data.message || 'Invoice created successfully!',
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    // Reset form after success
+                                    document.getElementById('invoiceForm').reset();
+                                    document.querySelector('#productList tbody').innerHTML = '';
+                                    
+                                    // Reset Choices.js selectors
+                                    const choicesElements = document.querySelectorAll('.choices');
+                                    choicesElements.forEach(element => {
+                                        const choices = element.choices;
+                                        if (choices) {
+                                            choices.setChoiceByValue('');
+                                        }
+                                    });
+                                    
+                                    // Reset product count
+                                    window.productCount = 1;
+                                });
+                            } else {
+                                throw new Error(data.error || 'Unknown error occurred');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                title: 'Error!',
+                                text: error.message || 'There was an error creating the invoice. Please try again.',
+                                icon: 'error'
+                            });
+                        });
                     }
                 });
                 
-                return false; // Always return false as we're handling the submit via SweetAlert2
+                return false; // Always return false to prevent default form submission
             }
         </script>
     </body>

@@ -2,6 +2,7 @@
 if(session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/../private/auth_check.php';
 require_once __DIR__ . '/../../global/main_configuration.php';
+require_once __DIR__ . '/../public/refresh_xero_token.php';
 use League\OAuth2\Client\Provider\GenericProvider;
 use GuzzleHttp\Client;
 
@@ -92,12 +93,48 @@ $products = $pdo->query("
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Check if this is an AJAX request
+    $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+    
+    // For AJAX requests, use output buffering and error handling
+    if ($isAjax) {
+        ob_start();
+        
+        // Set error reporting to catch all errors
+        error_reporting(E_ALL);
+        ini_set('display_errors', 0); // Don't display errors directly
+        
+        // Custom error handler for AJAX
+        set_error_handler(function($severity, $message, $file, $line) {
+            ob_clean();
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => "PHP Error: $message in $file on line $line"]);
+            exit;
+        });
+        
+        // Custom exception handler for AJAX
+        set_exception_handler(function($exception) {
+            ob_clean();
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => "Exception: " . $exception->getMessage()]);
+            exit;
+        });
+    }
+    
     error_log("Form submitted. POST data: " . print_r($_POST, true));
     
     if (!isset($_POST['products']) || !isset($_POST['customer_id'])) {
-        $_SESSION['error'] = "Missing required data (products or customer)";
+        $errorMsg = "Missing required data (products or customer)";
         error_log("Missing data - Products: " . isset($_POST['products']) . ", Customer: " . isset($_POST['customer_id']));
-        header('Location: ' . $_SERVER['HTTP_REFERER']);
+        
+        if ($isAjax) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => $errorMsg]);
+            exit;
+        } else {
+            $_SESSION['error'] = $errorMsg;
+            header('Location: ' . $_SERVER['HTTP_REFERER']);
+        }
         exit;
     }
 
@@ -252,7 +289,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("SELECT * FROM product WHERE product_id = ?");
             $stmt->execute([$product_id]);
             $productfetch = $stmt->fetch(PDO::FETCH_ASSOC);
-            $product_code = $productfetch['item_code'];
+            $product_code = $productfetch['product_code'] ?? 'UNKNOWN'; // Use product_code and add fallback
 
             $price_id = $product['price_id'];
             $stmt = $pdo->prepare("SELECT * FROM price WHERE price_id = ?");
@@ -320,8 +357,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $_SESSION['success'] = "Invoice #$invoice_number created successfully!";
         error_log("Transaction committed successfully");
-        header('Location: ' . $_SERVER['HTTP_REFERER']);
-        exit;
+        
+        if ($isAjax) {
+            ob_clean(); // Clear any output buffer content
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, 'message' => "Invoice #$invoice_number created successfully!", 'invoice_number' => $invoice_number]);
+            exit;
+        } else {
+            header('Location: ' . $_SERVER['HTTP_REFERER']);
+            exit;
+        }
 
     } catch (Exception $e) {
         $pdo->rollBack();
@@ -330,8 +375,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errorMsg .= " SQL Error: " . $stmt->errorInfo()[2];
         }
         error_log($errorMsg);
-        $_SESSION['error'] = $errorMsg;
-        header('Location: ' . $_SERVER['HTTP_REFERER']);
-        exit;
+        
+        if ($isAjax) {
+            ob_clean(); // Clear any output buffer content
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => $errorMsg]);
+            exit;
+        } else {
+            $_SESSION['error'] = $errorMsg;
+            header('Location: ' . $_SERVER['HTTP_REFERER']);
+            exit;
+        }
     }
 }

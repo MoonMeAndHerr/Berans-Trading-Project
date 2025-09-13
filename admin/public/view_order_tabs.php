@@ -337,7 +337,19 @@ $displayed_orders = array_slice($orders, $offset, $items_per_page);
                     method: 'POST',
                     body: formData
                 })
-                .then(res => res.json())
+                .then(res => {
+                    // Check if response is JSON
+                    const contentType = res.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return res.json();
+                    } else {
+                        // If not JSON, get text and throw error
+                        return res.text().then(text => {
+                            console.error('Non-JSON response:', text);
+                            throw new Error('Server returned non-JSON response. Check server logs.');
+                        });
+                    }
+                })
                 .then(data => {
                     if(data.success) {
                         // Show success message
@@ -578,19 +590,27 @@ $displayed_orders = array_slice($orders, $offset, $items_per_page);
         });
     };
 
-    // Replace the existing search JavaScript code
-    document.getElementById('searchInput').addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const orderCards = document.querySelectorAll('#ordersList .col-12');
-        
-        orderCards.forEach(card => {
-            const invoiceNumber = card.querySelector('.card-title').textContent.toLowerCase();
-            if (invoiceNumber.includes(searchTerm)) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
+    // Replace the existing search JavaScript code with error handling
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const orderCards = document.querySelectorAll('#ordersList .col-12');
+            
+            orderCards.forEach(card => {
+                const titleElement = card.querySelector('.card-title');
+                if (titleElement) {
+                    const invoiceNumber = titleElement.textContent.toLowerCase();
+                    if (invoiceNumber.includes(searchTerm)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
         });
-    });
+    } else {
+        console.warn('Search input element not found');
+    }
 });
 </script>

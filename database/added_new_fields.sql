@@ -43,7 +43,10 @@ WHERE `supplier_payments_total` IS NULL OR `shipping_payments_total` IS NULL;
 -- Add commission tracking fields for staff profit sharing
 ALTER TABLE `invoice` 
 ADD COLUMN `commission_staff_id` INT(11) NULL COMMENT 'Staff member who gets commission from this order',
-ADD COLUMN `commission_percentage` DECIMAL(5,2) DEFAULT 0.00 COMMENT 'Commission percentage (0-100) for the assigned staff';
+ADD COLUMN `commission_percentage` DECIMAL(5,2) DEFAULT 0.00 COMMENT 'Commission percentage (0-100) for the assigned staff',
+ADD COLUMN `commission_paid_amount` DECIMAL(15,2) DEFAULT 0.00 COMMENT 'Amount of commission already paid to staff',
+ADD COLUMN `commission_payment_date` TIMESTAMP NULL COMMENT 'Date when commission was last paid',
+ADD COLUMN `commission_payment_notes` TEXT NULL COMMENT 'Notes about commission payments';
 
 -- Add foreign key constraint for commission_staff_id
 ALTER TABLE `invoice` 
@@ -87,5 +90,8 @@ FOREIGN KEY (`commission_staff_id`) REFERENCES `staff`(`staff_id`) ON DELETE SET
 -- INVOICE TABLE (Commission):
 -- + commission_staff_id (INT 11) - FK to staff table for commission recipient
 -- + commission_percentage (DECIMAL 5,2) - Commission percentage (0-100%)
+-- + commission_paid_amount (DECIMAL 15,2) - Amount already paid to staff
+-- + commission_payment_date (TIMESTAMP) - Date of last commission payment
+-- + commission_payment_notes (TEXT) - Notes about commission payments
 -- + fk_commission_staff (FOREIGN KEY) - Ensures valid staff reference
 -- =====================================================

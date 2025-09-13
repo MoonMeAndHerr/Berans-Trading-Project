@@ -1,60 +1,24 @@
 <?php
 
-require_once __DIR__ . '/../../global/main_configuration.php';
-require_once __DIR__ . '/../private/auth_check.php';
+include __DIR__ . '/../include/header.php';
 ?>
-
-<!doctype html>
-<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg">
-
-<head>
-
-    <meta charset="utf-8" />
-    <title>Berans Trading</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-    <meta content="Themesbrand" name="author" />
-    <!-- App favicon -->
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
-
-    <!-- Layout config Js -->
-    <script src="assets/js/layout.js"></script>
-    <!-- Bootstrap Css -->
-    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <!-- Icons Css -->
-    <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-    <!-- App Css-->
-    <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
-    <!-- custom Css-->
-    <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
-    
     <!-- Custom Profit & Loss Styles -->
     <link href="assets/css/profit-loss.css" rel="stylesheet" type="text/css" />
-</head>
-
-<body>
-
-    <!-- Begin page -->
-    <div id="layout-wrapper">
-        <?php 
-        include __DIR__ . '/../include/sidebar.php'; 
-        ?>
-
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
         <div class="main-content">
                 <div class="page-content">
                     <div class="container-fluid">
-                                                <!-- Page Title -->
+                        <!-- Page Title -->
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0">Basic Elements</h4>
+                                    <h4 class="mb-sm-0">Profit & Loss Management</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Forms</a></li>
-                                            <li class="breadcrumb-item active">Basic Elements</li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Order</a></li>
+                                            <li class="breadcrumb-item active">Profit & Loss Management</li>
                                         </ol>
                                     </div>
                                 </div>
@@ -67,9 +31,9 @@ require_once __DIR__ . '/../private/auth_check.php';
                                 <div class="col-md-6">
                                     <div class="clean-card p-4 text-center">
                                         <div class="mb-4">
-                                            <i class="ri-lock-line" style="font-size: 48px; color: #6b7280;"></i>
+                                            <i class="ri-lock-line" style="font-size: 48px; opacity: 0.6;"></i>
                                         </div>
-                                        <h3 class="mb-2" style="color: #111827;">Security Verification</h3>
+                                        <h3 class="mb-2">Security Verification</h3>
                                         <p class="text-muted mb-4">Enter your access key to view profit & loss data</p>
                                         
                                         <div class="mb-3">
@@ -91,23 +55,53 @@ require_once __DIR__ . '/../private/auth_check.php';
 
                         <!-- Main Content -->
                         <div id="mainContent" style="display: none;">
-                            
-
-
                             <!-- Filter Controls -->
                             <div class="card mb-4">
                                 <div class="card-body py-3">
-                                    <div class="row g-3 align-items-end">
-                                        <!-- Clean Page Header -->
-                                        <div class="d-flex justify-content-between align-items-center ">
-                                            <div>
-                                                <h1 class="page-title">Profit & Loss Management</h1>
-                                                <p class="page-subtitle">Track order profitability and manage payments</p>
+                                    <!-- Payment Summary Row -->
+                                    <div class="row g-3 mb-3 border-bottom pb-3" id="paymentSummaryRow">
+                                        <div class="col-md-4">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <div class="rounded bg-light p-2">
+                                                        <i class="ri-hand-coin-line text-primary" style="font-size: 18px;"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-0" id="totalCommissionPayments">RM 0.00</h6>
+                                                    <small class="text-muted">Commission Paid</small>
+                                                </div>
                                             </div>
-                                            <button class="btn btn-clean" onclick="loadProfitLossData()">
-                                                <i class="ri-refresh-line me-2"></i>Refresh Data
-                                            </button>
                                         </div>
+                                        <div class="col-md-4">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <div class="rounded bg-light p-2">
+                                                        <i class="ri-truck-line text-success" style="font-size: 18px;"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-0" id="totalShippingPayments">RM 0.00</h6>
+                                                    <small class="text-muted">Shipping Paid</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <div class="rounded bg-light p-2">
+                                                        <i class="ri-building-line text-warning" style="font-size: 18px;"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-0" id="totalSupplierPayments">RM 0.00</h6>
+                                                    <small class="text-muted">Supplier Paid</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row g-3 align-items-end">
                                         <div class="col-md-3">
                                             <label class="form-label fw-medium text-muted">Filter by Month</label>
                                             <input type="month" id="monthFilter" class="form-control" placeholder="Select month">
@@ -138,6 +132,108 @@ require_once __DIR__ . '/../private/auth_check.php';
                                                 <button class="btn btn-clean-outline btn-sm" onclick="clearFilters()" title="Clear Filters">
                                                     <i class="ri-close-line"></i>
                                                 </button>
+                                                <button class="btn btn-clean-outline btn-sm" onclick="loadProfitLossData()" title="Refresh Data">
+                                                    <i class="ri-refresh-line"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Commission Summary Section -->
+                            <div class="row mb-4" id="commissionSummarySection" style="display: none;">
+                                <div class="col-12">
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-header bg-primary bg-opacity-10 border-0">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h6 class="card-title mb-0 text-primary fw-bold">
+                                                    <i class="ri-team-line me-2"></i>Staff Commission Summary
+                                                </h6>
+                                                <button class="btn btn-outline-primary btn-sm" onclick="toggleCommissionSummary()">
+                                                    <i class="ri-eye-line"></i> View Details
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-3">
+                                                    <label class="form-label fw-medium">Date From</label>
+                                                    <input type="date" id="commissionDateFrom" class="form-control">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label fw-medium">Date To</label>
+                                                    <input type="date" id="commissionDateTo" class="form-control">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label fw-medium">Staff (Optional)</label>
+                                                    <select id="commissionStaffFilter" class="form-select">
+                                                        <option value="">All Staff</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3 d-flex align-items-end">
+                                                    <button class="btn btn-primary w-100" onclick="loadCommissionSummary()">
+                                                        <i class="ri-calculator-line me-1"></i>Calculate
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Summary Display -->
+                                            <div id="commissionSummaryDisplay" class="mt-4" style="display: none;">
+                                                <div class="row g-3">
+                                                    <div class="col-md-3">
+                                                        <div class="text-center p-3 bg-light rounded">
+                                                            <h5 class="text-primary mb-1" id="totalProfit">RM 0</h5>
+                                                            <small class="text-muted">Total Profit</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="text-center p-3 bg-light rounded">
+                                                            <h5 class="text-success mb-1" id="totalCommissionDue">RM 0</h5>
+                                                            <small class="text-muted">Commission Due</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="text-center p-3 bg-light rounded">
+                                                            <h5 class="text-info mb-1" id="totalCommissionPaid">RM 0</h5>
+                                                            <small class="text-muted">Commission Paid</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="text-center p-3 bg-light rounded">
+                                                            <h5 class="text-danger mb-1" id="totalCommissionRemaining">RM 0</h5>
+                                                            <small class="text-muted">Remaining to Pay</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Staff Breakdown -->
+                                                <div class="mt-4">
+                                                    <h6 class="fw-bold mb-3">Staff Breakdown</h6>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm table-hover">
+                                                            <thead class="table-light">
+                                                                <tr>
+                                                                    <th>Staff Name</th>
+                                                                    <th>Orders</th>
+                                                                    <th>Revenue</th>
+                                                                    <th>Profit</th>
+                                                                    <th>Commission Due</th>
+                                                                    <th>Paid</th>
+                                                                    <th>Remaining</th>
+                                                                    <th>Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="staffCommissionBreakdown">
+                                                                <tr>
+                                                                    <td colspan="8" class="text-center text-muted">
+                                                                        Select date range and click Calculate
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -223,7 +319,7 @@ require_once __DIR__ . '/../private/auth_check.php';
                             <div class="modal-header bg-light border-0 py-4">
                                 <div>
                                     <h5 class="modal-title fw-bold text-dark mb-1">Payment Management</h5>
-                                    <p class="text-muted small mb-0">Manage supplier and shipping payments</p>
+                                    <p class="text-muted small mb-0">Manage supplier, shipping, and commission payments</p>
                                 </div>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
@@ -241,6 +337,12 @@ require_once __DIR__ . '/../private/auth_check.php';
                                             <a class="nav-link border-0 px-4 py-3 fw-medium" data-bs-toggle="tab" href="#shippingPaymentTab" role="tab">
                                                 <i class="ri-ship-line me-2 fs-5"></i>
                                                 Shipping Payments
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link border-0 px-4 py-3 fw-medium" data-bs-toggle="tab" href="#commissionPaymentTab" role="tab">
+                                                <i class="ri-team-line me-2 fs-5"></i>
+                                                Commission Payment
                                             </a>
                                         </li>
                                     </ul>
@@ -276,11 +378,11 @@ require_once __DIR__ . '/../private/auth_check.php';
                                                             <div class="mb-3">
                                                                 <label class="form-label fw-medium text-dark">Payment Amount</label>
                                                                 <div class="input-group">
-                                                                    <span class="input-group-text bg-light border-end-0">¥</span>
+                                                                    <span class="input-group-text bg-light border-end-0">RM</span>
                                                                     <input type="number" class="form-control border-start-0 ps-0" id="supplierPaymentAmount" 
                                                                            name="amount" step="0.01" min="0" placeholder="0.00" required>
                                                                 </div>
-                                                                <small class="text-muted">Amount in Japanese Yen</small>
+                                                                <small class="text-muted">Amount in Malaysian Ringgit</small>
                                                             </div>
                                                             
                                                             <div class="mb-3">
@@ -361,11 +463,11 @@ require_once __DIR__ . '/../private/auth_check.php';
                                                             <div class="mb-3">
                                                                 <label class="form-label fw-medium text-dark">Payment Amount</label>
                                                                 <div class="input-group">
-                                                                    <span class="input-group-text bg-light border-end-0">¥</span>
+                                                                    <span class="input-group-text bg-light border-end-0">RM</span>
                                                                     <input type="number" class="form-control border-start-0 ps-0" id="shippingPaymentAmount" 
                                                                            name="amount" step="0.01" min="0" placeholder="0.00" required>
                                                                 </div>
-                                                                <small class="text-muted">Amount in Japanese Yen</small>
+                                                                <small class="text-muted">Amount in Malaysian Ringgit</small>
                                                             </div>
                                                             
                                                             <div class="mb-3">
@@ -412,6 +514,81 @@ require_once __DIR__ . '/../private/auth_check.php';
                                                                 <!-- Will be populated by JavaScript -->
                                                             </tbody>
                                                         </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Commission Payment Tab -->
+                                    <div class="tab-pane" id="commissionPaymentTab" role="tabpanel">
+                                        <div class="row g-0">
+                                            <!-- Commission Summary -->
+                                            <div class="col-lg-6 border-end">
+                                                <div class="p-4">
+                                                    <h6 class="fw-bold mb-3 text-success">
+                                                        <i class="ri-team-line me-2"></i>Commission Summary
+                                                    </h6>
+                                                    <div id="commissionSummary" class="payment-summary">
+                                                        <!-- Will be populated by JavaScript -->
+                                                    </div>
+                                                    
+                                                    <!-- Commission Payment Form -->
+                                                    <div class="mt-4">
+                                                        <h6 class="fw-medium mb-3">Record Commission Payment</h6>
+                                                        <form id="commissionPaymentForm">
+                                                            <input type="hidden" id="commissionInvoiceId">
+                                                            
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-medium">Payment Amount (RM)</label>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text bg-success text-white border-0">RM</span>
+                                                                    <input type="number" class="form-control ps-3" id="commissionPaymentAmount" 
+                                                                           step="0.01" min="0" placeholder="0.00">
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-medium">Payment Notes</label>
+                                                                <textarea class="form-control" id="commissionPaymentDescription" 
+                                                                          rows="3" placeholder="Optional notes about this commission payment..."></textarea>
+                                                            </div>
+                                                            
+                                                            <div class="d-grid">
+                                                                <button type="submit" class="btn btn-success">
+                                                                    <i class="ri-money-dollar-circle-line me-2"></i>Record Commission Payment
+                                                                </button>
+                                                            </div>
+                                                            
+                                                            <div class="mt-3">
+                                                                <div id="commissionPaymentImpact" class="small text-muted">Enter amount to see impact</div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Commission Payment History -->
+                                            <div class="col-lg-6">
+                                                <div class="p-4">
+                                                    <h6 class="fw-bold mb-3 text-muted">
+                                                        <i class="ri-history-line me-2"></i>Commission Payment History
+                                                    </h6>
+                                                    <div class="bg-light rounded-3 p-3">
+                                                        <div class="table-responsive">
+                                                            <table class="table table-sm mb-0">
+                                                                <thead>
+                                                                    <tr class="border-0">
+                                                                        <th class="border-0 bg-transparent fw-medium text-muted small">DATE</th>
+                                                                        <th class="border-0 bg-transparent fw-medium text-muted small">AMOUNT</th>
+                                                                        <th class="border-0 bg-transparent fw-medium text-muted small">NOTES</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="commissionPaymentHistory" class="border-0">
+                                                                    <!-- Will be populated by JavaScript -->
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -497,6 +674,8 @@ require_once __DIR__ . '/../private/auth_check.php';
                         </div>
                     </div>
                 </div>
+
+                
             <?php include __DIR__ . '/../include/footer.php';?>
         </div><!-- end main content-->
     </div><!-- END layout-wrapper -->
@@ -533,7 +712,6 @@ require_once __DIR__ . '/../private/auth_check.php';
             const toggleKeyVisibilityBtn = document.getElementById('toggleKeyVisibility');
             const keyIcon = document.getElementById('keyIcon');
             const securitySection = document.getElementById('securitySection');
-            const mainContentSection = document.getElementById('mainContentSection');
             const lockAccessBtn = document.getElementById('lockAccess');
 
             console.log('Elements found:', {
@@ -568,43 +746,10 @@ require_once __DIR__ . '/../private/auth_check.php';
                 });
             }
 
-            // Verify access key
+            // Verify access key - Using onclick attribute instead of event listener
+            // (Button has onclick="verifyAccess()" in HTML)
             if (verifyAccessKeyBtn) {
-                console.log('Setting up verify button listener');
-                verifyAccessKeyBtn.addEventListener('click', function() {
-                    console.log('Verify button clicked');
-                    const enteredKey = accessKeyInput.value.trim();
-                    console.log('Entered key:', enteredKey);
-                    console.log('Expected key:', ACCESS_KEY);
-                    
-                    if (enteredKey === ACCESS_KEY) {
-                        console.log('Key matched - granting access');
-                        accessGranted = true; // Use global variable
-                        securitySection.style.display = 'none';
-                        mainContentSection.style.display = 'block';
-                        
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Access Granted!',
-                            text: 'You can now access the profit & loss management system.',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-
-                        // Load profit/loss data
-                        loadProfitLossData();
-                    } else {
-                        console.log('Key did not match - access denied');
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Access Denied',
-                            text: 'Invalid access key. Please contact your administrator.',
-                            confirmButtonText: 'Try Again'
-                        });
-                        accessKeyInput.value = '';
-                        accessKeyInput.focus();
-                    }
-                });
+                console.log('Verify button found - using onclick handler');
             } else {
                 console.log('Verify button not found!');
             }
@@ -614,7 +759,7 @@ require_once __DIR__ . '/../private/auth_check.php';
                 lockAccessBtn.addEventListener('click', function() {
                     accessGranted = false; // Use global variable
                     securitySection.style.display = 'block';
-                    mainContentSection.style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'none';
                     accessKeyInput.value = '';
                     
                     Swal.fire({
@@ -765,6 +910,154 @@ require_once __DIR__ . '/../private/auth_check.php';
         const ACCESS_KEY = "PROFIT2024";
         let accessGranted = false;
 
+        // Commission Summary Functions
+        function toggleCommissionSummary() {
+            const section = document.getElementById('commissionSummarySection');
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                loadStaffList();
+            } else {
+                section.style.display = 'none';
+            }
+        }
+        
+        function loadStaffList() {
+            // Load staff list for the filter dropdown
+            fetch('../private/forms-new-order-backend.php?action=get_staff')
+            .then(response => response.json())
+            .then(data => {
+                const staffSelect = document.getElementById('commissionStaffFilter');
+                staffSelect.innerHTML = '<option value="">All Staff</option>';
+                
+                if (data.staff && data.staff.length > 0) {
+                    data.staff.forEach(staff => {
+                        staffSelect.innerHTML += `<option value="${staff.staff_id}">${staff.staff_name}</option>`;
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error loading staff list:', error);
+            });
+        }
+        
+        function loadCommissionSummary() {
+            const dateFrom = document.getElementById('commissionDateFrom').value;
+            const dateTo = document.getElementById('commissionDateTo').value;
+            const staffId = document.getElementById('commissionStaffFilter').value;
+            
+            if (!dateFrom || !dateTo) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Date Range Required',
+                    text: 'Please select both start and end dates'
+                });
+                return;
+            }
+            
+            // Build query parameters
+            let queryParams = new URLSearchParams();
+            queryParams.append('action', 'get_staff_commission_summary');
+            queryParams.append('date_from', dateFrom);
+            queryParams.append('date_to', dateTo);
+            if (staffId) {
+                queryParams.append('staff_id', staffId);
+            }
+            
+            fetch(`../private/profit_loss_backend.php?${queryParams.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayCommissionSummary(data);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.error || 'Failed to load commission summary'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Network Error',
+                    text: 'Failed to connect to server'
+                });
+            });
+        }
+        
+        function displayCommissionSummary(data) {
+            const summary = data.overall_summary;
+            const staffSummary = data.staff_summary;
+            
+            // Update summary cards
+            document.getElementById('totalProfit').textContent = `RM ${formatNumber(summary.total_profit || 0)}`;
+            document.getElementById('totalCommissionDue').textContent = `RM ${formatNumber(summary.total_commission_due || 0)}`;
+            document.getElementById('totalCommissionPaid').textContent = `RM ${formatNumber(summary.total_commission_paid || 0)}`;
+            document.getElementById('totalCommissionRemaining').textContent = `RM ${formatNumber((summary.total_commission_due || 0) - (summary.total_commission_paid || 0))}`;
+            
+            // Update staff breakdown table
+            const tbody = document.getElementById('staffCommissionBreakdown');
+            let tableHtml = '';
+            
+            if (staffSummary && staffSummary.length > 0) {
+                staffSummary.forEach(staff => {
+                    const remaining = parseFloat(staff.total_commission_remaining || 0);
+                    const remainingClass = remaining <= 0 ? 'text-success' : 'text-danger';
+                    
+                    tableHtml += `
+                        <tr>
+                            <td class="fw-medium">${staff.staff_name}</td>
+                            <td>${staff.total_orders}</td>
+                            <td>RM ${formatNumber(staff.total_revenue || 0)}</td>
+                            <td class="${parseFloat(staff.total_profit) >= 0 ? 'text-success' : 'text-danger'}">
+                                RM ${formatNumber(staff.total_profit || 0)}
+                            </td>
+                            <td>RM ${formatNumber(staff.total_commission_due || 0)}</td>
+                            <td class="text-info">RM ${formatNumber(staff.total_commission_paid || 0)}</td>
+                            <td class="${remainingClass} fw-medium">RM ${formatNumber(remaining)}</td>
+                            <td>
+                                ${remaining > 0 ? `
+                                    <button class="btn btn-success btn-sm" onclick="payAllCommissionForStaff('${staff.staff_id}', '${staff.staff_name}', ${remaining})" title="Pay All Remaining">
+                                        <i class="ri-money-dollar-circle-line"></i>
+                                    </button>
+                                ` : `
+                                    <span class="text-success small">✓ Paid</span>
+                                `}
+                            </td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tableHtml = '<tr><td colspan="8" class="text-center text-muted">No commission data found for this period</td></tr>';
+            }
+            
+            tbody.innerHTML = tableHtml;
+            document.getElementById('commissionSummaryDisplay').style.display = 'block';
+        }
+        
+        function payAllCommissionForStaff(staffId, staffName, totalRemaining) {
+            // This would open a bulk payment modal for all unpaid commissions for this staff
+            Swal.fire({
+                title: `Pay All Commission for ${staffName}?`,
+                text: `Total amount to pay: RM ${formatNumber(totalRemaining)}`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                confirmButtonText: 'Pay All',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Implementation for bulk payment would go here
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Feature Coming Soon',
+                        text: 'Bulk commission payment feature will be implemented soon. Please pay individual orders for now.'
+                    });
+                }
+            });
+        }
+
         // Verify Access Function
         function verifyAccess() {
             const key = document.getElementById('accessKey').value;
@@ -783,7 +1076,7 @@ require_once __DIR__ . '/../private/auth_check.php';
                 });
                 
                 // Load data
-                loadProfitLossData();
+                loadProfitLossData(1); // Call the global function with page parameter
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -816,6 +1109,7 @@ require_once __DIR__ . '/../private/auth_check.php';
             }
         }
 
+        // Staff Payment Functions
         // Initialize event listeners when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
             // Set up payment form listeners
@@ -921,8 +1215,37 @@ require_once __DIR__ . '/../private/auth_check.php';
                     });
                 });
             }
+            
+            // Set up commission payment form listener
+            const commissionPaymentForm = document.getElementById('commissionPaymentForm');
+            if (commissionPaymentForm) {
+                commissionPaymentForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const invoiceId = document.getElementById('commissionInvoiceId').value;
+                    const amount = document.getElementById('commissionPaymentAmount').value;
+                    const notes = document.getElementById('commissionPaymentDescription').value;
+                    
+                    if (!amount || amount <= 0) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Invalid Amount',
+                            text: 'Please enter a valid payment amount greater than 0'
+                        });
+                        return;
+                    }
+                    
+                    const formData = new FormData();
+                    formData.append('action', 'pay_staff_commission');
+                    formData.append('invoice_id', invoiceId);
+                    formData.append('amount', amount);
+                    formData.append('notes', notes);
+                    
+                    submitCommissionPayment(formData);
+                });
+            }
         });
-
+        
         function submitPayment(formData, type) {
             const submitButton = document.querySelector(`#${type}PaymentForm button[type="submit"]`);
             const originalText = submitButton.innerHTML;
@@ -1041,6 +1364,67 @@ require_once __DIR__ . '/../private/auth_check.php';
                 submitButton.disabled = false;
             });
         }
+        
+        function submitCommissionPayment(formData) {
+            const submitButton = document.querySelector('#commissionPaymentForm button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            
+            // Show loading state
+            submitButton.innerHTML = '<i class="ri-loader-4-line"></i> Processing...';
+            submitButton.disabled = true;
+            
+            fetch('../private/profit_loss_backend.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Payment Recorded',
+                        text: `Commission payment of RM ${formatNumber(data.payment_amount)} recorded for ${data.staff_name}`,
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    
+                    // Refresh the commission tab data
+                    const invoiceId = document.getElementById('commissionInvoiceId').value;
+                    fetch(`../private/profit_loss_backend.php?action=get_order_details&invoice_id=${invoiceId}`)
+                    .then(response => response.json())
+                    .then(orderData => {
+                        if (orderData.success) {
+                            displayCommissionData(orderData);
+                            displayPaymentData(orderData); // Also refresh payment history
+                        }
+                    });
+                    
+                    // Refresh main table
+                    loadProfitLossData(currentPage);
+                    
+                    // Clear form
+                    document.getElementById('commissionPaymentForm').reset();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Payment Failed',
+                        text: data.error || 'Failed to record commission payment'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Network Error',
+                    text: 'Failed to connect to server'
+                });
+            })
+            .finally(() => {
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+            });
+        }
 
         // Helper functions
         function formatCurrency(amount) {
@@ -1104,13 +1488,18 @@ require_once __DIR__ . '/../private/auth_check.php';
                     queryParams.append(key, currentFilters[key]);
                 }
             });
-            
-            fetch(`../private/profit_loss_backend.php?${queryParams.toString()}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.orders) {
-                    displayCleanOrdersTable(data.orders);
-                    displayPagination(data.pagination);
+
+            // Load both orders and payment summaries
+            Promise.all([
+                fetch(`../private/profit_loss_backend.php?${queryParams.toString()}`),
+                fetch(`../private/profit_loss_backend.php?action=get_payment_summaries&${Object.keys(currentFilters).map(key => currentFilters[key] ? `${key}=${currentFilters[key]}` : '').filter(Boolean).join('&')}`)
+            ])
+            .then(responses => Promise.all(responses.map(r => r.json())))
+            .then(([ordersData, summariesData]) => {
+                // Handle orders data
+                if (ordersData.success && ordersData.orders) {
+                    displayCleanOrdersTable(ordersData.orders);
+                    displayPagination(ordersData.pagination);
                 } else {
                     tableBody.innerHTML = `
                         <tr>
@@ -1120,6 +1509,11 @@ require_once __DIR__ . '/../private/auth_check.php';
                         </tr>
                     `;
                     clearPagination();
+                }
+
+                // Handle payment summaries data
+                if (summariesData.success) {
+                    updatePaymentSummaryCards(summariesData.summaries);
                 }
             })
             .catch(error => {
@@ -1167,6 +1561,22 @@ require_once __DIR__ . '/../private/auth_check.php';
             // Reset to first page
             currentPage = 1;
             loadProfitLossData(1);
+        }
+
+        function updatePaymentSummaryCards(summaries) {
+            console.log('Updating payment summary cards:', summaries);
+            
+            // Update commission payments
+            document.getElementById('totalCommissionPayments').textContent = 
+                `RM ${formatNumber(summaries.total_commission_payments || 0)}`;
+            
+            // Update shipping payments
+            document.getElementById('totalShippingPayments').textContent = 
+                `RM ${formatNumber(summaries.total_shipping_payments || 0)}`;
+            
+            // Update supplier payments
+            document.getElementById('totalSupplierPayments').textContent = 
+                `RM ${formatNumber(summaries.total_supplier_payments || 0)}`;
         }
 
         function displayPagination(pagination) {
@@ -1257,22 +1667,28 @@ require_once __DIR__ . '/../private/auth_check.php';
             }
 
             const rows = orders.map(order => {
-                // Use the backend calculated values - keep separate like modal
+                // Use the backend calculated values - convert to RM like modal
                 const supplierCostYen = parseFloat(order.total_supplier_cost_yen || 0);
                 const shippingCostRm = parseFloat(order.total_shipping_cost_rm || 0);
                 const supplierPaidYen = parseFloat(order.supplier_payments_total || 0);
                 const shippingPaidRm = parseFloat(order.shipping_payments_total || 0);
+                const avgConversionRate = parseFloat(order.avg_conversion_rate || 0.032);
                 
-                // Calculate remaining amounts separately
-                const supplierRemainingYen = Math.max(0, supplierCostYen - supplierPaidYen);
+                // Convert supplier amounts to RM (same calculation as modal)
+                const supplierCostRm = supplierCostYen / avgConversionRate;
+                const supplierPaidRm = supplierPaidYen / avgConversionRate;
+                
+                // Calculate remaining amounts in RM (consistent with modal)
+                const supplierRemainingRm = Math.max(0, supplierCostRm - supplierPaidRm);
                 const shippingRemainingRm = Math.max(0, shippingCostRm - shippingPaidRm);
+                const totalRemainingRm = supplierRemainingRm + shippingRemainingRm;
                 
-                // Calculate payment status based on both currencies
+                // Calculate payment status based on RM amounts
                 let status = 'unpaid';
                 let statusText = 'Unpaid';
-                const supplierFullyPaid = supplierRemainingYen <= 0 && supplierCostYen > 0;
-                const shippingFullyPaid = shippingRemainingRm <= 0 && shippingCostRm > 0;
-                const hasSupplierPayment = supplierPaidYen > 0;
+                const supplierFullyPaid = supplierRemainingRm <= 0.01 && supplierCostRm > 0; // Small tolerance for floating point
+                const shippingFullyPaid = shippingRemainingRm <= 0.01 && shippingCostRm > 0;
+                const hasSupplierPayment = supplierPaidRm > 0;
                 const hasShippingPayment = shippingPaidRm > 0;
                 
                 if (supplierFullyPaid && shippingFullyPaid) {
@@ -1286,14 +1702,14 @@ require_once __DIR__ . '/../private/auth_check.php';
                 return `
                     <tr>
                         <td>
-                            <div style="font-weight: 600; color: #111827;">${order.order_number || '#' + order.invoice_id}</div>
+                            <div style="font-weight: 600;">${order.order_number || '#' + order.invoice_id}</div>
                         </td>
                         <td>
-                            <div style="font-weight: 500; color: #374151;">${order.customer_name || 'Unknown'}</div>
-                            <div style="font-size: 12px; color: #6b7280;">${order.customer_company_name || ''}</div>
+                            <div style="font-weight: 500;">${order.customer_name || 'Unknown'}</div>
+                            <div style="font-size: 12px; opacity: 0.7;">${order.customer_company_name || ''}</div>
                         </td>
                         <td>
-                            <div style="color: #374151;">${formatDate(order.order_date)}</div>
+                            <div>${formatDate(order.order_date)}</div>
                         </td>
                         <td>
                             <div style="font-weight: 600; color: ${order.actual_profit_loss >= 0 ? '#059669' : '#dc2626'};">
@@ -1305,28 +1721,40 @@ require_once __DIR__ . '/../private/auth_check.php';
                         </td>
                         <td>
                             <div style="font-weight: 500; color: #059669;">
-                                ¥${formatNumber(supplierPaidYen)} + RM${formatNumber(shippingPaidRm)}
+                                RM${formatNumber(supplierPaidRm + shippingPaidRm)}
                             </div>
                             <div style="font-size: 12px; color: #6b7280;">
-                                Supplier + Shipping payments
+                                Total paid (RM${formatNumber(supplierPaidRm)} supplier + RM${formatNumber(shippingPaidRm)} shipping)
                             </div>
                         </td>
                         <td>
-                            <div style="font-weight: 600; color: ${(supplierRemainingYen <= 0 && shippingRemainingRm <= 0) ? '#059669' : '#dc2626'};">
-                                ¥${formatNumber(supplierRemainingYen)} + RM${formatNumber(shippingRemainingRm)}
+                            <div style="font-weight: 600; color: ${totalRemainingRm <= 0.01 ? '#059669' : '#dc2626'};">
+                                RM${formatNumber(totalRemainingRm)}
                             </div>
                             <div style="font-size: 12px; color: #6b7280;">
-                                Remaining amounts
+                                Total remaining (RM${formatNumber(supplierRemainingRm)} supplier + RM${formatNumber(shippingRemainingRm)} shipping)
                             </div>
                         </td>
                         <td>
                             ${order.staff_name ? `
-                                <div style="font-weight: 500; color: #374151;">${order.staff_name}</div>
-                                <div style="font-size: 12px; color: #059669;">
-                                    ${order.commission_percentage}% = RM${formatNumber((order.actual_profit_loss * (order.commission_percentage / 100)))}
+                                <div style="font-weight: 500;">${order.staff_name}</div>
+                                <div style="font-size: 12px; color: ${(() => {
+                                    // Use revenue for commission calculation
+                                    const commissionDue = order.total_revenue * (order.commission_percentage / 100);
+                                    const paidAmount = parseFloat(order.commission_paid_amount || 0);
+                                    const remaining = commissionDue - paidAmount;
+                                    return remaining <= 0 ? '#059669' : '#dc2626';
+                                })()};">
+                                    ${(() => {
+                                        // Use revenue for commission calculation
+                                        const commissionDue = order.total_revenue * (order.commission_percentage / 100);
+                                        const paidAmount = parseFloat(order.commission_paid_amount || 0);
+                                        const remaining = commissionDue - paidAmount;
+                                        return remaining <= 0 ? 'Paid' : `Remaining: RM${formatNumber(remaining)}`;
+                                    })()}
                                 </div>
                             ` : `
-                                <div style="color: #6b7280; font-style: italic;">No commission</div>
+                                <div style="font-style: italic; opacity: 0.7;">No commission</div>
                             `}
                         </td>
                         <td>
@@ -1426,31 +1854,6 @@ require_once __DIR__ . '/../private/auth_check.php';
             .then(response => response.json())
             .then(data => {
                 console.log('Raw profit details data:', data); // Debug log
-                
-                // ENHANCED DEBUGGING - Show actual values received from backend
-                if (data.success && data.items && data.items.length > 0) {
-                    const item = data.items[0];
-                    
-                    // Show comprehensive debug info
-                    const debugInfo = `DEBUGGING - BACKEND RESPONSE VALUES:
-                    
-Unit Shipping Cost RM: "${item.unit_shipping_cost_rm}" (type: ${typeof item.unit_shipping_cost_rm})
-Total Shipping Cost RM: "${item.total_shipping_cost_rm}" (type: ${typeof item.total_shipping_cost_rm})
-Total Cost RM: "${item.total_cost_rm}" (type: ${typeof item.total_cost_rm})
-Product ID: "${item.product_id}"
-
-After parseFloat conversion:
-- parseFloat(unit_shipping_cost_rm): ${parseFloat(item.unit_shipping_cost_rm || 0)}
-- parseFloat(total_cost_rm): ${parseFloat(item.total_cost_rm || 0)}
-
-After formatNumber:
-- formatNumber(unit_shipping_cost): ${formatNumber(parseFloat(item.unit_shipping_cost_rm || 0))}
-- formatNumber(total_cost): ${formatNumber(parseFloat(item.total_cost_rm || 0))}
-
-This shows the RAW values from backend vs final display values.`;
-                    
-                    alert(debugInfo);
-                }
                 
                 if (data.success) {
                     // Log individual items for debugging
@@ -1612,6 +2015,8 @@ This shows the RAW values from backend vs final display values.`;
                 const unitPrice = parseFloat(item.unit_price || 0);
                 const itemRevenue = parseFloat(item.item_revenue || 0);
                 const unitSupplierCost = parseFloat(item.unit_supplier_cost_yen || 0);
+                const conversionRate = parseFloat(item.conversion_rate || 0.032); // Use actual conversion rate
+                const unitSupplierCostRm = unitSupplierCost / conversionRate; // Correct calculation: yen / conversion_rate
                 const unitShippingCost = parseFloat(item.unit_shipping_cost_rm || 0);
                 const totalCostRm = parseFloat(item.total_cost_rm || 0);
                 
@@ -1621,7 +2026,7 @@ This shows the RAW values from backend vs final display values.`;
                         <td>${formatNumber(quantity)}</td>
                         <td>RM ${formatNumber(unitPrice)}</td>
                         <td>RM ${formatNumber(itemRevenue)}</td>
-                        <td>¥${formatNumber(unitSupplierCost)}</td>
+                        <td>¥${formatNumber(unitSupplierCost)} / RM ${formatNumber(unitSupplierCostRm)}</td>
                         <td>RM ${formatNumber(unitShippingCost)}</td>
                         <td>RM ${formatNumber(totalCostRm)}</td>
                         <td class="${profitClass}">RM ${formatNumber(Math.abs(itemProfit))}</td>
@@ -1629,13 +2034,14 @@ This shows the RAW values from backend vs final display values.`;
                 `;
             });
 
-            const totalProfitClass = (summary?.total_profit || 0) >= 0 ? 'text-success' : 'text-danger';
-            
             // Safely extract summary values
             const totalRevenue = parseFloat(summary?.total_revenue || 0);
             const totalSupplierCost = parseFloat(summary?.total_supplier_cost_yen || 0);
+            const avgConversionRate = parseFloat(summary?.avg_conversion_rate || 0.032);
+            const totalSupplierCostRm = totalSupplierCost / avgConversionRate; // Use correct calculation
             const totalShippingCost = parseFloat(summary?.total_shipping_cost_rm || 0);
             const totalProfit = parseFloat(summary?.total_profit || 0);
+            const totalProfitClass = totalProfit >= 0 ? 'text-success' : 'text-danger';
             
             const html = `
                 <div class="row mb-4">
@@ -1649,7 +2055,7 @@ This shows the RAW values from backend vs final display values.`;
                     <div class="col-md-6">
                         <h6 class="fw-bold">Financial Summary</h6>
                         <p><strong>Total Revenue:</strong> RM ${formatNumber(totalRevenue)}</p>
-                        <p><strong>Supplier Cost:</strong> ¥${formatNumber(totalSupplierCost)}</p>
+                        <p><strong>Supplier Cost:</strong> ¥${formatNumber(totalSupplierCost)} / RM ${formatNumber(totalSupplierCostRm)}</p>
                         <p><strong>Shipping Cost:</strong> RM ${formatNumber(totalShippingCost)}</p>
                         <p><strong>Total Profit:</strong> <span class="${totalProfitClass}">RM ${formatNumber(Math.abs(totalProfit))}</span></p>
                     </div>
@@ -1662,7 +2068,7 @@ This shows the RAW values from backend vs final display values.`;
                             <tr>
                                 <th>Product</th>
                                 <th>Qty</th>
-                                <th>Unit Price</th>
+                                <th>Selling Price</th>
                                 <th>Revenue</th>
                                 <th>Supplier Cost</th>
                                 <th>Shipping Cost</th>
@@ -1755,9 +2161,10 @@ This shows the RAW values from backend vs final display values.`;
         }
 
         function loadPaymentTabsData(invoiceId) {
-            // Set invoice IDs for both forms
+            // Set invoice IDs for all forms
             document.getElementById('supplierInvoiceId').value = invoiceId;
             document.getElementById('shippingInvoiceId').value = invoiceId;
+            document.getElementById('commissionInvoiceId').value = invoiceId;
 
             // Load order details and payment history
             Promise.all([
@@ -1769,10 +2176,13 @@ This shows the RAW values from backend vs final display values.`;
                 if (orderData.success && paymentData.success) {
                     displayPaymentTabs(invoiceId, orderData, paymentData);
                     setupPaymentCalculations(orderData);
+                    displayCommissionData(orderData);
                 } else {
                     document.getElementById('supplierSummary').innerHTML = 
                         '<div class="alert alert-danger">Error loading data</div>';
                     document.getElementById('shippingSummary').innerHTML = 
+                        '<div class="alert alert-danger">Error loading data</div>';
+                    document.getElementById('commissionSummary').innerHTML = 
                         '<div class="alert alert-danger">Error loading data</div>';
                 }
             })
@@ -1781,6 +2191,8 @@ This shows the RAW values from backend vs final display values.`;
                 document.getElementById('supplierSummary').innerHTML = 
                     '<div class="alert alert-danger">Failed to load data</div>';
                 document.getElementById('shippingSummary').innerHTML = 
+                    '<div class="alert alert-danger">Failed to load data</div>';
+                document.getElementById('commissionSummary').innerHTML = 
                     '<div class="alert alert-danger">Failed to load data</div>';
             });
         }
@@ -1791,26 +2203,29 @@ This shows the RAW values from backend vs final display values.`;
             
             // Calculate due amounts - keep currencies separate like main table
             const supplierDue = summary.total_supplier_cost_yen;
+            const avgConversionRate = parseFloat(summary.avg_conversion_rate || 0.032);
+            const supplierDueRm = supplierDue / avgConversionRate; // Use correct calculation
             const shippingDue = summary.total_shipping_cost_rm; // Fixed: use RM for shipping
             const supplierPaid = summary.supplier_payments_made;
+            const supplierPaidRm = supplierPaid / avgConversionRate; // Use correct calculation
             const shippingPaid = summary.shipping_payments_made;
-            const supplierBalance = supplierDue - supplierPaid;
+            const supplierBalance = supplierDueRm - supplierPaidRm; // Use RM for balance
             const shippingBalance = shippingDue - shippingPaid;
 
             // Supplier Summary
             const supplierSummaryHtml = `
                 <div class="mb-3">
                     <p class="mb-1"><strong>Total Due:</strong></p>
-                    <h5 class="text-primary">¥${formatCurrency(supplierDue)}</h5>
+                    <h5 class="text-primary">RM ${formatCurrency(supplierDueRm)}</h5>
                 </div>
                 <div class="mb-3">
                     <p class="mb-1"><strong>Amount Paid:</strong></p>
-                    <h6 class="text-success">¥${formatCurrency(supplierPaid)}</h6>
+                    <h6 class="text-success">RM ${formatCurrency(supplierPaidRm)}</h6>
                 </div>
                 <div class="mb-3">
                     <p class="mb-1"><strong>Balance:</strong></p>
                     <h6 class="${supplierBalance > 0 ? 'text-danger' : supplierBalance < 0 ? 'text-warning' : 'text-success'}">
-                        ¥${formatCurrency(Math.abs(supplierBalance))}
+                        RM ${formatCurrency(Math.abs(supplierBalance))}
                         ${supplierBalance > 0 ? '(Outstanding)' : supplierBalance < 0 ? '(Overpaid)' : '(Paid)'}
                     </h6>
                 </div>
@@ -1847,13 +2262,16 @@ This shows the RAW values from backend vs final display values.`;
             // Payment History
             const supplierPayments = payments.filter(p => p.type === 'supplier');
             const shippingPayments = payments.filter(p => p.type === 'shipping');
+            const commissionPayments = payments.filter(p => p.type === 'commission');
 
             let supplierHistoryHtml = '';
+            // avgConversionRate already declared above in this function scope
             supplierPayments.forEach(payment => {
+                const amountRm = payment.amount / avgConversionRate; // Use correct calculation
                 supplierHistoryHtml += `
                     <tr>
                         <td>${payment.date}</td>
-                        <td>¥${formatCurrency(payment.amount)}</td>
+                        <td>RM ${formatCurrency(amountRm)}</td>
                         <td>${payment.description || 'N/A'}</td>
                     </tr>
                 `;
@@ -1864,7 +2282,18 @@ This shows the RAW values from backend vs final display values.`;
                 shippingHistoryHtml += `
                     <tr>
                         <td>${payment.date}</td>
-                        <td>¥${formatCurrency(payment.amount)}</td>
+                        <td>RM ${formatNumber(payment.amount)}</td>
+                        <td>${payment.description || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+
+            let commissionHistoryHtml = '';
+            commissionPayments.forEach(payment => {
+                commissionHistoryHtml += `
+                    <tr>
+                        <td>${payment.date}</td>
+                        <td>RM ${formatNumber(payment.amount)}</td>
                         <td>${payment.description || 'N/A'}</td>
                     </tr>
                 `;
@@ -1874,6 +2303,8 @@ This shows the RAW values from backend vs final display values.`;
                 supplierHistoryHtml || '<tr><td colspan="3" class="text-center">No payments recorded</td></tr>';
             document.getElementById('shippingPaymentHistory').innerHTML = 
                 shippingHistoryHtml || '<tr><td colspan="3" class="text-center">No payments recorded</td></tr>';
+            document.getElementById('commissionPaymentHistory').innerHTML = 
+                commissionHistoryHtml || '<tr><td colspan="3" class="text-center">No payments recorded</td></tr>';
         }
 
         function setupPaymentCalculations(orderData) {
@@ -1934,37 +2365,94 @@ This shows the RAW values from backend vs final display values.`;
             }
         }
 
-        // Global functions for button actions
-        function viewProfitDetails(invoiceId) {
-            if (!accessGranted) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Access Required',
-                    text: 'Please verify your access key first.'
-                });
+        function displayCommissionData(orderData) {
+            const order = orderData.order;
+            
+            // Check if this order has staff commission
+            if (!order.commission_staff_id || !order.staff_name) {
+                document.getElementById('commissionSummary').innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="ri-information-line me-2"></i>
+                        No staff commission assigned to this order.
+                    </div>
+                `;
+                // Disable the form
+                document.getElementById('commissionPaymentForm').style.display = 'none';
                 return;
             }
-
-            const modal = new bootstrap.Modal(document.getElementById('profitDetailsModal'));
-            modal.show();
-
-            // Load profit details
-            fetch(`../private/profit_loss_backend.php?action=get_order_details&invoice_id=${invoiceId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    displayProfitDetails(data);
-                } else {
-                    document.getElementById('profitDetailsContent').innerHTML = 
-                        '<div class="alert alert-danger">Error: ' + (data.error || 'Unknown error') + '</div>';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('profitDetailsContent').innerHTML = 
-                    '<div class="alert alert-danger">Failed to load data</div>';
-            });
+            
+            // Calculate commission amounts
+            const commissionPercentage = parseFloat(order.commission_percentage || 0);
+            const totalRevenue = parseFloat(orderData.summary?.total_revenue || 0); // Use revenue instead of profit
+            const commissionDue = totalRevenue * (commissionPercentage / 100);
+            const commissionPaid = parseFloat(order.commission_paid_amount || 0);
+            const commissionRemaining = commissionDue - commissionPaid;
+            
+            // Display commission summary
+            const commissionSummaryHtml = `
+                <div class="mb-3">
+                    <p class="mb-1"><strong>Staff Member:</strong></p>
+                    <h6 class="text-primary">${order.staff_name}</h6>
+                </div>
+                <div class="mb-3">
+                    <p class="mb-1"><strong>Commission Rate:</strong></p>
+                    <h6 class="text-info">${commissionPercentage}%</h6>
+                </div>
+                <div class="mb-3">
+                    <p class="mb-1"><strong>Total Commission Due:</strong></p>
+                    <h5 class="text-primary">RM ${formatNumber(commissionDue)}</h5>
+                </div>
+                <div class="mb-3">
+                    <p class="mb-1"><strong>Amount Paid:</strong></p>
+                    <h6 class="text-success">RM ${formatNumber(commissionPaid)}</h6>
+                </div>
+                <div class="mb-3">
+                    <p class="mb-1"><strong>Remaining Balance:</strong></p>
+                    <h6 class="${commissionRemaining > 0 ? 'text-danger' : commissionRemaining < 0 ? 'text-warning' : 'text-success'}">
+                        RM ${formatNumber(commissionRemaining)}
+                        ${commissionRemaining <= 0 ? '<span class="badge bg-success ms-2">Paid</span>' : ''}
+                    </h6>
+                </div>
+                <div class="alert alert-light">
+                    <small><strong>Note:</strong> Commission based on total revenue of RM ${formatNumber(totalRevenue)} (fixed amount, unaffected by payments made)</small>
+                </div>
+            `;
+            
+            document.getElementById('commissionSummary').innerHTML = commissionSummaryHtml;
+            
+            // Clear payment amount field (don't auto-populate)
+            document.getElementById('commissionPaymentAmount').value = '';
+            
+            // Show the form
+            document.getElementById('commissionPaymentForm').style.display = 'block';
+            
+            // Setup payment impact calculation
+            const amountInput = document.getElementById('commissionPaymentAmount');
+            const impactDiv = document.getElementById('commissionPaymentImpact');
+            
+            if (amountInput && impactDiv) {
+                amountInput.addEventListener('input', function() {
+                    const amount = parseFloat(this.value) || 0;
+                    const newTotal = commissionPaid + amount;
+                    const difference = newTotal - commissionDue;
+                    
+                    let impactHtml = '';
+                    if (amount === 0) {
+                        impactHtml = 'Enter amount to see impact';
+                    } else if (difference > 0) {
+                        impactHtml = `<span class="text-warning">⚠️ Overpayment by RM ${formatNumber(difference)}<br>Staff will be overpaid</span>`;
+                    } else if (difference < 0) {
+                        impactHtml = `<span class="text-info">ℹ️ Partial payment: RM ${formatNumber(Math.abs(difference))} remaining</span>`;
+                    } else {
+                        impactHtml = `<span class="text-success">✅ Full commission payment</span>`;
+                    }
+                    
+                    impactDiv.innerHTML = impactHtml;
+                });
+            }
         }
+
+        // Global functions for button actions
 
         function managePayments(invoiceId) {
             if (!accessGranted) {
@@ -2001,22 +2489,73 @@ This shows the RAW values from backend vs final display values.`;
             .then(data => {
                 if (data.success) {
                     const summary = data.summary;
-                    const totalProfitClass = summary.total_profit >= 0 ? 'text-success' : 'text-danger';
+                    const order = data.order;
+                    
+                    // Use the same calculations as main table
+                    const supplierCostYen = parseFloat(summary.total_supplier_cost_yen || 0);
+                    const shippingCostRm = parseFloat(summary.total_shipping_cost_rm || 0);
+                    const supplierPaidYen = parseFloat(summary.supplier_payments_made || 0);
+                    const shippingPaidRm = parseFloat(summary.shipping_payments_made || 0);
+                    const avgConversionRate = parseFloat(summary.avg_conversion_rate || 0.032);
+                    const totalRevenue = parseFloat(summary.total_revenue || 0);
+                    const actualProfitLoss = parseFloat(summary.actual_profit_loss || 0);
+                    
+                    // Convert supplier amounts to RM (same as main table)
+                    const supplierCostRm = supplierCostYen / avgConversionRate;
+                    const supplierPaidRm = supplierPaidYen / avgConversionRate;
+                    
+                    // Calculate totals (same as main table)
+                    const totalPaidRm = supplierPaidRm + shippingPaidRm;
+                    const supplierRemainingRm = Math.max(0, supplierCostRm - supplierPaidRm);
+                    const shippingRemainingRm = Math.max(0, shippingCostRm - shippingPaidRm);
+                    const totalRemainingRm = supplierRemainingRm + shippingRemainingRm;
+                    
+                    const actualProfitClass = actualProfitLoss >= 0 ? 'text-success' : 'text-danger';
+                    const remainingClass = totalRemainingRm <= 0.01 ? 'text-success' : 'text-danger';
+                    
+                    // Calculate commission information if staff is assigned (same as main table)
+                    let commissionHtml = '';
+                    if (order.commission_staff_id && order.staff_name) {
+                        const commissionPercentage = parseFloat(order.commission_percentage || 0);
+                        const commissionDue = totalRevenue * (commissionPercentage / 100);
+                        const commissionPaid = parseFloat(order.commission_paid_amount || 0);
+                        const commissionRemaining = commissionDue - commissionPaid;
+                        const commissionClass = commissionRemaining <= 0 ? 'text-success' : 'text-danger';
+                        
+                        commissionHtml = `
+                            <div class="col-md-12 mt-3">
+                                <hr>
+                                <h6 class="fw-bold">Commission Information</h6>
+                                <p><strong>Staff:</strong> ${order.staff_name} (${commissionPercentage}%)</p>
+                                <p><strong>Commission Due:</strong> RM ${formatNumber(commissionDue)} <small>(${commissionPercentage}% of revenue)</small></p>
+                                <p><strong>Commission Paid:</strong> RM ${formatNumber(commissionPaid)}</p>
+                                <p><strong>Commission Remaining:</strong> <span class="${commissionClass}">RM ${formatNumber(Math.abs(commissionRemaining))}</span></p>
+                            </div>
+                        `;
+                    }
                     
                     const summaryHtml = `
                         <div class="card">
                             <div class="card-body">
-                                <h6 class="card-title">Final Profit & Loss Summary</h6>
+                                <h6 class="card-title">Final Order Summary</h6>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <p><strong>Total Revenue:</strong> RM ${formatCurrency(summary.total_revenue)}</p>
-                                        <p><strong>Total Cost:</strong> ¥${formatCurrency(summary.total_cost_yen)}</p>
-                                        <p><strong>Final Profit:</strong> <span class="${totalProfitClass}">RM ${formatCurrency(Math.abs(summary.total_profit))}</span></p>
+                                        <p><strong>Total Revenue:</strong> RM ${formatNumber(totalRevenue)}</p>
+                                        <p><strong>Actual Profit/Loss:</strong> <span class="${actualProfitClass}">RM ${formatNumber(Math.abs(actualProfitLoss))}</span></p>
+                                        <p><strong>Total Paid:</strong> <span class="text-success">RM ${formatNumber(totalPaidRm)}</span></p>
+                                        <small class="text-muted">RM ${formatNumber(supplierPaidRm)} supplier + RM ${formatNumber(shippingPaidRm)} shipping</small>
                                     </div>
                                     <div class="col-md-6">
-                                        <p><strong>Supplier Payments:</strong> ¥${formatCurrency(summary.supplier_payments_made)}</p>
-                                        <p><strong>Shipping Payments:</strong> ¥${formatCurrency(summary.shipping_payments_made)}</p>
+                                        <p><strong>Total Remaining:</strong> <span class="${remainingClass}">RM ${formatNumber(totalRemainingRm)}</span></p>
+                                        <small class="text-muted">RM ${formatNumber(supplierRemainingRm)} supplier + RM ${formatNumber(shippingRemainingRm)} shipping</small>
+                                        <br><br>
+                                        <p><strong>Status:</strong> 
+                                            <span class="badge ${totalRemainingRm <= 0.01 ? 'bg-success' : (totalPaidRm > 0 ? 'bg-warning' : 'bg-danger')}">
+                                                ${totalRemainingRm <= 0.01 ? 'Fully Paid' : (totalPaidRm > 0 ? 'Partially Paid' : 'Unpaid')}
+                                            </span>
+                                        </p>
                                     </div>
+                                    ${commissionHtml}
                                 </div>
                             </div>
                         </div>
