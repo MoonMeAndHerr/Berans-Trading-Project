@@ -26,7 +26,7 @@ if ($staff_id > 0) {
             SELECT s.*, c.company_name, c.bank_name, c.bank_account_name, 
                    c.bank_account_number, c.address, c.contact
             FROM staff s
-            LEFT JOIN company c ON s.company_id = c.company_id
+            LEFT JOIN site_config c ON s.company_id = c.company_id
             WHERE s.staff_id = :staff_id
             LIMIT 1
         ");

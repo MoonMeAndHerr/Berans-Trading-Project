@@ -190,28 +190,6 @@
 
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Public Relation</span></li>
 
-                                <!-- ===== Roles ===== -->
-                                <li class="nav-item">
-                                    <a class="nav-link menu-link" href="#sidebarTablesRoles" data-bs-toggle="collapse" role="button"
-                                    aria-expanded="false" aria-controls="sidebarTablesRoles">
-                                        <i class="bx bx-crown"></i>
-                                        <span data-key="t-tables">Roles</span>
-                                    </a>
-                                    <div class="collapse menu-dropdown" id="sidebarTablesRoles">
-                                        <ul class="nav nav-sm flex-column">
-                                            <li class="nav-item">
-                                            <a href="manage-roles.php" 
-                                                class="nav-link" 
-                                                data-allowed-roles='["admin"]' 
-                                                data-key="t-basic-tables">
-                                                Manage Roles
-                                            </a>
-                                            </li>
-                                            <!-- Add more staff links here if needed -->
-                                        </ul>
-                                    </div>
-                                </li>
-                    
                                 <!-- ===== Staff ===== -->
                                 <li class="nav-item">
                                     <a class="nav-link menu-link" href="#sidebarTablesStaff" data-bs-toggle="collapse" role="button"
