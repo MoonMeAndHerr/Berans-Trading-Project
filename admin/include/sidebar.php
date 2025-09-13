@@ -87,7 +87,7 @@
                         $current_user = null;
                         if (isset($_SESSION['staff_id'])) {
                             try {
-                                $stmt = $pdo->prepare("SELECT staff_name, staff_designation FROM staff WHERE staff_id = :staff_id");
+                                $stmt = $pdo->prepare("SELECT staff_name, staff_designation, staff_profile_picture FROM staff WHERE staff_id = :staff_id");
                                 $stmt->bindParam(':staff_id', $_SESSION['staff_id']);
                                 $stmt->execute();
                                 $current_user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -114,7 +114,7 @@
                         <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
                             <span class="d-flex align-items-center">
-                                <img class="rounded-circle header-profile-user" src="assets/images/users/avatar-<?php echo isset($_SESSION['staff_id']) ? ($_SESSION['staff_id'] % 10 + 1) : '1'; ?>.jpg"
+                                <img class="rounded-circle header-profile-user" src="../../media/<?php echo htmlspecialchars($current_user['staff_profile_picture']); ?>"
                                     alt="Header Avatar">
                                 <span class="text-start ms-xl-2">
                                     <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">
@@ -134,20 +134,6 @@
                             <a class="dropdown-item" href="pages-profile.php"><i
                                     class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span
                                     class="align-middle">Profile</span></a>
-                            <a class="dropdown-item" href="apps-tasks-kanban.html"><i
-                                    class="mdi mdi-calendar-check-outline text-muted fs-16 align-middle me-1"></i> <span
-                                    class="align-middle">Taskboard</span></a>
-                            <a class="dropdown-item" href="pages-faqs.html"><i
-                                    class="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1"></i> <span
-                                    class="align-middle">Help</span></a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="pages-profile-settings.html"><span
-                                    class="badge bg-soft-success text-success mt-1 float-end">New</span><i
-                                    class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span
-                                    class="align-middle">Settings</span></a>
-                            <a class="dropdown-item" href="auth-lockscreen-basic.html"><i
-                                    class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span
-                                    class="align-middle">Lock screen</span></a>
                             <a class="dropdown-item" href="../private/logout.php">
                                     <i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i>
                                     <span class="align-middle" data-key="t-logout">Logout</span>
@@ -203,7 +189,7 @@
                             </li>
 
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Public Relation</span></li>
-                    
+
                                 <!-- ===== Staff ===== -->
                                 <li class="nav-item">
                                     <a class="nav-link menu-link" href="#sidebarTablesStaff" data-bs-toggle="collapse" role="button"

@@ -1,9 +1,15 @@
 <?php
 
+require_once __DIR__ . '/../../global/main_configuration.php';
+require_once __DIR__ . '/../private/auth_check.php';
 include __DIR__ . '/../include/header.php';
 ?>
+
     <!-- Custom Profit & Loss Styles -->
     <link href="assets/css/profit-loss.css" rel="stylesheet" type="text/css" />
+
+
+
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
