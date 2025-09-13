@@ -38,9 +38,11 @@ function getOrderTabs() {
                     WHERE invoice_id = i.invoice_id 
                     LIMIT 1
                 ) THEN (
-                    SELECT MAX(p.production_lead_time) 
+                    SELECT MAX(pr.production_lead_time + COALESCE(psh.delivery_days, 0)) 
                     FROM invoice_item ii 
-                    JOIN product p ON p.product_id = ii.product_id 
+                    JOIN product pr ON pr.product_id = ii.product_id 
+                    LEFT JOIN price p ON p.product_id = pr.product_id
+                    LEFT JOIN price_shipping psh ON p.new_freight_method = psh.shipping_code
                     WHERE ii.invoice_id = i.invoice_id
                 )
                 ELSE NULL
@@ -50,11 +52,70 @@ function getOrderTabs() {
                     SELECT 1 FROM payment_history 
                     WHERE invoice_id = i.invoice_id 
                     LIMIT 1
+                ) THEN (
+                    SELECT MAX(pr.production_lead_time) 
+                    FROM invoice_item ii 
+                    JOIN product pr ON pr.product_id = ii.product_id 
+                    WHERE ii.invoice_id = i.invoice_id
+                )
+                ELSE NULL
+            END as max_production_lead_time,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 FROM payment_history 
+                    WHERE invoice_id = i.invoice_id 
+                    LIMIT 1
+                ) THEN (
+                    SELECT psh.delivery_days
+                    FROM invoice_item ii 
+                    JOIN product pr ON pr.product_id = ii.product_id 
+                    LEFT JOIN price p ON p.product_id = pr.product_id
+                    LEFT JOIN price_shipping psh ON p.new_freight_method = psh.shipping_code
+                    WHERE ii.invoice_id = i.invoice_id
+                    AND pr.production_lead_time = (
+                        SELECT MAX(pr2.production_lead_time) 
+                        FROM invoice_item ii2 
+                        JOIN product pr2 ON pr2.product_id = ii2.product_id 
+                        WHERE ii2.invoice_id = i.invoice_id
+                    )
+                    LIMIT 1
+                )
+                ELSE NULL
+            END as delivery_days,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 FROM payment_history 
+                    WHERE invoice_id = i.invoice_id 
+                    LIMIT 1
+                ) THEN (
+                    SELECT psh.shipping_name
+                    FROM invoice_item ii 
+                    JOIN product pr ON pr.product_id = ii.product_id 
+                    LEFT JOIN price p ON p.product_id = pr.product_id
+                    LEFT JOIN price_shipping psh ON p.new_freight_method = psh.shipping_code
+                    WHERE ii.invoice_id = i.invoice_id
+                    AND pr.production_lead_time = (
+                        SELECT MAX(pr2.production_lead_time) 
+                        FROM invoice_item ii2 
+                        JOIN product pr2 ON pr2.product_id = ii2.product_id 
+                        WHERE ii2.invoice_id = i.invoice_id
+                    )
+                    LIMIT 1
+                )
+                ELSE NULL
+            END as shipping_method_name,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 FROM payment_history 
+                    WHERE invoice_id = i.invoice_id 
+                    LIMIT 1
                 ) THEN DATE_ADD(CURRENT_DATE(), 
                     INTERVAL (
-                        SELECT MAX(p.production_lead_time) 
+                        SELECT MAX(pr.production_lead_time + COALESCE(psh.delivery_days, 0)) 
                         FROM invoice_item ii 
-                        JOIN product p ON p.product_id = ii.product_id 
+                        JOIN product pr ON pr.product_id = ii.product_id 
+                        LEFT JOIN price p ON p.product_id = pr.product_id
+                        LEFT JOIN price_shipping psh ON p.new_freight_method = psh.shipping_code
                         WHERE ii.invoice_id = i.invoice_id
                     ) DAY
                 )
@@ -174,13 +235,15 @@ function getCartonDetails($invoice_id) {
     }
 }
 
-// Add this new function to get the highest production lead time
+// Add this new function to get the highest production lead time + delivery days
 function getHighestProductionLeadTime($invoice_id) {
     global $pdo;
     $query = "
-        SELECT MAX(p.production_lead_time) as max_lead_time
+        SELECT MAX(pr.production_lead_time + COALESCE(psh.delivery_days, 0)) as max_lead_time
         FROM invoice_item ii
-        JOIN product p ON p.product_id = ii.product_id
+        JOIN product pr ON pr.product_id = ii.product_id
+        LEFT JOIN price p ON p.product_id = pr.product_id
+        LEFT JOIN price_shipping psh ON p.new_freight_method = psh.shipping_code
         WHERE ii.invoice_id = ?
     ";
     

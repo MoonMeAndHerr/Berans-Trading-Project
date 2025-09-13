@@ -6,26 +6,12 @@
 
 ?>
 
+        <!-- Minimal CSS for Forms -->
+        <link href="assets/css/forms-new-order-minimal.css" rel="stylesheet" type="text/css" />
+
         <!-- Scripts -->
         <script src="assets/js/layout.js"></script>
         <script src="assets/libs/choices.js/public/assets/scripts/choices.min.js"></script>
-        <!-- Add this CSS in the head section after your existing stylesheets -->
-
-        <style>
-        .select-wrapper {
-            position: relative;
-        }
-        .select-search {
-            padding: 5px;
-            width: 100%;
-            margin-bottom: 5px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-        }
-        .select-container {
-            position: relative;
-        }
-        </style>
 
 
             <!-- Main Content -->
@@ -36,11 +22,11 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0">Basic Elements</h4>
+                                    <h4 class="mb-sm-0">New Order</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Forms</a></li>
-                                            <li class="breadcrumb-item active">Basic Elements</li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Orders</a></li>
+                                            <li class="breadcrumb-item active">Create New</li>
                                         </ol>
                                     </div>
                                 </div>
@@ -51,174 +37,217 @@
                         <form method="POST" action="" id="invoiceForm">
                             <input type="hidden" name="products" id="productsJson">
                             <div class="col-lg-12">
-                                <div class="card">
-                                    <!-- Add Alert Messages here -->
-                                    <?php if (isset($_SESSION['error']) || isset($_SESSION['success'])): ?>
-                                        <script>
-                                            document.addEventListener('DOMContentLoaded', function() {
-                                                <?php if (isset($_SESSION['error'])): ?>
-                                                    Swal.fire({
-                                                        title: 'Error!',
-                                                        text: <?= json_encode($_SESSION['error']) ?>,
-                                                        icon: 'error'
-                                                    });
-                                                    <?php unset($_SESSION['error']); ?>
-                                                <?php endif; ?>
-                                                
-                                                <?php if (isset($_SESSION['success'])): ?>
-                                                    Swal.fire({
-                                                        title: 'Success!',
-                                                        text: <?= json_encode($_SESSION['success']) ?>,
-                                                        icon: 'success'
-                                                    });
-                                                    <?php unset($_SESSION['success']); ?>
-                                                <?php endif; ?>
-                                            });
-                                        </script>
+                                <div class="form-container-minimal">
+                                    <!-- Form Header -->
+                                    <div class="form-header-minimal">
+                                        <h4>Create New Order</h4>
+                                        <div class="subtitle">Add products, select customer, and generate invoice</div>
+                                    </div>
+
+                                    <!-- Form Body -->
+                                    <div class="form-body-minimal">
+                                        <!-- Alert Messages -->
+                                        <?php if (isset($_SESSION['error']) || isset($_SESSION['success'])): ?>
+                                            <script>
+                                                document.addEventListener('DOMContentLoaded', function() {
+                                                    <?php if (isset($_SESSION['error'])): ?>
+                                                        Swal.fire({
+                                                            title: 'Error!',
+                                                            text: <?= json_encode($_SESSION['error']) ?>,
+                                                            icon: 'error'
+                                                        });
+                                                        <?php unset($_SESSION['error']); ?>
+                                                    <?php endif; ?>
+                                                    
+                                                    <?php if (isset($_SESSION['success'])): ?>
+                                                        Swal.fire({
+                                                            title: 'Success!',
+                                                            text: <?= json_encode($_SESSION['success']) ?>,
+                                                            icon: 'success'
+                                                        });
+                                                        <?php unset($_SESSION['success']); ?>
+                                                    <?php endif; ?>
+                                                });
+                                            </script>
                                         <?php endif; ?>
 
-                                    <div class="card-header align-items-center d-flex">
-                                        <h4 class="card-title mb-0 flex-grow-1">Add New Order</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="live-preview">
-                                            <!-- Product Pricing Section -->
-                                            <section class="product-pricing mb-5">
-                                                <h5 class="text-start fw-bold fs-2 mb-3">Product Pricing</h5>
-                                                <!-- Dropdowns -->
-                                                <div class="row g-3">
-                                                    <div class="col-sm-3">
-                                                        <select class="form-select" id="section" name="section" required>
-                                                            <option disabled selected>Choose Section...</option>
-                                                            <?php foreach ($sections as $s): ?>
-                                                                <option value="<?= $s['section_id'] ?>"><?= $s['section_name'] ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
+                                        <!-- Product Pricing Section -->
+                                        <div class="section-header-minimal">
+                                            <h5>
+                                                <span class="section-icon">
+                                                    <i class="ri-shopping-bag-line"></i>
+                                                </span>
+                                                Product Selection
+                                            </h5>
+                                        </div>
 
-                                                    <div class="col-sm-3">
-                                                        <select class="form-select" id="category" name="category" required>
-                                                            <option disabled selected>Choose Category...</option>
-                                                            <?php foreach ($categories as $c): ?>
-                                                                <option value="<?= $c['category_id'] ?>" data-section="<?= $c['section_id'] ?>">
-                                                                    <?= $c['category_name'] ?>
-                                                                </option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="col-sm-3">
-                                                        <select class="form-select" id="subcategory" name="subcategory" required>
-                                                            <option disabled selected>Choose Subcategory...</option>
-                                                            <?php foreach ($subcategories as $sc): ?>
-                                                                <option value="<?= $sc['subcategory_id'] ?>" data-category="<?= $sc['category_id'] ?>">
-                                                                    <?= $sc['subcategory_name'] ?>
-                                                                </option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="col-sm-3">
-                                                        <select class="form-select" id="product" name="product_id" required>
-                                                            <option disabled selected>Choose Product...</option>
-                                                            <?php foreach ($products as $p): ?>
-                                                                <option value="<?= $p['product_id'] ?>"
-                                                                    data-section="<?= $p['section_id'] ?>"
-                                                                    data-category="<?= $p['category_id'] ?>"
-                                                                    data-subcategory="<?= $p['subcategory_id'] ?>"
-                                                                    data-moq="<?= $p['new_moq_quantity'] ?>"
-                                                                    data-price="<?= $p['new_selling_price'] ?>"  // Changed from new_unit_price_rm
-                                                                    data-price-id="<?= $p['price_id'] ?>" 
-                                                                ><?= $p['display_name'] ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                </div> <!-- end row -->
-
-                                                <div class="row g-3 mt-3 mb-3">
-                                                    <!-- MOQ (read-only, fetched from price) -->
-                                                    <div class="col-sm-3">
-                                                        <label for="moq" class="form-label">MOQ</label>
-                                                        <input type="number" id="moq" name="moq" class="form-control" readonly>
-                                                    </div>
-
-                                                    <!-- Quantity (user input) -->
-                                                    <div class="col-sm-3">
-                                                        <label for="quantity" class="form-label">Quantity</label>
-                                                        <input type="number" id="quantity" name="quantity" class="form-control" min="1">
-                                                    </div>
-
-                                                    <!-- Add Product Button -->
-                                                    <div class="col-sm-3 d-flex align-items-end">
-                                                        <button type="button" id="addProduct" class="btn btn-primary">+ Add Product</button>
-                                                    </div>
-                                                </div> <!-- end quantity row -->
-                                            </section>
-
-                                            <!-- Customer Section -->
-                                            <section class="customer-info mb-5">
-                                                <hr class="my-4">
-                                                <h5 class="text-start fw-bold fs-2 mb-3">Customer & Staff Information</h5>
-                                                <div class="row g-3">
-                                                    <div class="col-sm-4">
-                                                        <label for="customer" class="form-label">Customer</label>
-                                                        <select class="form-select" id="customer" name="customer_id" required>
-                                                            <option value="" disabled selected>Select Customer...</option>
-                                                            <?php foreach ($customers as $c): ?>
-                                                                <option value="<?= $c['customer_id'] ?>"><?= $c['customer_name'] ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-sm-4">
-                                                        <label for="selected_staff" class="form-label">Commission Staff</label>
-                                                        <select class="form-select" id="selected_staff" name="selected_staff">
-                                                            <option value="" disabled selected>Select Staff...</option>
-                                                            <?php foreach ($staff as $s): ?>
-                                                                <option value="<?= $s['staff_id'] ?>"><?= htmlspecialchars($s['staff_name']) ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-sm-4">
-                                                        <label for="staff_commission_percentage" class="form-label">Commission %</label>
-                                                        <div class="input-group">
-                                                            <input type="number" class="form-control" id="staff_commission_percentage" name="staff_commission_percentage" 
-                                                                   min="0" max="100" step="0.1" placeholder="0.0">
-                                                            <span class="input-group-text">%</span>
-                                                        </div>
-                                                    </div>
+                                        <div class="form-group-minimal">
+                                            <!-- Product Dropdowns -->
+                                            <div class="form-row-minimal cols-4">
+                                                <div class="form-field-minimal">
+                                                    <label for="section">Section</label>
+                                                    <select class="form-select" id="section" name="section" required>
+                                                        <option disabled selected>Choose Section...</option>
+                                                        <?php foreach ($sections as $s): ?>
+                                                            <option value="<?= $s['section_id'] ?>"><?= $s['section_name'] ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
                                                 </div>
-                                            </section>
 
-                                            <!-- Order List Section -->
-                                            <section class="order-list mb-5">
-                                                <hr class="my-4">
-                                                <h5 class="text-start fw-bold fs-2 mb-3">Order List</h5>
-                                                <div class="table-responsive">
-                                                    <table class="table" id="productList">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>No</th>
-                                                                <th>Product Name</th>
-                                                                <th>Price/Unit (RM)</th>
-                                                                <th>QTY</th>
-                                                                <th>Total Price (RM)</th>
-                                                                <th>Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody></tbody>
-                                                    </table>
+                                                <div class="form-field-minimal">
+                                                    <label for="category">Category</label>
+                                                    <select class="form-select" id="category" name="category" required>
+                                                        <option disabled selected>Choose Category...</option>
+                                                        <?php foreach ($categories as $c): ?>
+                                                            <option value="<?= $c['category_id'] ?>" data-section="<?= $c['section_id'] ?>">
+                                                                <?= $c['category_name'] ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
                                                 </div>
-                                            </section>
 
-                                            <!-- Submit Button -->
-                                            <div class="row mt-4">
-                                                <div class="col-sm-12 text-center">
-                                                    <button type="submit" class="btn btn-success" onclick="return prepareSubmission()">
-                                                        Create Invoice
-                                                    </button>
+                                                <div class="form-field-minimal">
+                                                    <label for="subcategory">Subcategory</label>
+                                                    <select class="form-select" id="subcategory" name="subcategory" required>
+                                                        <option disabled selected>Choose Subcategory...</option>
+                                                        <?php foreach ($subcategories as $sc): ?>
+                                                            <option value="<?= $sc['subcategory_id'] ?>" data-category="<?= $sc['category_id'] ?>">
+                                                                <?= $sc['subcategory_name'] ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-field-minimal">
+                                                    <label for="product">Product</label>
+                                                    <select class="form-select" id="product" name="product_id" required>
+                                                        <option disabled selected>Choose Product...</option>
+                                                        <?php foreach ($products as $p): ?>
+                                                            <option value="<?= $p['product_id'] ?>"
+                                                                data-section="<?= $p['section_id'] ?>"
+                                                                data-category="<?= $p['category_id'] ?>"
+                                                                data-subcategory="<?= $p['subcategory_id'] ?>"
+                                                                data-moq="<?= $p['new_moq_quantity'] ?>"
+                                                                data-price="<?= $p['new_selling_price'] ?>"
+                                                                data-price-id="<?= $p['price_id'] ?>" 
+                                                            ><?= $p['display_name'] ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Quantity Section -->
+                                            <div class="form-row-minimal cols-3">
+                                                <div class="form-field-minimal">
+                                                    <label for="moq">MOQ (Minimum Order Quantity)</label>
+                                                    <input type="number" id="moq" name="moq" class="form-control" readonly>
+                                                </div>
+
+                                                <div class="form-field-minimal">
+                                                    <label for="quantity">Quantity</label>
+                                                    <input type="number" id="quantity" name="quantity" class="form-control" min="1" placeholder="Enter quantity">
+                                                </div>
+
+                                                <div class="form-field-minimal">
+                                                    <label>&nbsp;</label>
+                                                    <div class="action-button-container">
+                                                        <button type="button" id="addProduct" class="btn-minimal btn-primary">
+                                                            <i class="ri-add-line"></i>
+                                                            Add Product
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <!-- Customer & Staff Section -->
+                                        <div class="section-header-minimal">
+                                            <h5>
+                                                <span class="section-icon">
+                                                    <i class="ri-user-line"></i>
+                                                </span>
+                                                Customer & Staff Information
+                                            </h5>
+                                        </div>
+
+                                        <div class="form-group-minimal">
+                                            <div class="form-row-minimal cols-3">
+                                                <div class="form-field-minimal">
+                                                    <label for="customer">Customer</label>
+                                                    <select class="form-select" id="customer" name="customer_id" required>
+                                                        <option value="" disabled selected>Select Customer...</option>
+                                                        <?php foreach ($customers as $c): ?>
+                                                            <option value="<?= $c['customer_id'] ?>"><?= $c['customer_name'] ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-field-minimal">
+                                                    <label for="selected_staff">Commission Staff</label>
+                                                    <select class="form-select" id="selected_staff" name="selected_staff">
+                                                        <option value="" disabled selected>Select Staff...</option>
+                                                        <?php foreach ($staff as $s): ?>
+                                                            <option value="<?= $s['staff_id'] ?>"><?= htmlspecialchars($s['staff_name']) ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-field-minimal">
+                                                    <label for="staff_commission_percentage">Commission Percentage</label>
+                                                    <div class="input-group-minimal">
+                                                        <input type="number" class="form-control" id="staff_commission_percentage" name="staff_commission_percentage" 
+                                                               min="0" max="100" step="0.1" placeholder="0.0">
+                                                        <span class="input-group-text">%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Order List Section -->
+                                        <div class="section-header-minimal">
+                                            <h5>
+                                                <span class="section-icon">
+                                                    <i class="ri-list-check"></i>
+                                                </span>
+                                                Order Summary
+                                            </h5>
+                                        </div>
+
+                                        <div class="form-group-minimal">
+                                            <div class="table-responsive">
+                                                <table class="table-minimal" id="productList">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No</th>
+                                                            <th>Product Name</th>
+                                                            <th>Price/Unit (RM)</th>
+                                                            <th>Quantity</th>
+                                                            <th>Total Price (RM)</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="empty-state-minimal">
+                                                            <td colspan="6">
+                                                                <div class="empty-icon">
+                                                                    <i class="ri-shopping-cart-line"></i>
+                                                                </div>
+                                                                <div class="empty-text">No products added yet</div>
+                                                                <div class="empty-subtext">Add products above to see them here</div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Section -->
+                                    <div class="submit-section-minimal">
+                                        <button type="submit" class="submit-button-minimal" onclick="return prepareSubmission()">
+                                            <i class="ri-file-add-line"></i>
+                                            Create Invoice
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -418,6 +447,12 @@
                         return;
                     }
 
+                    // Remove empty state if it exists
+                    const emptyState = productList.querySelector('.empty-state-minimal');
+                    if (emptyState) {
+                        emptyState.remove();
+                    }
+
                     // Create new row
                     const row = productList.insertRow();
                     row.innerHTML = `
@@ -427,9 +462,12 @@
                         <td>${quantity}</td>
                         <td>${(unitPrice * quantity).toFixed(2)}</td>
                         <td>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmRemoveProduct(this)">
-                                Remove
-                            </button>
+                            <div class="table-actions">
+                                <button type="button" class="btn-minimal btn-danger" onclick="confirmRemoveProduct(this)">
+                                    <i class="ri-delete-bin-line"></i>
+                                    Remove
+                                </button>
+                            </div>
                         </td>
                         <input type="hidden" name="products[]" value='${JSON.stringify({
                             product_id: selectedProductId,
@@ -469,7 +507,24 @@
                     showCloseButton: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        button.closest('tr').remove();
+                        const row = button.closest('tr');
+                        const tbody = row.parentElement;
+                        row.remove();
+                        
+                        // If no more products, show empty state
+                        if (tbody.children.length === 0) {
+                            tbody.innerHTML = `
+                                <tr class="empty-state-minimal">
+                                    <td colspan="6">
+                                        <div class="empty-icon">
+                                            <i class="ri-shopping-cart-line"></i>
+                                        </div>
+                                        <div class="empty-text">No products added yet</div>
+                                        <div class="empty-subtext">Add products above to see them here</div>
+                                    </td>
+                                </tr>
+                            `;
+                        }
                     }
                 });
             }
@@ -583,7 +638,19 @@
                                 }).then(() => {
                                     // Reset form after success
                                     document.getElementById('invoiceForm').reset();
-                                    document.querySelector('#productList tbody').innerHTML = '';
+                                    
+                                    // Reset table to empty state
+                                    document.querySelector('#productList tbody').innerHTML = `
+                                        <tr class="empty-state-minimal">
+                                            <td colspan="6">
+                                                <div class="empty-icon">
+                                                    <i class="ri-shopping-cart-line"></i>
+                                                </div>
+                                                <div class="empty-text">No products added yet</div>
+                                                <div class="empty-subtext">Add products above to see them here</div>
+                                            </td>
+                                        </tr>
+                                    `;
                                     
                                     // Reset Choices.js selectors
                                     const choicesElements = document.querySelectorAll('.choices');

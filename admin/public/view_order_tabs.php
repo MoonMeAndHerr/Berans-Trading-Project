@@ -4,252 +4,309 @@
             require_once __DIR__ . '/../private/view-order-tabs-backend.php';
             $orders = getOrderTabs();
         ?>
+        <!-- Minimal CSS for Order Tabs -->
+        <link href="assets/css/order-tabs-minimal.css" rel="stylesheet" type="text/css" />
 
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
         <div class="main-content">
-                <div class="page-content">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0">Basic Elements</h4>
-
-                                    <div class="page-title-right">
-                                        <ol class="breadcrumb m-0">
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Forms</a></li>
-                                            <li class="breadcrumb-item active">Basic Elements</li>
-                                        </ol>
-                                    </div>
-
+            <div class="page-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                                <h4 class="mb-sm-0">Order Management</h4>
+                                <div class="page-title-right">
+                                    <ol class="breadcrumb m-0">
+                                        <li class="breadcrumb-item"><a href="javascript: void(0);">Orders</a></li>
+                                        <li class="breadcrumb-item active">Management</li>
+                                    </ol>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-            <!-- ============================================================== -->
-            <!-- Start right Content here -->
-            <!-- ============================================================== -->
+                    <?php
+                    // Pagination logic
+                    $items_per_page = 8;
+                    $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                    $total_items = count($orders);
+                    $total_pages = ceil($total_items / $items_per_page);
+                    $offset = ($current_page - 1) * $items_per_page;
+                    $displayed_orders = array_slice($orders, $offset, $items_per_page);
+                    ?>
 
-                                                  
+                    <!-- Order Container -->
+                    <div class="order-container">
+                        <!-- Header Section -->
+                        <div class="order-header-section">
+                            <div class="search-compact">
+                                <input type="text" id="searchInput" placeholder="Search orders by number, customer, or status...">
+                                <i class="ri-search-line search-icon"></i>
+                                <button type="button" class="search-clear" id="clearSearch" style="display: none;">
+                                    <i class="ri-close-line"></i>
+                                </button>
+                            </div>
+                            <div class="filter-compact">
+                                <select id="statusFilter" class="filter-select">
+                                    <option value="">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
 
-<!-- Start Order Cards -->
-
-<div class="row mb-3">
-    <div class="col-md-4">
-        <div class="position-relative">
-            <input type="text" class="form-control ps-3" id="searchInput" placeholder="Search invoice number...">
-            <i class="ri-search-line position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;"></i>
-        </div>
-    </div>
-</div>
-
-<?php
-// Add pagination logic
-$items_per_page = 5;
-$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$total_items = count($orders);
-$total_pages = ceil($total_items / $items_per_page);
-$offset = ($current_page - 1) * $items_per_page;
-
-// Slice the orders array for current page
-$displayed_orders = array_slice($orders, $offset, $items_per_page);
-?>
-
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">Order Management</h4>
-            </div>
-            <div class="card-body">
-                <div class="row" id="ordersList">
-                    <?php foreach($displayed_orders as $order): ?>
-                    <div class="col-12 mb-3">
-                        <div class="card border <?= $order['status'] === 'completed' ? 'border-success bg-success bg-opacity-10' : '' ?>">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h5 class="card-title mb-1">Order #<?= htmlspecialchars($order['invoice_number']) ?></h5>
-                                        <p class="text-muted mb-1">Company: <?= htmlspecialchars($order['customer_company_name'] ?? 'N/A') ?></p>
-                                        <p class="text-muted mb-1">Contact: <?= htmlspecialchars($order['customer_name']) ?>
-                                        <?php if($order['customer_phone']): ?>(<?= htmlspecialchars($order['customer_phone']) ?>)<?php endif; ?></p>
-                                        <div class="text-info mb-1">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <strong>Total Amount Due:</strong>
-                                                <span class="fs-5 fw-bold">RM<?= number_format($order['total_amount'], 2) ?></span>
-                                            </div>
+                        <!-- Order List -->
+                        <div class="order-list" id="ordersList">
+                            <?php foreach($displayed_orders as $order): ?>
+                            <div class="order-item <?= $order['status'] === 'completed' ? 'completed' : '' ?>" data-order-id="<?= $order['invoice_id'] ?>">
+                                <div class="order-row">
+                                    <div class="order-status-indicator">
+                                        <div class="order-status-dot <?= $order['status'] === 'completed' ? 'completed' : 'pending' ?>"></div>
+                                    </div>
+                                    
+                                    <div class="order-info-main">
+                                        <div class="order-number">
+                                            Order #<?= htmlspecialchars($order['invoice_number']) ?>
+                                            <span class="order-badge"><?= ucfirst($order['status']) ?></span>
                                         </div>
-                                        <?php if(isset($order['total_paid'])): ?>
-                                        <div class="text-success mb-1">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <strong>Total Paid:</strong>
-                                                <span class="fs-5 fw-bold">RM<?= number_format($order['total_paid'], 2) ?></span>
-                                            </div>
+                                        <div class="order-customer">
+                                            <i class="ri-building-line" style="font-size: 0.75rem;"></i>
+                                            <?= htmlspecialchars($order['customer_company_name'] ?? $order['customer_name']) ?>
+                                            <?php if(!empty($order['customer_phone'])): ?>
+                                            <span class="customer-phone"><?= htmlspecialchars($order['customer_phone']) ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="order-amounts">
+                                        <div class="amount-row">
+                                            <span class="amount-label">Total:</span>
+                                            <span class="amount-total">RM <?= number_format($order['total_amount'], 2) ?></span>
+                                        </div>
+                                        <?php if(isset($order['total_paid']) && $order['total_paid'] > 0): ?>
+                                        <div class="amount-row">
+                                            <span class="amount-label">Paid:</span>
+                                            <span class="amount-paid">RM <?= number_format($order['total_paid'], 2) ?></span>
+                                        </div>
+                                        <div class="amount-row">
+                                            <span class="amount-label">Balance:</span>
+                                            <span class="amount-remaining">RM <?= number_format($order['total_amount'] - $order['total_paid'], 2) ?></span>
+                                        </div>
+                                        <?php else: ?>
+                                        <div class="amount-row">
+                                            <span class="amount-label">Status:</span>
+                                            <span class="amount-remaining">Unpaid</span>
                                         </div>
                                         <?php endif; ?>
-                                        <?php if ($order['has_payment']): ?>
-                                        <div class="text-warning">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <strong>ETA:</strong>
-                                                <span class="fs-5">
-                                                <?php if ($order['max_lead_time']): ?>
-                                                    <span class="fw-bold"><?= $order['max_lead_time'] ?> Days</span>
-                                                    <small>(<?= date('d M Y', strtotime($order['estimated_completion_date'])) ?>)</small>
-                                                <?php else: ?>
-                                                    <span class="text-muted">N/A</span>
+                                    </div>
+                                    
+                                    <div class="order-actions-compact">
+                                        <?php if ($order['has_payment'] && $order['max_lead_time']): ?>
+                                        <div class="eta-indicator">
+                                            <i class="ri-time-line"></i>
+                                            ETA: <?= $order['max_lead_time'] ?>d
+                                        </div>
+                                        <?php endif; ?>
+                                        
+                                        <div class="action-buttons">
+                                            <button class="btn-compact btn-compact-primary" onclick="toggleOrderDetails(<?= $order['invoice_id'] ?>)">
+                                                <i class="ri-eye-line"></i>
+                                                Details
+                                            </button>
+                                            
+                                            <button class="btn-compact btn-compact-secondary" onclick="loadOrderList(<?= $order['invoice_id'] ?>)" data-bs-toggle="modal" data-bs-target="#orderListModal">
+                                                <i class="ri-list-check"></i>
+                                                Items
+                                            </button>
+                                            
+                                            <button class="btn-compact btn-success" onclick="preparePayment(<?= $order['invoice_id'] ?>, <?= $order['total_amount'] ?>)" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                                                <i class="ri-money-dollar-circle-line"></i>
+                                                Payment
+                                            </button>
+                                            
+                                            <button class="btn-compact <?= $order['status'] === 'completed' ? 'btn-warning' : 'btn-success' ?>" onclick="toggleOrderStatus(<?= $order['invoice_id'] ?>, '<?= $order['status'] ?>')">
+                                                <i class="<?= $order['status'] === 'completed' ? 'ri-arrow-go-back-line' : 'ri-check-line' ?>"></i>
+                                                <?= $order['status'] === 'completed' ? 'Reopen' : 'Complete' ?>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Expandable Details -->
+                                <div class="order-details">
+                                    <div class="details-grid">
+                                        <div class="detail-item">
+                                            <div class="detail-label">Customer Contact</div>
+                                            <div class="detail-value">
+                                                <?= htmlspecialchars($order['customer_name']) ?>
+                                                <?php if($order['customer_phone']): ?>
+                                                <br><small style="color: var(--order-text-muted);"><?= htmlspecialchars($order['customer_phone']) ?></small>
                                                 <?php endif; ?>
-                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <?php if ($order['has_payment'] && $order['max_lead_time']): ?>
+                                        <div class="detail-item">
+                                            <div class="detail-label">Delivery Timeline</div>
+                                            <div class="detail-value">
+                                                <?= date('d M Y', strtotime($order['estimated_completion_date'])) ?>
+                                                <div class="detail-breakdown">
+                                                    <span class="breakdown-item">Production: <?= $order['max_production_lead_time'] ?? 0 ?>d</span>
+                                                    <span class="breakdown-item">Delivery: <?= $order['delivery_days'] ?? 0 ?>d</span>
+                                                    <?php if ($order['shipping_method_name']): ?>
+                                                    <span class="breakdown-item"><?= htmlspecialchars($order['shipping_method_name']) ?></span>
+                                                    <?php endif; ?>
+                                                </div>
                                             </div>
                                         </div>
                                         <?php endif; ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="d-flex justify-content-md-end gap-2 mt-3 mt-md-0">
-                                            <button type="button" class="btn btn-primary" 
-                                                    onclick="loadOrderList(<?= $order['invoice_id'] ?>)" 
-                                                    data-bs-toggle="modal" data-bs-target="#orderListModal">
-                                                Order List
-                                            </button>
-                                            <button type="button" class="btn btn-info" 
-                                                    onclick="loadCartonDetails(<?= $order['invoice_id'] ?>)" 
-                                                    data-bs-toggle="modal" data-bs-target="#cartonDetailModal">
-                                                Carton Detail
-                                            </button>
-                                            <button type="button" class="btn btn-success" 
-                                                    onclick="preparePayment(<?= $order['invoice_id'] ?>, <?= $order['total_amount'] ?>)" 
-                                                    data-bs-toggle="modal" data-bs-target="#paymentModal">
-                                                + Payment
-                                            </button>
-                                            <button type="button" 
-                                                    class="btn <?= $order['status'] === 'completed' ? 'btn-warning' : 'btn-success' ?>" 
-                                                    onclick="toggleOrderStatus(<?= $order['invoice_id'] ?>, '<?= $order['status'] ?>')">
-                                                <?= $order['status'] === 'completed' ? 'Mark as Incomplete' : 'Mark as Completed' ?>
-                                            </button>
+                                        
+                                        <div class="detail-item">
+                                            <div class="detail-label">Quick Actions</div>
+                                            <div class="detail-value">
+                                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                                    <button class="btn-compact btn-outline" onclick="loadCartonDetails(<?= $order['invoice_id'] ?>)" data-bs-toggle="modal" data-bs-target="#cartonDetailModal">
+                                                        <i class="ri-archive-line"></i> Carton Details
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="pagination-minimal">
+                            <?php if($current_page > 1): ?>
+                            <a href="?page=<?= $current_page - 1 ?>" class="page-link">
+                                <i class="ri-arrow-left-line"></i> Previous
+                            </a>
+                            <?php endif; ?>
+                            
+                            <?php for($i = 1; $i <= $total_pages; $i++): ?>
+                            <div class="page-item <?= ($current_page == $i) ? 'active' : '' ?>">
+                                <a href="?page=<?= $i ?>" class="page-link"><?= $i ?></a>
+                            </div>
+                            <?php endfor; ?>
+                            
+                            <?php if($current_page < $total_pages): ?>
+                            <a href="?page=<?= $current_page + 1 ?>" class="page-link">
+                                Next <i class="ri-arrow-right-line"></i>
+                            </a>
+                            <?php endif; ?>
                         </div>
                     </div>
-                    <?php endforeach; ?>
-                </div>
-                
-                <!-- Add pagination -->
-                <div class="row mt-3">
-                    <div class="col-12">
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item <?= ($current_page <= 1) ? 'disabled' : '' ?>">
-                                    <a class="page-link" href="?page=<?= $current_page - 1 ?>">Previous</a>
-                                </li>
-                                <?php for($i = 1; $i <= $total_pages; $i++): ?>
-                                <li class="page-item <?= ($current_page == $i) ? 'active' : '' ?>">
-                                    <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
-                                </li>
-                                <?php endfor; ?>
-                                <li class="page-item <?= ($current_page >= $total_pages) ? 'disabled' : '' ?>">
-                                    <a class="page-link" href="?page=<?= $current_page + 1 ?>">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- End Order Cards -->
 
-<!-- Order List Modal -->
-<div class="modal fade" id="orderListModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Order List</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Product Name</th>
-                                <th>Price/Unit (RM)</th>
-                                <th>QTY</th>
-                                <th>Total Price (RM)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Data will be populated dynamically -->
-                        </tbody>
-                    </table>
+                <!-- Modals -->
+                <!-- Order List Modal -->
+                <div class="modal fade" id="orderListModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="ri-list-check"></i>Order Items
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <table class="table-minimal">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Product</th>
+                                            <th class="text-end">Price/Unit</th>
+                                            <th class="text-center">QTY</th>
+                                            <th class="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Data populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Carton Detail Modal -->
-<div class="modal fade" id="cartonDetailModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Carton Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Carton Dimensions</th>
-                                <th>Weight</th>
-                                <th>PCS/Carton</th>
-                                <th>CBM/Carton</th>
-                                <th>CBM/MOQ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Data will be populated dynamically -->
-                        </tbody>
-                    </table>
+                <!-- Carton Detail Modal -->
+                <div class="modal fade" id="cartonDetailModal" tabindex="-1">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="ri-archive-line"></i>Carton Details
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <table class="table-minimal">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th class="text-center">Dimensions</th>
+                                            <th class="text-end">Weight</th>
+                                            <th class="text-center">PCS/Carton</th>
+                                            <th class="text-end">CBM/Carton</th>
+                                            <th class="text-end">CBM/MOQ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Data populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Payment Modal -->
-<div class="modal fade" id="paymentModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Payment</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="paymentForm">
-                    <div class="mb-3">
-                        <label class="form-label">Total Amount Due (RM)</label>
-                        <input type="text" class="form-control" id="totalAmount" readonly>
+                <!-- Payment Modal -->
+                <div class="modal fade" id="paymentModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="ri-money-dollar-circle-line"></i>Add Payment
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="paymentForm" class="form-minimal">
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="ri-money-cny-circle-line"></i>Total Amount Due (RM)
+                                        </label>
+                                        <input type="text" class="form-control" id="totalAmount" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="ri-bank-card-line"></i>Amount Paid (RM)
+                                        </label>
+                                        <input type="number" class="form-control" id="amountPaid" step="0.01" min="0" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="ri-calculator-line"></i>Remaining Amount (RM)
+                                        </label>
+                                        <input type="text" class="form-control" id="remainingAmount" readonly>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn-compact btn-outline" data-bs-dismiss="modal">
+                                    <i class="ri-close-line"></i> Cancel
+                                </button>
+                                <button type="submit" form="paymentForm" class="btn-compact btn-success">
+                                    <i class="ri-check-line"></i> Submit Payment
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Amount Paid (RM)</label>
-                        <input type="number" class="form-control" id="amountPaid" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Remaining Amount (RM)</label>
-                        <input type="text" class="form-control" id="remainingAmount" readonly>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit Payment</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+                </div>
 
                     </div> <!-- container-fluid -->           
                 </div><!-- End Page-content -->
@@ -276,341 +333,335 @@ $displayed_orders = array_slice($orders, $offset, $items_per_page);
     <script src="assets/js/app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-    // Payment calculation
-    const paymentForm = document.getElementById('paymentForm');
-    const totalAmountInput = document.getElementById('totalAmount');
-    const amountPaidInput = document.getElementById('amountPaid');
-    const remainingAmountInput = document.getElementById('remainingAmount');
+            // Payment calculation
+            const paymentForm = document.getElementById('paymentForm');
+            const totalAmountInput = document.getElementById('totalAmount');
+            const amountPaidInput = document.getElementById('amountPaid');
+            const remainingAmountInput = document.getElementById('remainingAmount');
+            let currentInvoiceId = null;
 
-    // Add this near the top of the DOMContentLoaded event handler
-    let currentInvoiceId = null;
-
-    // Update remaining amount when paid amount changes
-    amountPaidInput.addEventListener('input', function() {
-        const totalAmount = parseFloat(totalAmountInput.value) || 0;
-        const paidAmount = parseFloat(this.value) || 0;
-        const remainingAmount = totalAmount - paidAmount;
-        remainingAmountInput.value = remainingAmount.toFixed(2);
-    });
-
-    // Handle payment form submission
-    paymentForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const paidAmount = parseFloat(amountPaidInput.value);
-        const totalAmount = parseFloat(totalAmountInput.value);
-
-        if (paidAmount <= 0) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Please enter a valid payment amount',
-                icon: 'error'
+            // Update remaining amount when paid amount changes
+            amountPaidInput.addEventListener('input', function() {
+                const totalAmount = parseFloat(totalAmountInput.value) || 0;
+                const paidAmount = parseFloat(this.value) || 0;
+                const remainingAmount = totalAmount - paidAmount;
+                remainingAmountInput.value = remainingAmount.toFixed(2);
             });
-            return;
-        }
 
-        if (paidAmount > totalAmount) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Payment amount cannot exceed total amount',
-                icon: 'error'
-            });
-            return;
-        }
+            // Handle payment form submission
+            paymentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const paidAmount = parseFloat(amountPaidInput.value);
+                const totalAmount = parseFloat(totalAmountInput.value);
 
-        // Show confirmation dialog
-        Swal.fire({
-            title: 'Confirm Payment',
-            text: `Are you sure customer has made payment of RM${paidAmount.toFixed(2)}?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, proceed!',
-            cancelButtonText: 'No, cancel!',
-            showCloseButton: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const formData = new FormData();
-                formData.append('invoice_id', currentInvoiceId);
-                formData.append('amount_paid', amountPaidInput.value);
-                formData.append('is_first_payment', totalAmount === parseFloat(amountPaidInput.value));
-                
-                fetch('../private/view-order-tabs-backend.php?action=submit_payment', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(res => {
-                    // Check if response is JSON
-                    const contentType = res.headers.get('content-type');
-                    if (contentType && contentType.includes('application/json')) {
-                        return res.json();
-                    } else {
-                        // If not JSON, get text and throw error
-                        return res.text().then(text => {
-                            console.error('Non-JSON response:', text);
-                            throw new Error('Server returned non-JSON response. Check server logs.');
-                        });
-                    }
-                })
-                .then(data => {
-                    if(data.success) {
-                        // Show success message
-                        Swal.fire({
-                            title: 'Payment Successful!',
-                            text: 'The payment has been recorded successfully.',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.reload();
-                            }
-                        });
-                    } else {
-                        throw new Error(data.error || 'Failed to process payment');
-                    }
-                })
-                .catch(error => {
-                    console.error('Payment error:', error);
+                if (paidAmount <= 0) {
                     Swal.fire({
                         title: 'Error!',
-                        text: 'Error processing payment: ' + error.message,
+                        text: 'Please enter a valid payment amount',
                         icon: 'error'
                     });
+                    return;
+                }
+
+                // Show confirmation dialog
+                Swal.fire({
+                    title: 'Confirm Payment',
+                    text: `Are you sure customer has made payment of RM${paidAmount.toFixed(2)}?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, proceed!',
+                    cancelButtonText: 'No, cancel!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const formData = new FormData();
+                        formData.append('invoice_id', currentInvoiceId);
+                        formData.append('amount_paid', amountPaidInput.value);
+                        formData.append('is_first_payment', totalAmount === parseFloat(amountPaidInput.value));
+                        
+                        fetch('../private/view-order-tabs-backend.php?action=submit_payment', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if(data.success) {
+                                Swal.fire({
+                                    title: 'Payment Successful!',
+                                    text: 'The payment has been recorded successfully.',
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                }).then(() => window.location.reload());
+                            } else {
+                                throw new Error(data.error || 'Failed to process payment');
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Error processing payment: ' + error.message,
+                                icon: 'error'
+                            });
+                        });
+                    }
                 });
+            });
+
+            // Enhanced search functionality
+            const searchInput = document.getElementById('searchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const clearSearchBtn = document.getElementById('clearSearch');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase().trim();
+                    
+                    // Show/hide clear button
+                    if (clearSearchBtn) {
+                        clearSearchBtn.style.display = searchTerm ? 'flex' : 'none';
+                    }
+                    
+                    filterOrders();
+                });
+                
+                // Clear search functionality
+                if (clearSearchBtn) {
+                    clearSearchBtn.addEventListener('click', function() {
+                        searchInput.value = '';
+                        clearSearchBtn.style.display = 'none';
+                        filterOrders();
+                        searchInput.focus();
+                    });
+                }
+            }
+            
+            if (statusFilter) {
+                statusFilter.addEventListener('change', filterOrders);
+            }
+            
+            function filterOrders() {
+                const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+                const selectedStatus = statusFilter ? statusFilter.value.toLowerCase() : '';
+                const orderItems = document.querySelectorAll('.order-item');
+                let visibleCount = 0;
+                
+                orderItems.forEach(item => {
+                    const orderNumber = item.querySelector('.order-number')?.textContent.toLowerCase() || '';
+                    const customerName = item.querySelector('.order-customer')?.textContent.toLowerCase() || '';
+                    const statusBadge = item.querySelector('.order-badge')?.textContent.toLowerCase() || '';
+                    
+                    const matchesSearch = !searchTerm || 
+                        orderNumber.includes(searchTerm) || 
+                        customerName.includes(searchTerm) ||
+                        statusBadge.includes(searchTerm);
+                    
+                    const matchesStatus = !selectedStatus || statusBadge.includes(selectedStatus);
+                    
+                    const shouldShow = matchesSearch && matchesStatus;
+                    item.style.display = shouldShow ? '' : 'none';
+                    
+                    if (shouldShow) visibleCount++;
+                });
+                
+                // Update any results summary if present
+                console.log(`Showing ${visibleCount} of ${orderItems.length} orders`);
             }
         });
-    });
 
-    // Function to mark order as completed
-    window.markAsCompleted = function(orderId) {
-        if (confirm('Are you sure you want to mark this order as completed?')) {
-            // Here you'll add the AJAX call to update order status
-            console.log('Order marked as completed:', orderId);
-        }
-    };
-
-    // Replace the existing loadOrderList function in your script section with:
-    window.loadOrderList = function(invoiceId) {
-        console.log('Loading order list for invoice:', invoiceId); // Debug log
-
-        // Show loading state
-        const tbody = document.querySelector('#orderListModal tbody');
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center">Loading...</td></tr>';
-
-        fetch(`../private/view-order-tabs-backend.php?action=get_order_items&invoice_id=${invoiceId}`)
-            .then(res => {
-                console.log('Response received:', res); // Debug log
-                return res.json();
-            })
-            .then(data => {
-                console.log('Data received:', data); // Debug log
-                if(data.success && data.items) {
-                    tbody.innerHTML = data.items.map((item, index) => `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td>${htmlEscape(item.product_name)}</td>
-                            <td class="text-end">${formatCurrency(item.unit_price)}</td>
-                            <td class="text-center">${item.quantity}</td>
-                            <td class="text-end">${formatCurrency(item.total_price)}</td>
-                        </tr>
-                    `).join('');
-
-                    // Add total row
-                    const total = data.items.reduce((sum, item) => sum + parseFloat(item.total_price), 0);
-                    tbody.innerHTML += `
-                        <tr class="table-light">
-                            <td colspan="4" class="text-end fw-bold">Total</td>
-                            <td class="text-end fw-bold">${formatCurrency(total)}</td>
-                        </tr>
-                    `;
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">No items found</td></tr>';
-                    console.error('Failed to load order items:', data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error loading order items:', error);
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading items</td></tr>';
-            });
-    };
-
-    // Update the loadCartonDetails function in your script section
-    window.loadCartonDetails = function(invoiceId) {
-        const tbody = document.querySelector('#cartonDetailModal tbody');
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center">Loading...</td></tr>';
-
-        fetch(`../private/view-order-tabs-backend.php?action=get_carton_details&invoice_id=${invoiceId}`)
-            .then(res => res.json())
-            .then(data => {
-                if(data.success && data.details && data.details.length > 0) {
-                    tbody.innerHTML = data.details.map(detail => {
-                        // Calculate total CBM/Carton including additional cartons
-                        const totalCBMCarton = parseFloat(detail.cbm_carton || 0) +
-                            parseFloat(detail.add_carton1_total_cbm || 0) +
-                            parseFloat(detail.add_carton2_total_cbm || 0) +
-                            parseFloat(detail.add_carton3_total_cbm || 0) +
-                            parseFloat(detail.add_carton4_total_cbm || 0) +
-                            parseFloat(detail.add_carton5_total_cbm || 0) +
-                            parseFloat(detail.add_carton6_total_cbm || 0);
-
-                        return `
-                            <tr>
-                                <td>
-                                    ${htmlEscape(detail.product_name)}
-                                    <small class="d-block text-muted">${htmlEscape(detail.product_code)}</small>
-                                </td>
-                                <td class="text-center">
-                                    ${detail.carton_width} × ${detail.carton_height} × ${detail.carton_length}
-                                </td>
-                                <td class="text-end">${formatNumber(detail.carton_weight)} kg</td>
-                                <td class="text-center">${detail.pcs_per_carton}</td>
-                                <td class="text-end">${formatNumber(totalCBMCarton)}</td>
-                                <td class="text-end">${formatNumber(detail.new_total_cbm_moq || 0)}</td>
-                            </tr>
-                        `;
-                    }).join('') + `
-                        <tr class="table-light">
-                            <td colspan="2" class="text-end fw-bold">Total:</td>
-                            <td class="text-end fw-bold">${formatNumber(
-                                data.details.reduce((sum, item) => sum + parseFloat(item.carton_weight || 0), 0)
-                            )} kg</td>
-                            <td class="text-center fw-bold">${
-                                data.details.reduce((sum, item) => sum + parseInt(item.pcs_per_carton || 0), 0)
-                            }</td>
-                            <td class="text-end fw-bold">${formatNumber(
-                                data.details.reduce((sum, item) => {
-                                    return sum + 
-                                        parseFloat(item.cbm_carton || 0) +
-                                        parseFloat(item.add_carton1_total_cbm || 0) +
-                                        parseFloat(item.add_carton2_total_cbm || 0) +
-                                        parseFloat(item.add_carton3_total_cbm || 0) +
-                                        parseFloat(item.add_carton4_total_cbm || 0) +
-                                        parseFloat(item.add_carton5_total_cbm || 0) +
-                                        parseFloat(item.add_carton6_total_cbm || 0);
-                                }, 0)
-                            )}</td>
-                            <td class="text-end fw-bold">${formatNumber(
-                                data.details.reduce((sum, item) => sum + parseFloat(item.new_total_cbm_moq || 0), 0)
-                            )}</td>
-                        </tr>
-                    `;
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">No carton details found</td></tr>';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading details</td></tr>';
-            });
-    };
-
-    // Helper functions
-    function htmlEscape(str) {
-        return str
-            .replace(/&/g, '&amp;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
-    }
-
-    function formatNumber(value) {
-        return parseFloat(value || 0).toLocaleString('en-MY', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
-    }
-
-    function formatCurrency(value) {
-        return parseFloat(value || 0).toLocaleString('en-MY', {
-            style: 'decimal',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
-    }
-
-    // Add this function to prepare payment modal
-    window.preparePayment = function(invoiceId, totalAmount) {
-        currentInvoiceId = invoiceId;
-        document.getElementById('totalAmount').value = totalAmount.toFixed(2);
-        document.getElementById('amountPaid').value = '';
-        document.getElementById('remainingAmount').value = '';
-    };
-
-    // Add toggleOrderStatus function
-    window.toggleOrderStatus = function(invoiceId, currentStatus) {
-        const newStatus = currentStatus === 'completed' ? 'pending' : 'completed';
-        
-        Swal.fire({
-            title: 'Are you sure?',
-            text: newStatus === 'completed' ? 
-                'Do you want to mark this order as completed?' : 
-                'Do you want to mark this order as incomplete?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, proceed!',
-            cancelButtonText: 'No, cancel!',
-            showCloseButton: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const formData = new FormData();
-                formData.append('invoice_id', invoiceId);
-                formData.append('status', newStatus);
+        // Toggle order details
+        function toggleOrderDetails(orderId) {
+            const orderItem = document.querySelector(`[data-order-id="${orderId}"]`);
+            if (orderItem) {
+                orderItem.classList.toggle('expanded');
                 
-                fetch('../private/view-order-tabs-backend.php?action=toggle_status', {
-                    method: 'POST',
-                    body: formData
-                })
+                // Update button text and icon
+                const detailsBtn = orderItem.querySelector('.btn-compact-primary');
+                if (detailsBtn) {
+                    const isExpanded = orderItem.classList.contains('expanded');
+                    const icon = detailsBtn.querySelector('i');
+                    const text = detailsBtn.querySelector('span') || detailsBtn.childNodes[detailsBtn.childNodes.length - 1];
+                    
+                    if (isExpanded) {
+                        icon.className = 'ri-eye-off-line';
+                        if (text.textContent) text.textContent = ' Hide';
+                    } else {
+                        icon.className = 'ri-eye-line';
+                        if (text.textContent) text.textContent = ' Details';
+                    }
+                }
+            }
+        }
+
+        // Load order list with minimal loading
+        window.loadOrderList = function(invoiceId) {
+            const tbody = document.querySelector('#orderListModal tbody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="loading-minimal">
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                        <span>Loading...</span>
+                    </td>
+                </tr>
+            `;
+
+            fetch(`../private/view-order-tabs-backend.php?action=get_order_items&invoice_id=${invoiceId}`)
                 .then(res => res.json())
                 .then(data => {
-                    if(data.success) {
-                        Swal.fire({
-                            title: 'Status Updated!',
-                            text: newStatus === 'completed' ? 
-                                'Order has been marked as completed.' : 
-                                'Order has been marked as incomplete.',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.reload();
-                            }
-                        });
+                    if(data.success && data.items) {
+                        tbody.innerHTML = data.items.map((item, index) => `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${htmlEscape(item.product_name)}</td>
+                                <td class="text-end">RM ${formatNumber(item.unit_price)}</td>
+                                <td class="text-center">${item.quantity}</td>
+                                <td class="text-end">RM ${formatNumber(item.total_price)}</td>
+                            </tr>
+                        `).join('');
+
+                        const total = data.items.reduce((sum, item) => sum + parseFloat(item.total_price), 0);
+                        tbody.innerHTML += `
+                            <tr style="background: var(--order-bg-tertiary); font-weight: 600;">
+                                <td colspan="4" class="text-end">Total</td>
+                                <td class="text-end">RM ${formatNumber(total)}</td>
+                            </tr>
+                        `;
                     } else {
-                        throw new Error(data.error || 'Failed to update status');
+                        tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="color: var(--order-text-muted); padding: 2rem;">No items found</td></tr>';
                     }
                 })
                 .catch(error => {
-                    console.error('Status update error:', error);
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Error updating status: ' + error.message,
-                        icon: 'error'
-                    });
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="color: var(--order-danger); padding: 2rem;">Error loading items</td></tr>';
                 });
-            }
-        });
-    };
+        };
 
-    // Replace the existing search JavaScript code with error handling
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const orderCards = document.querySelectorAll('#ordersList .col-12');
-            
-            orderCards.forEach(card => {
-                const titleElement = card.querySelector('.card-title');
-                if (titleElement) {
-                    const invoiceNumber = titleElement.textContent.toLowerCase();
-                    if (invoiceNumber.includes(searchTerm)) {
-                        card.style.display = '';
+        // Load carton details
+        window.loadCartonDetails = function(invoiceId) {
+            const tbody = document.querySelector('#cartonDetailModal tbody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="loading-minimal">
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                        <span>Loading...</span>
+                    </td>
+                </tr>
+            `;
+
+            fetch(`../private/view-order-tabs-backend.php?action=get_carton_details&invoice_id=${invoiceId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success && data.details && data.details.length > 0) {
+                        tbody.innerHTML = data.details.map(detail => {
+                            const totalCBMCarton = parseFloat(detail.cbm_carton || 0) +
+                                parseFloat(detail.add_carton1_total_cbm || 0) +
+                                parseFloat(detail.add_carton2_total_cbm || 0) +
+                                parseFloat(detail.add_carton3_total_cbm || 0) +
+                                parseFloat(detail.add_carton4_total_cbm || 0) +
+                                parseFloat(detail.add_carton5_total_cbm || 0) +
+                                parseFloat(detail.add_carton6_total_cbm || 0);
+
+                            return `
+                                <tr>
+                                    <td>
+                                        <strong>${htmlEscape(detail.product_name)}</strong>
+                                        <br><small style="color: var(--order-text-muted);">${htmlEscape(detail.product_code)}</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <small style="background: var(--order-bg-tertiary); padding: 0.125rem 0.375rem; border-radius: var(--order-radius); font-family: monospace;">
+                                            ${detail.carton_width} × ${detail.carton_height} × ${detail.carton_length}
+                                        </small>
+                                    </td>
+                                    <td class="text-end">${formatNumber(detail.carton_weight)} kg</td>
+                                    <td class="text-center">
+                                        <span style="background: var(--order-accent-light); color: var(--order-accent); padding: 0.125rem 0.375rem; border-radius: var(--order-radius); font-weight: 500;">
+                                            ${detail.pcs_per_carton}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">${formatNumber(totalCBMCarton)}</td>
+                                    <td class="text-end">${formatNumber(detail.new_total_cbm_moq || 0)}</td>
+                                </tr>
+                            `;
+                        }).join('');
                     } else {
-                        card.style.display = 'none';
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="color: var(--order-text-muted); padding: 2rem;">No carton details found</td></tr>';
                     }
+                })
+                .catch(error => {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="color: var(--order-danger); padding: 2rem;">Error loading details</td></tr>';
+                });
+        };
+
+        // Prepare payment modal
+        window.preparePayment = function(invoiceId, totalAmount) {
+            currentInvoiceId = invoiceId;
+            document.getElementById('totalAmount').value = totalAmount.toFixed(2);
+            document.getElementById('amountPaid').value = '';
+            document.getElementById('remainingAmount').value = '';
+        };
+
+        // Toggle order status
+        window.toggleOrderStatus = function(invoiceId, currentStatus) {
+            const newStatus = currentStatus === 'completed' ? 'pending' : 'completed';
+            
+            Swal.fire({
+                title: 'Are you sure?',
+                text: newStatus === 'completed' ? 
+                    'Mark this order as completed?' : 
+                    'Mark this order as incomplete?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, proceed!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('invoice_id', invoiceId);
+                    formData.append('status', newStatus);
+                    
+                    fetch('../private/view-order-tabs-backend.php?action=toggle_status', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.success) {
+                            Swal.fire({
+                                title: 'Status Updated!',
+                                text: `Order has been marked as ${newStatus}.`,
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then(() => window.location.reload());
+                        } else {
+                            throw new Error(data.error || 'Failed to update status');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Error updating status: ' + error.message,
+                            icon: 'error'
+                        });
+                    });
                 }
             });
-        });
-    } else {
-        console.warn('Search input element not found');
-    }
-});
-</script>
+        };
+
+        // Helper functions
+        function htmlEscape(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function formatNumber(value) {
+            return parseFloat(value || 0).toLocaleString('en-MY', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+    </script>

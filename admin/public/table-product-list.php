@@ -4,6 +4,9 @@ include __DIR__ . '/../private/table-product-list-backend.php';
 include __DIR__ . '/../include/header.php';
 ?>
 
+        <!-- Custom CSS for Product List -->
+        <link href="assets/css/table-product-list-minimal.css" rel="stylesheet" type="text/css" />
+
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
@@ -45,6 +48,7 @@ include __DIR__ . '/../include/header.php';
                                                     <th>Material</th>
                                                     <th>Product Type</th>
                                                     <th>Variant</th>
+                                                    <th>Description</th>
                                                     <th>Selling Price</th>
                                                     <th>Profit</th>
                                                     <th>Created</th>
@@ -61,6 +65,11 @@ include __DIR__ . '/../include/header.php';
                                                     <td><?= htmlspecialchars($product['material_name']) ?></td>
                                                     <td><?= htmlspecialchars($product['product_type_name']) ?></td>
                                                     <td><?= htmlspecialchars($product['variant']) ?></td>
+                                                    <td>
+                                                        <div class="description-cell" title="<?= htmlspecialchars($product['description']) ?>">
+                                                            <?= htmlspecialchars($product['description'] ?: 'N/A') ?>
+                                                        </div>
+                                                    </td>
                                                     <td>
                                                         <?= $product['new_selling_price'] ? 'RM ' . number_format($product['new_selling_price'], 2) : 'N/A' ?>
                                                     </td>
@@ -498,9 +507,9 @@ include __DIR__ . '/../include/header.php';
             $('#productTable').DataTable({
                 responsive: true,
                 pageLength: 25,
-                order: [[9, 'desc']], // Order by created date (now column 9)
+                order: [[10, 'desc']], // Order by created date (now column 10)
                 columnDefs: [
-                    { orderable: false, targets: [10] } // Disable sorting on Actions column (now column 10)
+                    { orderable: false, targets: [11] } // Disable sorting on Actions column (now column 11)
                 ]
             });
 
