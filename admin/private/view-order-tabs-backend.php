@@ -2,6 +2,7 @@
 
 if(session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/../../global/main_configuration.php';
+require_once __DIR__ . '/../public/refresh_xero_token.php';
 use League\OAuth2\Client\Provider\GenericProvider;
 use GuzzleHttp\Client;
 
@@ -15,7 +16,8 @@ function getOrderTabs() {
         SELECT 
             i.invoice_id,
             i.invoice_number,
-            i.total_amount,
+            i.total_amount as original_total,
+            (i.total_amount - COALESCE((SELECT SUM(amount_paid) FROM payment_history WHERE invoice_id = i.invoice_id), 0)) as total_amount,
             i.created_at,
             i.status,
             c.customer_name,
@@ -315,18 +317,18 @@ if(isset($_GET['action'])) {
                     ");
                     $stmt->execute([$invoice_id, $amount_paid]);
                     
-                    // Update invoice total_amount
+                    // DON'T update invoice total_amount - it should remain the original invoice amount
+                    // Just update the payment tracking fields
                     $stmt = $pdo->prepare("
                         UPDATE invoice 
-                        SET total_amount = total_amount - ?,
-                            first_payment_date = CASE 
+                        SET first_payment_date = CASE 
                                 WHEN first_payment_date IS NULL THEN CURRENT_TIMESTAMP
                                 ELSE first_payment_date
                             END,
                             updated_at = CURRENT_TIMESTAMP
                         WHERE invoice_id = ?
                     ");
-                    $stmt->execute([$amount_paid, $invoice_id]);
+                    $stmt->execute([$invoice_id]);
                     
                     $pdo->commit();
                     echo json_encode(['success' => true]);
