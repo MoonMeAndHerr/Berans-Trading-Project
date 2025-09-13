@@ -48,7 +48,7 @@
                                         <?php endif; ?>
 
                                         <div class="live-preview">
-                                            <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="POST">
+                                            <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="POST" enctype="multipart/form-data"q>
 
                                                 <div class="row g-3">
                                                     <div class="row g-3 mt-2">
@@ -126,6 +126,11 @@
                                                                     <input type="number" class="form-control" name="production_lead_time" placeholder="Enter Lead Time (Days)" required>
                                                                     <label>Production Lead Time (Days)</label>
                                                                 </div>
+                                                            </div>
+                                                                                                   
+                                                            <div class="col-lg-12">
+                                                                <label>Product Image</label>
+                                                                    <input type="file" accept="image/*" class="form-control" name="image" required>
                                                             </div>
                                                         </div>
                                                     </div>

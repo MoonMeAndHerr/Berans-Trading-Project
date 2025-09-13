@@ -1678,9 +1678,9 @@ include __DIR__ . '/../include/header.php';
                 const supplierCostRm = supplierCostYen / avgConversionRate;
                 const supplierPaidRm = supplierPaidYen / avgConversionRate;
                 
-                // Calculate remaining amounts in RM (consistent with modal)
-                const supplierRemainingRm = Math.max(0, supplierCostRm - supplierPaidRm);
-                const shippingRemainingRm = Math.max(0, shippingCostRm - shippingPaidRm);
+                // Calculate remaining amounts in RM (allow negative for overpayments)
+                const supplierRemainingRm = supplierCostRm - supplierPaidRm;
+                const shippingRemainingRm = shippingCostRm - shippingPaidRm;
                 const totalRemainingRm = supplierRemainingRm + shippingRemainingRm;
                 
                 // Calculate payment status based on RM amounts
@@ -1690,8 +1690,12 @@ include __DIR__ . '/../include/header.php';
                 const shippingFullyPaid = shippingRemainingRm <= 0.01 && shippingCostRm > 0;
                 const hasSupplierPayment = supplierPaidRm > 0;
                 const hasShippingPayment = shippingPaidRm > 0;
+                const isOverpaid = totalRemainingRm < -0.01; // Check for overpayment
                 
-                if (supplierFullyPaid && shippingFullyPaid) {
+                if (isOverpaid) {
+                    status = 'overpaid';
+                    statusText = 'Overpaid';
+                } else if (supplierFullyPaid && shippingFullyPaid) {
                     status = 'paid';
                     statusText = 'Fully Paid';
                 } else if (hasSupplierPayment || hasShippingPayment) {

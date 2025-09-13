@@ -380,6 +380,16 @@ body {
     color: #f87171;
 }
 
+.status-overpaid {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+}
+
+[data-layout-mode="dark"] .status-overpaid {
+    background: rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
+}
+
 .profit-positive {
     color: #059669;
     font-weight: 600;
