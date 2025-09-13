@@ -908,13 +908,28 @@ function getPaymentSummaries($pdo, $monthFilter = '', $searchFilter = '', $dateF
         
         $query = "
             SELECT 
-                -- Commission payments total (revenue-based)
+                -- Commission calculations
                 SUM(COALESCE(i.commission_paid_amount, 0)) as total_commission_payments,
+                SUM(
+                    CASE 
+                        WHEN i.commission_staff_id IS NOT NULL AND i.commission_percentage > 0 
+                        THEN (i.total_amount * (i.commission_percentage / 100)) - COALESCE(i.commission_paid_amount, 0)
+                        ELSE 0 
+                    END
+                ) as total_commission_remaining,
                 
-                -- Shipping payments total (already in RM)
+                -- Shipping calculations (already in RM)
                 SUM(COALESCE(i.shipping_payments_total, 0)) as total_shipping_payments,
+                SUM(
+                    COALESCE((
+                        SELECT SUM(ii.quantity * p.new_unit_freight_cost_rm) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id
+                    ), 0) - COALESCE(i.shipping_payments_total, 0)
+                ) as total_shipping_remaining,
                 
-                -- Supplier payments total (convert from Yen to RM)
+                -- Supplier calculations (convert from Yen to RM)
                 SUM(
                     COALESCE(i.supplier_payments_total, 0) / COALESCE((
                         SELECT AVG(p.new_conversion_rate) 
@@ -922,7 +937,26 @@ function getPaymentSummaries($pdo, $monthFilter = '', $searchFilter = '', $dateF
                         JOIN price p ON p.product_id = ii.product_id 
                         WHERE ii.invoice_id = i.invoice_id AND p.new_conversion_rate > 0
                     ), 0.032)
-                ) as total_supplier_payments_rm
+                ) as total_supplier_payments_rm,
+                SUM(
+                    COALESCE((
+                        SELECT SUM(ii.quantity * p.new_unit_price_yen) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id
+                    ), 0) / COALESCE((
+                        SELECT AVG(p.new_conversion_rate) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id AND p.new_conversion_rate > 0
+                    ), 0.032) - 
+                    COALESCE(i.supplier_payments_total, 0) / COALESCE((
+                        SELECT AVG(p.new_conversion_rate) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id AND p.new_conversion_rate > 0
+                    ), 0.032)
+                ) as total_supplier_remaining_rm
             FROM invoice i
             LEFT JOIN customer c ON i.customer_id = c.customer_id
             WHERE $whereClause
@@ -936,8 +970,11 @@ function getPaymentSummaries($pdo, $monthFilter = '', $searchFilter = '', $dateF
             'success' => true,
             'summaries' => [
                 'total_commission_payments' => floatval($result['total_commission_payments'] ?? 0),
+                'total_commission_remaining' => floatval($result['total_commission_remaining'] ?? 0),
                 'total_shipping_payments' => floatval($result['total_shipping_payments'] ?? 0),
-                'total_supplier_payments' => floatval($result['total_supplier_payments_rm'] ?? 0)
+                'total_shipping_remaining' => floatval($result['total_shipping_remaining'] ?? 0),
+                'total_supplier_payments' => floatval($result['total_supplier_payments_rm'] ?? 0),
+                'total_supplier_remaining' => floatval($result['total_supplier_remaining_rm'] ?? 0)
             ]
         ];
         
