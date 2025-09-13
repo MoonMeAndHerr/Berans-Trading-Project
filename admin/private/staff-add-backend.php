@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Fetch companies for dropdown
 $companies = [];
 try {
-    $stmt = $pdo->query("SELECT company_id, company_name FROM company ORDER BY company_name");
+    $stmt = $pdo->query("SELECT company_id, company_name FROM site_config ORDER BY company_name");
     $companies = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     error_log("Company fetch error: " . $e->getMessage());
@@ -142,7 +142,7 @@ try {
     $sql = "SELECT s.staff_id, s.staff_number, s.staff_name, s.staff_designation, 
                    s.username, s.email, s.role, c.company_name
             FROM staff s
-            LEFT JOIN company c ON s.company_id = c.company_id
+            LEFT JOIN site_config c ON s.company_id = c.company_id
             ORDER BY s.staff_id ASC
             LIMIT :limit OFFSET :offset";
     
