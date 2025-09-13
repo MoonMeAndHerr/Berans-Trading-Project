@@ -87,7 +87,7 @@
                         $current_user = null;
                         if (isset($_SESSION['staff_id'])) {
                             try {
-                                $stmt = $pdo->prepare("SELECT staff_name, staff_designation FROM staff WHERE staff_id = :staff_id");
+                                $stmt = $pdo->prepare("SELECT staff_name, staff_designation, staff_profile_picture FROM staff WHERE staff_id = :staff_id");
                                 $stmt->bindParam(':staff_id', $_SESSION['staff_id']);
                                 $stmt->execute();
                                 $current_user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -114,7 +114,7 @@
                         <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
                             <span class="d-flex align-items-center">
-                                <img class="rounded-circle header-profile-user" src="assets/images/users/avatar-<?php echo isset($_SESSION['staff_id']) ? ($_SESSION['staff_id'] % 10 + 1) : '1'; ?>.jpg"
+                                <img class="rounded-circle header-profile-user" src="../../media/<?php echo htmlspecialchars($current_user['staff_profile_picture']); ?>"
                                     alt="Header Avatar">
                                 <span class="text-start ms-xl-2">
                                     <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">

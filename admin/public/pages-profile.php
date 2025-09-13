@@ -63,7 +63,7 @@ if ($staff_id > 0) {
                         <div class="row g-4">
                             <div class="col-auto">
                                 <div class="avatar-lg">
-                                    <img src="assets/images/users/avatar-1.jpg" alt="user-img"
+                                    <img src="../../media/<?php echo htmlspecialchars($staff['staff_profile_picture']); ?>" alt="user-img"
                                         class="img-thumbnail rounded-circle" />
                                 </div>
                             </div>
@@ -122,7 +122,7 @@ if ($staff_id > 0) {
                                         </li>
                                     </ul>
                                     <div class="flex-shrink-0">
-                                        <a href="pages-profile-settings.html" class="btn btn-success"><i
+                                        <a href="pages-profile-settings" class="btn btn-success"><i
                                                 class="ri-edit-box-line align-bottom"></i> Edit Profile</a>
                                     </div>
                                 </div>
@@ -146,21 +146,6 @@ if ($staff_id > 0) {
                                             $percentage = round(($filled / $totalFields) * 100);
                                             ?>
 
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h5 class="card-title mb-5">Complete Your Profile</h5>
-                                                    <div class="progress animated-progress custom-progress progress-label">
-                                                        <div class="progress-bar bg-danger" 
-                                                            role="progressbar"
-                                                            style="width: <?= $percentage ?>%"
-                                                            aria-valuenow="<?= $percentage ?>" 
-                                                            aria-valuemin="0" 
-                                                            aria-valuemax="100">
-                                                            <div class="label"><?= $percentage ?>%</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
 
                                                 <?php if ($staff): ?>
                                                 <div class="card">
@@ -200,29 +185,6 @@ if ($staff_id > 0) {
                                                     <div class="alert alert-warning">⚠️ Staff info not found.</div>
                                                 <?php endif; ?>
 
-
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title mb-4">Skills</h5>
-                                                        <div class="d-flex flex-wrap gap-2 fs-15">
-                                                            <a href="javascript:void(0);"
-                                                                class="badge badge-soft-primary">Photoshop</a>
-                                                            <a href="javascript:void(0);"
-                                                                class="badge badge-soft-primary">illustrator</a>
-                                                            <a href="javascript:void(0);"
-                                                                class="badge badge-soft-primary">HTML</a>
-                                                            <a href="javascript:void(0);"
-                                                                class="badge badge-soft-primary">CSS</a>
-                                                            <a href="javascript:void(0);"
-                                                                class="badge badge-soft-primary">Javascript</a>
-                                                            <a href="javascript:void(0);"
-                                                                class="badge badge-soft-primary">Php</a>
-                                                            <a href="javascript:void(0);"
-                                                                class="badge badge-soft-primary">Python</a>
-                                                        </div>
-                                                    </div><!-- end card body -->
-                                                </div><!-- end card -->
-                      
                                                 <!--end card-->
                                             </div>
                                             
