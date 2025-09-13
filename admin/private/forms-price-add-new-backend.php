@@ -100,34 +100,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $productName = $materrialName.' '.$productType.' '.$size1.'*'.$size2.'*'.$size3.' '.$variant;
         
             try {
-                $xeroAuth = refreshXeroToken(); // always returns valid token
-                $accessToken = $xeroAuth['access_token'];
-                $tenantId    = $xeroAuth['tenant_id'];
+                $xeroAuth = refreshXeroToken(); // May return null if token refresh fails
                 
-                $client = new Client();
-                $response = $client->post('https://api.xero.com/api.xro/2.0/Items', [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $accessToken,
-                        'Xero-tenant-id' => $tenantId,
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/json'
-                    ],
-                    'json' => [
-                        'ItemID' => $xero_relation, // safer to include if available
-                        'Name' => $productName,  // safer to include
-                        'Description' => $description,
-                        'Code' => $product_code,
-                        'SalesDetails' => [
-                            'UnitPrice' => $_POST['selling_price_unit'],
+                // Only proceed with Xero API call if token refresh was successful
+                if ($xeroAuth && isset($xeroAuth['access_token']) && isset($xeroAuth['tenant_id'])) {
+                    $accessToken = $xeroAuth['access_token'];
+                    $tenantId    = $xeroAuth['tenant_id'];
+                    
+                    $client = new Client();
+                    $response = $client->post('https://api.xero.com/api.xro/2.0/Items', [
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $accessToken,
+                            'Xero-tenant-id' => $tenantId,
+                            'Accept' => 'application/json',
+                            'Content-Type' => 'application/json'
+                        ],
+                        'json' => [
+                            'ItemID' => $xero_relation, // safer to include if available
+                            'Name' => $productName,  // safer to include
+                            'Description' => $description,
+                            'Code' => $product_code,
+                            'SalesDetails' => [
+                                'UnitPrice' => $_POST['selling_price_unit'],
+                            ]
                         ]
-                    ]
-                ]);
+                    ]);
 
-                $result = json_decode($response->getBody(), true);
+                    $result = json_decode($response->getBody(), true);
+                } else {
+                    // Xero token refresh failed, but continue with database operation
+                    error_log("Xero integration skipped due to token refresh failure");
+                }
 
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 $response = $e->getResponse();
                 $body = $response ? $response->getBody()->getContents() : 'No response body';
+                error_log("Xero API error: " . $body);
+            } catch (Exception $e) {
+                error_log("Xero integration error: " . $e->getMessage());
             }
 
             $successMessage = "Pricing record updated successfully!";
@@ -171,34 +181,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $productName = $materrialName.' '.$productType.' '.$size1.'*'.$size2.'*'.$size3.' '.$_POST['variant'];
         
             try {
-                $xeroAuth = refreshXeroToken(); // always returns valid token
-                $accessToken = $xeroAuth['access_token'];
-                $tenantId    = $xeroAuth['tenant_id'];
+                $xeroAuth = refreshXeroToken(); // May return null if token refresh fails
                 
-                $client = new Client();
-                $response = $client->post('https://api.xero.com/api.xro/2.0/Items', [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $accessToken,
-                        'Xero-tenant-id' => $tenantId,
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/json'
-                    ],
-                    'json' => [
-                        'ItemID' => $xero_relation, // safer to include if available
-                        'Name' => $productName,  // safer to include
-                        'Description' => $description,
-                        'Code' => $product_code,
-                        'SalesDetails' => [
-                            'UnitPrice' => $_POST['selling_price_unit'],
+                // Only proceed with Xero API call if token refresh was successful
+                if ($xeroAuth && isset($xeroAuth['access_token']) && isset($xeroAuth['tenant_id'])) {
+                    $accessToken = $xeroAuth['access_token'];
+                    $tenantId    = $xeroAuth['tenant_id'];
+                    
+                    $client = new Client();
+                    $response = $client->post('https://api.xero.com/api.xro/2.0/Items', [
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $accessToken,
+                            'Xero-tenant-id' => $tenantId,
+                            'Accept' => 'application/json',
+                            'Content-Type' => 'application/json'
+                        ],
+                        'json' => [
+                            'ItemID' => $xero_relation, // safer to include if available
+                            'Name' => $productName,  // safer to include
+                            'Description' => $description,
+                            'Code' => $product_code,
+                            'SalesDetails' => [
+                                'UnitPrice' => $_POST['selling_price_unit'],
+                            ]
                         ]
-                    ]
-                ]);
+                    ]);
 
-                $result = json_decode($response->getBody(), true);
+                    $result = json_decode($response->getBody(), true);
+                } else {
+                    // Xero token refresh failed, but continue with database operation
+                    error_log("Xero integration skipped due to token refresh failure");
+                }
 
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 $response = $e->getResponse();
                 $body = $response ? $response->getBody()->getContents() : 'No response body';
+                error_log("Xero API error: " . $body);
+            } catch (Exception $e) {
+                error_log("Xero integration error: " . $e->getMessage());
             }
 
             $successMessage = "Pricing record inserted successfully!";

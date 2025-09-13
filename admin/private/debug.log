@@ -728,3 +728,227 @@
     "error": "",
     "ip": "::1"
 }
+[2025-09-12 21:03:16] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-09-12 21:03:24] Login attempt started - {
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36"
+}
+[2025-09-12 21:03:24] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-09-12 21:03:24] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-09-12 21:03:24] Password verification successful - {
+    "staff_id": 1
+}
+[2025-09-12 21:03:24] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-09-12 21:03:24] Session token created in database - {
+    "staff_id": "1",
+    "token": "7443fb11927257fa56a5f58b6c987f78"
+}
+[2025-09-12 21:03:24] Last login updated - {
+    "staff_id": "1"
+}
+[2025-09-12 22:44:12] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-09-12 22:44:18] Login attempt started - {
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36"
+}
+[2025-09-12 22:44:18] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-09-12 22:44:18] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-09-12 22:44:18] Password verification successful - {
+    "staff_id": 1
+}
+[2025-09-12 22:44:18] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-09-12 22:44:18] Session token created in database - {
+    "staff_id": "1",
+    "token": "6b328661ebf6f4c786dc7702630eed89"
+}
+[2025-09-12 22:44:18] Last login updated - {
+    "staff_id": "1"
+}
+[2025-09-13 00:26:09] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-09-13 00:26:17] Login attempt started - {
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36"
+}
+[2025-09-13 00:26:17] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-09-13 00:26:17] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-09-13 00:26:17] Password verification successful - {
+    "staff_id": 1
+}
+[2025-09-13 00:26:17] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-09-13 00:26:17] Session token created in database - {
+    "staff_id": "1",
+    "token": "b656f0dd33c9a52d3dfefcfdde7d74bb"
+}
+[2025-09-13 00:26:17] Last login updated - {
+    "staff_id": "1"
+}
+[2025-09-13 01:35:16] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-09-13 01:35:20] Login attempt started - {
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36"
+}
+[2025-09-13 01:35:20] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-09-13 01:35:20] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-09-13 01:35:20] Password verification successful - {
+    "staff_id": 1
+}
+[2025-09-13 01:35:20] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-09-13 01:35:20] Session token created in database - {
+    "staff_id": "1",
+    "token": "d793d7636eb29ef9b9c20dcde33e54a7"
+}
+[2025-09-13 01:35:20] Last login updated - {
+    "staff_id": "1"
+}
+[2025-09-13 01:45:55] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-09-13 01:45:59] Login attempt started - {
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36"
+}
+[2025-09-13 01:45:59] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-09-13 01:45:59] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-09-13 01:45:59] Password verification successful - {
+    "staff_id": 1
+}
+[2025-09-13 01:45:59] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-09-13 01:45:59] Session token created in database - {
+    "staff_id": "1",
+    "token": "eb5c73ae97c1804ba1478cdd2dc417c5"
+}
+[2025-09-13 01:45:59] Last login updated - {
+    "staff_id": "1"
+}
+[2025-09-13 07:23:11] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-09-13 07:23:17] Login attempt started - {
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36"
+}
+[2025-09-13 07:23:17] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-09-13 07:23:17] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-09-13 07:23:17] Password verification successful - {
+    "staff_id": 1
+}
+[2025-09-13 07:23:17] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-09-13 07:23:17] Session token created in database - {
+    "staff_id": "1",
+    "token": "122c6bacc80ce6c08fbd79090e17aa50"
+}
+[2025-09-13 07:23:17] Last login updated - {
+    "staff_id": "1"
+}
+[2025-09-13 07:41:04] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-09-13 07:41:08] Login attempt started - {
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36"
+}
+[2025-09-13 07:41:08] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-09-13 07:41:08] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-09-13 07:41:08] Password verification successful - {
+    "staff_id": 1
+}
+[2025-09-13 07:41:08] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-09-13 07:41:08] Session token created in database - {
+    "staff_id": "1",
+    "token": "99a752848a1066271620df280ac8f48e"
+}
+[2025-09-13 07:41:08] Last login updated - {
+    "staff_id": "1"
+}

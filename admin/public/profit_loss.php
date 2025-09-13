@@ -2,7 +2,8 @@
 
 include __DIR__ . '/../include/header.php';
 ?>
-
+    <!-- Custom Profit & Loss Styles -->
+    <link href="assets/css/profit-loss.css" rel="stylesheet" type="text/css" />
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
@@ -13,11 +14,11 @@ include __DIR__ . '/../include/header.php';
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0">Basic Elements</h4>
+                                    <h4 class="mb-sm-0">Profit & Loss Management</h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Forms</a></li>
-                                            <li class="breadcrumb-item active">Basic Elements</li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Order</a></li>
+                                            <li class="breadcrumb-item active">Profit & Loss Management</li>
                                         </ol>
                                     </div>
                                 </div>
@@ -30,9 +31,9 @@ include __DIR__ . '/../include/header.php';
                                 <div class="col-md-6">
                                     <div class="clean-card p-4 text-center">
                                         <div class="mb-4">
-                                            <i class="ri-lock-line" style="font-size: 48px; color: #6b7280;"></i>
+                                            <i class="ri-lock-line" style="font-size: 48px; opacity: 0.6;"></i>
                                         </div>
-                                        <h3 class="mb-2" style="color: #111827;">Security Verification</h3>
+                                        <h3 class="mb-2">Security Verification</h3>
                                         <p class="text-muted mb-4">Enter your access key to view profit & loss data</p>
                                         
                                         <div class="mb-3">
@@ -54,23 +55,53 @@ include __DIR__ . '/../include/header.php';
 
                         <!-- Main Content -->
                         <div id="mainContent" style="display: none;">
-                            
-
-
                             <!-- Filter Controls -->
                             <div class="card mb-4">
                                 <div class="card-body py-3">
-                                    <div class="row g-3 align-items-end">
-                                        <!-- Clean Page Header -->
-                                        <div class="d-flex justify-content-between align-items-center ">
-                                            <div>
-                                                <h1 class="page-title">Profit & Loss Management</h1>
-                                                <p class="page-subtitle">Track order profitability and manage payments</p>
+                                    <!-- Payment Summary Row -->
+                                    <div class="row g-3 mb-3 border-bottom pb-3" id="paymentSummaryRow">
+                                        <div class="col-md-4">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <div class="rounded bg-light p-2">
+                                                        <i class="ri-hand-coin-line text-primary" style="font-size: 18px;"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-0" id="totalCommissionPayments">RM 0.00</h6>
+                                                    <small class="text-muted">Commission Paid</small>
+                                                </div>
                                             </div>
-                                            <button class="btn btn-clean" onclick="loadProfitLossData()">
-                                                <i class="ri-refresh-line me-2"></i>Refresh Data
-                                            </button>
                                         </div>
+                                        <div class="col-md-4">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <div class="rounded bg-light p-2">
+                                                        <i class="ri-truck-line text-success" style="font-size: 18px;"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-0" id="totalShippingPayments">RM 0.00</h6>
+                                                    <small class="text-muted">Shipping Paid</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <div class="rounded bg-light p-2">
+                                                        <i class="ri-building-line text-warning" style="font-size: 18px;"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-0" id="totalSupplierPayments">RM 0.00</h6>
+                                                    <small class="text-muted">Supplier Paid</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row g-3 align-items-end">
                                         <div class="col-md-3">
                                             <label class="form-label fw-medium text-muted">Filter by Month</label>
                                             <input type="month" id="monthFilter" class="form-control" placeholder="Select month">
@@ -100,6 +131,9 @@ include __DIR__ . '/../include/header.php';
                                                 </button>
                                                 <button class="btn btn-clean-outline btn-sm" onclick="clearFilters()" title="Clear Filters">
                                                     <i class="ri-close-line"></i>
+                                                </button>
+                                                <button class="btn btn-clean-outline btn-sm" onclick="loadProfitLossData()" title="Refresh Data">
+                                                    <i class="ri-refresh-line"></i>
                                                 </button>
                                             </div>
                                         </div>
@@ -1454,13 +1488,18 @@ include __DIR__ . '/../include/header.php';
                     queryParams.append(key, currentFilters[key]);
                 }
             });
-            
-            fetch(`../private/profit_loss_backend.php?${queryParams.toString()}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.orders) {
-                    displayCleanOrdersTable(data.orders);
-                    displayPagination(data.pagination);
+
+            // Load both orders and payment summaries
+            Promise.all([
+                fetch(`../private/profit_loss_backend.php?${queryParams.toString()}`),
+                fetch(`../private/profit_loss_backend.php?action=get_payment_summaries&${Object.keys(currentFilters).map(key => currentFilters[key] ? `${key}=${currentFilters[key]}` : '').filter(Boolean).join('&')}`)
+            ])
+            .then(responses => Promise.all(responses.map(r => r.json())))
+            .then(([ordersData, summariesData]) => {
+                // Handle orders data
+                if (ordersData.success && ordersData.orders) {
+                    displayCleanOrdersTable(ordersData.orders);
+                    displayPagination(ordersData.pagination);
                 } else {
                     tableBody.innerHTML = `
                         <tr>
@@ -1470,6 +1509,11 @@ include __DIR__ . '/../include/header.php';
                         </tr>
                     `;
                     clearPagination();
+                }
+
+                // Handle payment summaries data
+                if (summariesData.success) {
+                    updatePaymentSummaryCards(summariesData.summaries);
                 }
             })
             .catch(error => {
@@ -1517,6 +1561,22 @@ include __DIR__ . '/../include/header.php';
             // Reset to first page
             currentPage = 1;
             loadProfitLossData(1);
+        }
+
+        function updatePaymentSummaryCards(summaries) {
+            console.log('Updating payment summary cards:', summaries);
+            
+            // Update commission payments
+            document.getElementById('totalCommissionPayments').textContent = 
+                `RM ${formatNumber(summaries.total_commission_payments || 0)}`;
+            
+            // Update shipping payments
+            document.getElementById('totalShippingPayments').textContent = 
+                `RM ${formatNumber(summaries.total_shipping_payments || 0)}`;
+            
+            // Update supplier payments
+            document.getElementById('totalSupplierPayments').textContent = 
+                `RM ${formatNumber(summaries.total_supplier_payments || 0)}`;
         }
 
         function displayPagination(pagination) {
@@ -1642,14 +1702,14 @@ include __DIR__ . '/../include/header.php';
                 return `
                     <tr>
                         <td>
-                            <div style="font-weight: 600; color: #111827;">${order.order_number || '#' + order.invoice_id}</div>
+                            <div style="font-weight: 600;">${order.order_number || '#' + order.invoice_id}</div>
                         </td>
                         <td>
-                            <div style="font-weight: 500; color: #374151;">${order.customer_name || 'Unknown'}</div>
-                            <div style="font-size: 12px; color: #6b7280;">${order.customer_company_name || ''}</div>
+                            <div style="font-weight: 500;">${order.customer_name || 'Unknown'}</div>
+                            <div style="font-size: 12px; opacity: 0.7;">${order.customer_company_name || ''}</div>
                         </td>
                         <td>
-                            <div style="color: #374151;">${formatDate(order.order_date)}</div>
+                            <div>${formatDate(order.order_date)}</div>
                         </td>
                         <td>
                             <div style="font-weight: 600; color: ${order.actual_profit_loss >= 0 ? '#059669' : '#dc2626'};">
@@ -1677,24 +1737,24 @@ include __DIR__ . '/../include/header.php';
                         </td>
                         <td>
                             ${order.staff_name ? `
-                                <div style="font-weight: 500; color: #374151;">${order.staff_name}</div>
+                                <div style="font-weight: 500;">${order.staff_name}</div>
                                 <div style="font-size: 12px; color: ${(() => {
-                                    // Use theoretical profit for commission calculation (consistent with modal)
-                                    const commissionDue = order.theoretical_profit * (order.commission_percentage / 100);
+                                    // Use revenue for commission calculation
+                                    const commissionDue = order.total_revenue * (order.commission_percentage / 100);
                                     const paidAmount = parseFloat(order.commission_paid_amount || 0);
                                     const remaining = commissionDue - paidAmount;
                                     return remaining <= 0 ? '#059669' : '#dc2626';
                                 })()};">
                                     ${(() => {
-                                        // Use theoretical profit for commission calculation (consistent with modal)
-                                        const commissionDue = order.theoretical_profit * (order.commission_percentage / 100);
+                                        // Use revenue for commission calculation
+                                        const commissionDue = order.total_revenue * (order.commission_percentage / 100);
                                         const paidAmount = parseFloat(order.commission_paid_amount || 0);
                                         const remaining = commissionDue - paidAmount;
                                         return remaining <= 0 ? 'Paid' : `Remaining: RM${formatNumber(remaining)}`;
                                     })()}
                                 </div>
                             ` : `
-                                <div style="color: #6b7280; font-style: italic;">No commission</div>
+                                <div style="font-style: italic; opacity: 0.7;">No commission</div>
                             `}
                         </td>
                         <td>
@@ -2323,8 +2383,8 @@ include __DIR__ . '/../include/header.php';
             
             // Calculate commission amounts
             const commissionPercentage = parseFloat(order.commission_percentage || 0);
-            const theoreticalProfit = parseFloat(orderData.summary?.total_profit || 0); // Use theoretical profit, not actual
-            const commissionDue = theoreticalProfit * (commissionPercentage / 100);
+            const totalRevenue = parseFloat(orderData.summary?.total_revenue || 0); // Use revenue instead of profit
+            const commissionDue = totalRevenue * (commissionPercentage / 100);
             const commissionPaid = parseFloat(order.commission_paid_amount || 0);
             const commissionRemaining = commissionDue - commissionPaid;
             
@@ -2354,7 +2414,7 @@ include __DIR__ . '/../include/header.php';
                     </h6>
                 </div>
                 <div class="alert alert-light">
-                    <small><strong>Note:</strong> Commission based on theoretical profit of RM ${formatNumber(theoreticalProfit)} (fixed amount, unaffected by payments made)</small>
+                    <small><strong>Note:</strong> Commission based on total revenue of RM ${formatNumber(totalRevenue)} (fixed amount, unaffected by payments made)</small>
                 </div>
             `;
             
@@ -2429,22 +2489,73 @@ include __DIR__ . '/../include/header.php';
             .then(data => {
                 if (data.success) {
                     const summary = data.summary;
-                    const totalProfitClass = summary.total_profit >= 0 ? 'text-success' : 'text-danger';
+                    const order = data.order;
+                    
+                    // Use the same calculations as main table
+                    const supplierCostYen = parseFloat(summary.total_supplier_cost_yen || 0);
+                    const shippingCostRm = parseFloat(summary.total_shipping_cost_rm || 0);
+                    const supplierPaidYen = parseFloat(summary.supplier_payments_made || 0);
+                    const shippingPaidRm = parseFloat(summary.shipping_payments_made || 0);
+                    const avgConversionRate = parseFloat(summary.avg_conversion_rate || 0.032);
+                    const totalRevenue = parseFloat(summary.total_revenue || 0);
+                    const actualProfitLoss = parseFloat(summary.actual_profit_loss || 0);
+                    
+                    // Convert supplier amounts to RM (same as main table)
+                    const supplierCostRm = supplierCostYen / avgConversionRate;
+                    const supplierPaidRm = supplierPaidYen / avgConversionRate;
+                    
+                    // Calculate totals (same as main table)
+                    const totalPaidRm = supplierPaidRm + shippingPaidRm;
+                    const supplierRemainingRm = Math.max(0, supplierCostRm - supplierPaidRm);
+                    const shippingRemainingRm = Math.max(0, shippingCostRm - shippingPaidRm);
+                    const totalRemainingRm = supplierRemainingRm + shippingRemainingRm;
+                    
+                    const actualProfitClass = actualProfitLoss >= 0 ? 'text-success' : 'text-danger';
+                    const remainingClass = totalRemainingRm <= 0.01 ? 'text-success' : 'text-danger';
+                    
+                    // Calculate commission information if staff is assigned (same as main table)
+                    let commissionHtml = '';
+                    if (order.commission_staff_id && order.staff_name) {
+                        const commissionPercentage = parseFloat(order.commission_percentage || 0);
+                        const commissionDue = totalRevenue * (commissionPercentage / 100);
+                        const commissionPaid = parseFloat(order.commission_paid_amount || 0);
+                        const commissionRemaining = commissionDue - commissionPaid;
+                        const commissionClass = commissionRemaining <= 0 ? 'text-success' : 'text-danger';
+                        
+                        commissionHtml = `
+                            <div class="col-md-12 mt-3">
+                                <hr>
+                                <h6 class="fw-bold">Commission Information</h6>
+                                <p><strong>Staff:</strong> ${order.staff_name} (${commissionPercentage}%)</p>
+                                <p><strong>Commission Due:</strong> RM ${formatNumber(commissionDue)} <small>(${commissionPercentage}% of revenue)</small></p>
+                                <p><strong>Commission Paid:</strong> RM ${formatNumber(commissionPaid)}</p>
+                                <p><strong>Commission Remaining:</strong> <span class="${commissionClass}">RM ${formatNumber(Math.abs(commissionRemaining))}</span></p>
+                            </div>
+                        `;
+                    }
                     
                     const summaryHtml = `
                         <div class="card">
                             <div class="card-body">
-                                <h6 class="card-title">Final Profit & Loss Summary</h6>
+                                <h6 class="card-title">Final Order Summary</h6>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <p><strong>Total Revenue:</strong> RM ${formatCurrency(summary.total_revenue)}</p>
-                                        <p><strong>Total Cost:</strong> ¥${formatCurrency(summary.total_cost_yen)}</p>
-                                        <p><strong>Final Profit:</strong> <span class="${totalProfitClass}">RM ${formatCurrency(Math.abs(summary.total_profit))}</span></p>
+                                        <p><strong>Total Revenue:</strong> RM ${formatNumber(totalRevenue)}</p>
+                                        <p><strong>Actual Profit/Loss:</strong> <span class="${actualProfitClass}">RM ${formatNumber(Math.abs(actualProfitLoss))}</span></p>
+                                        <p><strong>Total Paid:</strong> <span class="text-success">RM ${formatNumber(totalPaidRm)}</span></p>
+                                        <small class="text-muted">RM ${formatNumber(supplierPaidRm)} supplier + RM ${formatNumber(shippingPaidRm)} shipping</small>
                                     </div>
                                     <div class="col-md-6">
-                                        <p><strong>Supplier Payments:</strong> ¥${formatCurrency(summary.supplier_payments_made)}</p>
-                                        <p><strong>Shipping Payments:</strong> ¥${formatCurrency(summary.shipping_payments_made)}</p>
+                                        <p><strong>Total Remaining:</strong> <span class="${remainingClass}">RM ${formatNumber(totalRemainingRm)}</span></p>
+                                        <small class="text-muted">RM ${formatNumber(supplierRemainingRm)} supplier + RM ${formatNumber(shippingRemainingRm)} shipping</small>
+                                        <br><br>
+                                        <p><strong>Status:</strong> 
+                                            <span class="badge ${totalRemainingRm <= 0.01 ? 'bg-success' : (totalPaidRm > 0 ? 'bg-warning' : 'bg-danger')}">
+                                                ${totalRemainingRm <= 0.01 ? 'Fully Paid' : (totalPaidRm > 0 ? 'Partially Paid' : 'Unpaid')}
+                                            </span>
+                                        </p>
                                     </div>
+                                    ${commissionHtml}
                                 </div>
                             </div>
                         </div>

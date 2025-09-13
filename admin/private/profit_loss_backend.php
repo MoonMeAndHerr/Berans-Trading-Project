@@ -133,6 +133,16 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
             }
             break;
             
+        case 'get_payment_summaries':
+            $monthFilter = $_GET['month'] ?? '';
+            $searchFilter = $_GET['search'] ?? '';
+            $dateFromFilter = $_GET['date_from'] ?? '';
+            $dateToFilter = $_GET['date_to'] ?? '';
+            
+            $result = getPaymentSummaries($pdo, $monthFilter, $searchFilter, $dateFromFilter, $dateToFilter);
+            echo json_encode($result);
+            break;
+            
         default:
             echo json_encode(['success' => false, 'error' => 'Invalid action']);
     }
@@ -195,6 +205,7 @@ function getProfitLossOrders($pdo) {
                 i.invoice_number as order_number,
                 i.status,
                 i.created_at as order_date,
+                i.total_amount as total_revenue,
                 i.supplier_payments_total,
                 i.shipping_payments_total,
                 (COALESCE(i.supplier_payments_total, 0) + COALESCE(i.shipping_payments_total, 0)) as total_paid,
@@ -695,23 +706,13 @@ function getStaffCommissionSummary($pdo, $dateFrom, $dateTo, $staffId = null) {
                 ) as total_profit,
                 SUM(
                     CASE WHEN i.commission_percentage > 0 
-                    THEN (i.total_amount - COALESCE((
-                        SELECT SUM((p.new_unit_price_yen / COALESCE(p.new_conversion_rate, 0.032) + p.new_unit_freight_cost_rm) * ii.quantity) 
-                        FROM invoice_item ii 
-                        JOIN price p ON p.product_id = ii.product_id 
-                        WHERE ii.invoice_id = i.invoice_id
-                    ), 0)) * (i.commission_percentage / 100)
+                    THEN i.total_amount * (i.commission_percentage / 100)
                     ELSE 0 END
                 ) as total_commission_due,
                 SUM(COALESCE(i.commission_paid_amount, 0)) as total_commission_paid,
                 SUM(
                     CASE WHEN i.commission_percentage > 0 
-                    THEN ((i.total_amount - COALESCE((
-                        SELECT SUM((p.new_unit_price_yen / COALESCE(p.new_conversion_rate, 0.032) + p.new_unit_freight_cost_rm) * ii.quantity) 
-                        FROM invoice_item ii 
-                        JOIN price p ON p.product_id = ii.product_id 
-                        WHERE ii.invoice_id = i.invoice_id
-                    ), 0)) * (i.commission_percentage / 100)) - COALESCE(i.commission_paid_amount, 0)
+                    THEN (i.total_amount * (i.commission_percentage / 100)) - COALESCE(i.commission_paid_amount, 0)
                     ELSE 0 END
                 ) as total_commission_remaining
             FROM invoice i
@@ -742,12 +743,7 @@ function getStaffCommissionSummary($pdo, $dateFrom, $dateTo, $staffId = null) {
                 ) as total_profit,
                 SUM(
                     CASE WHEN i.commission_percentage > 0 
-                    THEN (i.total_amount - COALESCE((
-                        SELECT SUM((p.new_unit_price_yen * COALESCE(p.new_conversion_rate, 0.032) + p.new_unit_freight_cost_rm) * ii.quantity) 
-                        FROM invoice_item ii 
-                        JOIN price p ON p.product_id = ii.product_id 
-                        WHERE ii.invoice_id = i.invoice_id
-                    ), 0)) * (i.commission_percentage / 100)
+                    THEN i.total_amount * (i.commission_percentage / 100)
                     ELSE 0 END
                 ) as total_commission_due,
                 SUM(COALESCE(i.commission_paid_amount, 0)) as total_commission_paid
@@ -818,8 +814,8 @@ function payStaffCommission($pdo, $invoiceId, $amount, $notes = '') {
             return ['success' => false, 'error' => 'No staff assigned to this order'];
         }
         
-        // Calculate commission amounts based on theoretical profit (fixed amount)
-        $commissionDue = $order['theoretical_profit'] * ($order['commission_percentage'] / 100);
+        // Calculate commission amounts based on revenue (total_amount)
+        $commissionDue = $order['total_amount'] * ($order['commission_percentage'] / 100);
         $alreadyPaid = floatval($order['commission_paid_amount']);
         $newTotalPaid = $alreadyPaid + floatval($amount);
         
@@ -869,6 +865,84 @@ function payStaffCommission($pdo, $invoiceId, $amount, $notes = '') {
         
     } catch(PDOException $e) {
         error_log("Error paying staff commission: " . $e->getMessage());
+        return ['success' => false, 'error' => 'Database error: ' . $e->getMessage()];
+    }
+}
+
+/**
+ * Get payment summaries based on current filters
+ */
+function getPaymentSummaries($pdo, $monthFilter = '', $searchFilter = '', $dateFromFilter = '', $dateToFilter = '') {
+    try {
+        // Build WHERE conditions (same as main query)
+        $whereConditions = ["c.deleted_at IS NULL"];
+        $queryParams = [];
+        
+        // Month filter
+        if (!empty($monthFilter)) {
+            $whereConditions[] = "DATE_FORMAT(i.created_at, '%Y-%m') = ?";
+            $queryParams[] = $monthFilter;
+        }
+        
+        // Date range filter
+        if (!empty($dateFromFilter)) {
+            $whereConditions[] = "DATE(i.created_at) >= ?";
+            $queryParams[] = $dateFromFilter;
+        }
+        if (!empty($dateToFilter)) {
+            $whereConditions[] = "DATE(i.created_at) <= ?";
+            $queryParams[] = $dateToFilter;
+        }
+        
+        // Search filter
+        if (!empty($searchFilter)) {
+            $whereConditions[] = "(i.invoice_number LIKE ? OR c.customer_name LIKE ? OR c.customer_company_name LIKE ? OR DATE_FORMAT(i.created_at, '%Y-%m-%d') LIKE ?)";
+            $searchTerm = '%' . $searchFilter . '%';
+            $queryParams[] = $searchTerm;
+            $queryParams[] = $searchTerm;
+            $queryParams[] = $searchTerm;
+            $queryParams[] = $searchTerm;
+        }
+        
+        $whereClause = implode(' AND ', $whereConditions);
+        
+        $query = "
+            SELECT 
+                -- Commission payments total (revenue-based)
+                SUM(COALESCE(i.commission_paid_amount, 0)) as total_commission_payments,
+                
+                -- Shipping payments total (already in RM)
+                SUM(COALESCE(i.shipping_payments_total, 0)) as total_shipping_payments,
+                
+                -- Supplier payments total (convert from Yen to RM)
+                SUM(
+                    COALESCE(i.supplier_payments_total, 0) / COALESCE((
+                        SELECT AVG(p.new_conversion_rate) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id AND p.new_conversion_rate > 0
+                    ), 0.032)
+                ) as total_supplier_payments_rm
+            FROM invoice i
+            LEFT JOIN customer c ON i.customer_id = c.customer_id
+            WHERE $whereClause
+        ";
+        
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($queryParams);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return [
+            'success' => true,
+            'summaries' => [
+                'total_commission_payments' => floatval($result['total_commission_payments'] ?? 0),
+                'total_shipping_payments' => floatval($result['total_shipping_payments'] ?? 0),
+                'total_supplier_payments' => floatval($result['total_supplier_payments_rm'] ?? 0)
+            ]
+        ];
+        
+    } catch(PDOException $e) {
+        error_log("Error fetching payment summaries: " . $e->getMessage());
         return ['success' => false, 'error' => 'Database error: ' . $e->getMessage()];
     }
 }
