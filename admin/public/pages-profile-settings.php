@@ -85,20 +85,20 @@
 
                                 <?php 
 
-                                    if (isset($_SESSION['success'])) {
+                                    if (isset($_SESSION['success_message'])) {
                                         echo '<div class="alert alert-success alert-dismissible fade show m-3" role="alert">'
-                                            . htmlspecialchars($_SESSION['success']) .
+                                            . htmlspecialchars($_SESSION['success_message']) .
                                             '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                         </div>';
-                                        unset($_SESSION['success']);
+                                        unset($_SESSION['success_message']);
                                     }
 
-                                    if (isset($_SESSION['error'])) {
+                                    if (isset($_SESSION['error_message'])) {
                                         echo '<div class="alert alert-danger alert-dismissible fade show m-3" role="alert">'
-                                            . htmlspecialchars($_SESSION['error']) .
+                                            . htmlspecialchars($_SESSION['error_message']) .
                                             '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                         </div>';
-                                        unset($_SESSION['error']);
+                                        unset($_SESSION['error_message']);
                                     }
 
                                 ?>

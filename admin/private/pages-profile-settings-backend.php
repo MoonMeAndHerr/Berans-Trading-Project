@@ -21,7 +21,7 @@ if (isset($_POST['submit_change_details'])) {
         ]);
 
         if ($stmt->rowCount() > 0) {
-            $_SESSION['error'] = "Username already taken. Please choose another.";
+            $_SESSION['error_message'] = "Username already taken. Please choose another.";
             header("Location: ../public/pages-profile-settings.php");
             exit();
         }
@@ -33,7 +33,7 @@ if (isset($_POST['submit_change_details'])) {
         ]);
 
         if ($stmt->rowCount() > 0) {
-            $_SESSION['error'] = "Email already in use. Please choose another.";
+            $_SESSION['error_message'] = "Email already in use. Please choose another.";
             header("Location: ../public/pages-profile-settings.php");
             exit();
         }
@@ -60,7 +60,7 @@ if (isset($_POST['submit_change_details'])) {
             ':staffname' => $_POST['staff_name'],
             ':staff_id' => $_POST['staff_id']
         ]);
-        $_SESSION['success'] = "Profile details updated successfully.";
+        $_SESSION['success_message'] = "Profile details updated successfully.";
         header("Location: ../public/pages-profile-settings.php");
         exit();
     } catch (PDOException $e) {
@@ -77,7 +77,7 @@ if (isset($_POST['submit_change_password'])) {
 
             if ($_POST['staff_new_pass'] !== $_POST['staff_retype_pass']) {
 
-                $_SESSION['error'] = "New passwords do not match.";
+                $_SESSION['error_message'] = "New passwords do not match.";
                 header("Location: ../public/pages-profile-settings.php");
                 exit();
 
@@ -90,7 +90,7 @@ if (isset($_POST['submit_change_password'])) {
                 ':password' => $new_hashed_password,
                 ':staff_id' => $_POST['staff_id']
             ]);
-            $_SESSION['success'] = "Password changed successfully.";
+            $_SESSION['success_message'] = "Password changed successfully.";
             header("Location: ../public/pages-profile-settings.php");
             exit();
 
@@ -98,7 +98,7 @@ if (isset($_POST['submit_change_password'])) {
 
         } else {
 
-            $_SESSION['error'] = "Old password is incorrect.";
+            $_SESSION['error_message'] = "Old password is incorrect.";
             header("Location: ../public/pages-profile-settings.php");
             exit();
 

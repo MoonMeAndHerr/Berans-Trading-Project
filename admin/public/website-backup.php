@@ -89,7 +89,7 @@
                             <td>
                                 <a href="../private/backup-action?id=<?php echo $row['id']; ?>&action=rollback" target="_blank" class="btn btn-sm btn-success">Rollback</a>
                                 <a href="../private/backup-action?id=<?php echo $row['id']; ?>&action=download" target="_blank" class="btn btn-sm btn-danger">Download</a>
-                                <a href="../private/backup-action?id=<?php echo $row['id']; ?>&action=delete" target="_blank" class="btn btn-sm btn-warning">Delete</a>
+                                <a href="../private/backup-action?id=<?php echo $row['id']; ?>&action=delete" class="btn btn-sm btn-warning">Delete</a>
                             </td>
                             </tr>
                             <?php 
