@@ -52,25 +52,6 @@ CREATE TABLE `category` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `company`
---
-
-CREATE TABLE `company` (
-  `company_id` int NOT NULL,
-  `company_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `company_logo` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `company_tagline` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `bank_name` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `bank_account_name` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `bank_account_number` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `address` text COLLATE utf8mb4_general_ci,
-  `contact` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `customer`
 --
 
@@ -280,6 +261,20 @@ CREATE TABLE `price_shipping` (
   `delivery_days` int DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO `price_shipping` (`shipping_price_id`, `shipping_code`, `freight_rate`, `shipping_name`) VALUES
+(29, 'M1', 420.00, 'Sea Normal Goods'),
+(30, 'M2', 390.00, 'Sea Sensitive Goods'),
+(31, 'S1', 285.00, 'SG Sea Normal Goods'),
+(32, 'S2', 285.00, 'SG Sea Sensitive Goods'),
+(35, 'M3a', 17.00, 'Air VM Normal Goods'),
+(36, 'M3b', 17.00, 'Air KG Normal Goods'),
+(37, 'M4a', 19.00, 'Air VM Sensitive Goods'),
+(38, 'M4b', 19.00, 'Air KG Sensitive Goods'),
+(39, 'S3a', 24.00, 'SG Air VM Normal Goods'),
+(40, 'S3b', 24.00, 'SG Air KG Normal Goods'),
+(41, 'S4a', 24.00, 'SG Air VM Sensitive Goods'),
+(42, 'S4b', 24.00, 'SG Air KG Sensitive Goods');
+
 -- --------------------------------------------------------
 
 --
@@ -385,13 +380,6 @@ CREATE TABLE `sessions` (
   `token` varchar(64) COLLATE utf8mb4_general_ci NOT NULL,
   `expires_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `sessions`
---
-
-INSERT INTO `sessions` (`session_id`, `staff_id`, `token`, `expires_at`) VALUES
-(1, 34, 'e55149f30c898a0e693efd01a81f449a', '2025-09-14 00:54:47');
 
 -- --------------------------------------------------------
 
@@ -515,10 +503,6 @@ ALTER TABLE `category`
 --
 -- Indexes for table `company`
 --
-ALTER TABLE `company`
-  ADD PRIMARY KEY (`company_id`);
-
---
 -- Indexes for table `customer`
 --
 ALTER TABLE `customer`
@@ -614,6 +598,11 @@ ALTER TABLE `schedule`
 --
 ALTER TABLE `section`
   ADD PRIMARY KEY (`section_id`);
+
+-- Indexes for table `price_shipping`
+--
+ALTER TABLE `price_shipping`
+  ADD PRIMARY KEY (`shipping_price_id`);
 
 --
 -- Indexes for table `sessions`

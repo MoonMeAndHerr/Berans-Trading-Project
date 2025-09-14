@@ -63,6 +63,6 @@ try {
 
     }
 } catch (\Exception $e) {
-        $_SESSION['failed'] = '❌ Fail to establish connection with error: ' . $e->getMessage();
+        $_SESSION['failed'] = '❌ Fail to establish connection with error: ' . $e->getMessage()->getBody();
         header('Location: xero-main.php');
 }

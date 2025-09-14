@@ -67,7 +67,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         }
 
         // --- Insert Product ---
-        $stmt = $pdo->prepare("INSERT INTO Product 
+        $stmt = $pdo->prepare("INSERT INTO product 
             (section_id, category_id, subcategory_id, material_id, product_type_id, variant, description, production_lead_time,
             image_url,size_1, size_2, size_3, xero_relation, product_code)
             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
@@ -149,7 +149,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             echo "<script>console.log('Problem: " . $output . "' );</script>";
         }
 
-        $updateCodeStmt = $pdo->prepare("UPDATE Product SET product_code = ?, xero_relation = ? WHERE product_id = ?");
+        $updateCodeStmt = $pdo->prepare("UPDATE product SET product_code = ?, xero_relation = ? WHERE product_id = ?");
         $updateCodeStmt->execute([$product_code, $xero_relation, $product_id]);
 
         // --- Insert Price (Carton info) ---
@@ -174,7 +174,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
             if($index === 0){
                 // Main carton
-                $priceStmt = $pdo->prepare("INSERT INTO Price
+                $priceStmt = $pdo->prepare("INSERT INTO price
                     (product_id, supplier_id, carton_width, carton_height, carton_length, pcs_per_carton, carton_weight, cbm_carton)
                     VALUES (?,?,?,?,?,?,?,?)");
 
@@ -193,7 +193,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             } else {
                 // Additional cartons
                 $updateStmt = $pdo->prepare("
-                    UPDATE Price SET
+                    UPDATE price SET
                         add_carton{$index}_width = ?, add_carton{$index}_height = ?, add_carton{$index}_length = ?,
                         add_carton{$index}_pcs = ?, add_carton{$index}_weight = ?, add_carton{$index}_total_cbm = ?
                     WHERE price_id = ?
