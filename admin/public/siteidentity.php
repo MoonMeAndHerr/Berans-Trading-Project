@@ -98,6 +98,13 @@
                                                 </div>
                                             </div>
 
+                                            <div class="col-lg-6">
+                                                <div class="form-floating">
+                                                    <input type="text" class="form-control" id="bank_account_number" name="bank_account_number" placeholder="Enter bank account number" value="<?php echo $site_identity['bank_account_number']; ?>" required>
+                                                    <label for="bank_account_number">Company Bank Account Number</label>
+                                                </div>
+                                            </div>
+
                                             <div class="col-lg-12">
                                                 <div class="form-floating">
                                                     <input type="text" class="form-control" id="address" name="address" placeholder="Enter company address" value="<?php echo $site_identity['address']; ?>" required>

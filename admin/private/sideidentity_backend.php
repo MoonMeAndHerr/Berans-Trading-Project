@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $company_tagline = trim($_POST['company_tagline'] ?? '');
     $bank_name = trim($_POST['bank_name'] ?? '');
     $bank_account_name = trim($_POST['bank_account_name'] ?? '');
+    $bank_account_number = trim($_POST['bank_account_number'] ?? '');
     $address = trim($_POST['address'] ?? '');
     $contact = trim($_POST['contact'] ?? '');
     $email = trim($_POST['email'] ?? '');
@@ -66,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($company_tagline)) $errors[] = "Company tagline is required.";
     if (empty($bank_name)) $errors[] = "Bank name is required.";
     if (empty($bank_account_name)) $errors[] = "Bank account name is required.";
+    if (empty($bank_account_number)) $errors[] = "Bank account number is required.";
     if (empty($address)) $errors[] = "Company address is required.";
     if (empty($contact)) $errors[] = "Contact number is required.";
     if (empty($email)) {
@@ -83,6 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     company_tagline = :company_tagline,
                     bank_name = :bank_name,
                     bank_account_name = :bank_account_name,
+                    bank_account_number = :bank_account_number,
                     address = :address,
                     contact = :contact,
                     email = :email
@@ -95,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':company_tagline' => $company_tagline,
                 ':bank_name' => $bank_name,
                 ':bank_account_name' => $bank_account_name,
+                ':bank_account_number' => $bank_account_number,
                 ':address' => $address,
                 ':contact' => $contact,
                 ':email' => $email,
