@@ -74,8 +74,11 @@ include __DIR__ . '/../include/header.php';
                                                     </div>
                                                 </div>
                                                 <div class="flex-grow-1">
-                                                    <h6 class="mb-0" id="totalCommissionPayments">RM 0.00</h6>
-                                                    <small class="text-muted">Commission Paid</small>
+                                                    <h6 class="mb-0">
+                                                        <span id="totalCommissionPayments">RM 0.00</span> / 
+                                                        <span id="totalCommissionRemaining" class="text-danger">RM 0.00</span>
+                                                    </h6>
+                                                    <small class="text-muted">Commission Paid / Remaining</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -87,8 +90,11 @@ include __DIR__ . '/../include/header.php';
                                                     </div>
                                                 </div>
                                                 <div class="flex-grow-1">
-                                                    <h6 class="mb-0" id="totalShippingPayments">RM 0.00</h6>
-                                                    <small class="text-muted">Shipping Paid</small>
+                                                    <h6 class="mb-0">
+                                                        <span id="totalShippingPayments">RM 0.00</span> / 
+                                                        <span id="totalShippingRemaining" class="text-danger">RM 0.00</span>
+                                                    </h6>
+                                                    <small class="text-muted">Shipping Paid / Remaining</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -100,8 +106,11 @@ include __DIR__ . '/../include/header.php';
                                                     </div>
                                                 </div>
                                                 <div class="flex-grow-1">
-                                                    <h6 class="mb-0" id="totalSupplierPayments">RM 0.00</h6>
-                                                    <small class="text-muted">Supplier Paid</small>
+                                                    <h6 class="mb-0">
+                                                        <span id="totalSupplierPayments">RM 0.00</span> / 
+                                                        <span id="totalSupplierRemaining" class="text-danger">RM 0.00</span>
+                                                    </h6>
+                                                    <small class="text-muted">Supplier Paid / Remaining</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -1572,17 +1581,23 @@ include __DIR__ . '/../include/header.php';
         function updatePaymentSummaryCards(summaries) {
             console.log('Updating payment summary cards:', summaries);
             
-            // Update commission payments
+            // Update commission payments and remaining
             document.getElementById('totalCommissionPayments').textContent = 
                 `RM ${formatNumber(summaries.total_commission_payments || 0)}`;
+            document.getElementById('totalCommissionRemaining').textContent = 
+                `RM ${formatNumber(summaries.total_commission_remaining || 0)}`;
             
-            // Update shipping payments
+            // Update shipping payments and remaining
             document.getElementById('totalShippingPayments').textContent = 
                 `RM ${formatNumber(summaries.total_shipping_payments || 0)}`;
+            document.getElementById('totalShippingRemaining').textContent = 
+                `RM ${formatNumber(summaries.total_shipping_remaining || 0)}`;
             
-            // Update supplier payments
+            // Update supplier payments and remaining
             document.getElementById('totalSupplierPayments').textContent = 
                 `RM ${formatNumber(summaries.total_supplier_payments || 0)}`;
+            document.getElementById('totalSupplierRemaining').textContent = 
+                `RM ${formatNumber(summaries.total_supplier_remaining || 0)}`;
         }
 
         function displayPagination(pagination) {
