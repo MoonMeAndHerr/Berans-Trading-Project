@@ -214,9 +214,6 @@ if (isset($_SESSION['errors'])) {
             <!-- Show Success -->
             <?php if ($success): ?>
                 <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-                <?php 
-                echo '<pre>'; print_r($errors); echo '</pre>';
-                ?>
             <?php endif; ?>
 
             <!-- Edit Customer Form -->
