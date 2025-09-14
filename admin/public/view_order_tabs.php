@@ -7,7 +7,25 @@
         <!-- Minimal CSS for Order Tabs -->
         <link href="assets/css/order-tabs-minimal.css" rel="stylesheet" type="text/css" />
 
-        <!-- ============================================================== -->
+        <!-            // Handle payment form submission
+            paymentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Debug: Log the currentInvoiceId at form submission
+                console.log('Form submission - currentInvoiceId:', currentInvoiceId);
+                console.log('Form submission - typeof currentInvoiceId:', typeof currentInvoiceId);
+                
+                const paidAmount = parseFloat(amountPaidInput.value);
+                const totalAmount = parseFloat(totalAmountInput.value);
+
+                if (paidAmount <= 0) {
+                    Swal.fire({
+                        title: 'Invalid Amount',
+                        text: 'Please enter a valid payment amount.',
+                        icon: 'error'
+                    });
+                    return;
+                }================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
         <div class="main-content">
@@ -125,6 +143,11 @@
                                             <button class="btn-compact btn-success" onclick="preparePayment(<?= $order['invoice_id'] ?>, <?= $order['total_amount'] ?>)" data-bs-toggle="modal" data-bs-target="#paymentModal">
                                                 <i class="ri-money-dollar-circle-line"></i>
                                                 Payment
+                                            </button>
+                                            
+                                            <button class="btn-compact btn-info" onclick="debugInvoice(<?= $order['invoice_id'] ?>)" title="Debug Invoice">
+                                                <i class="ri-bug-line"></i>
+                                                Debug
                                             </button>
                                             
                                             <button class="btn-compact <?= $order['status'] === 'completed' ? 'btn-warning' : 'btn-success' ?>" onclick="toggleOrderStatus(<?= $order['invoice_id'] ?>, '<?= $order['status'] ?>')">
@@ -276,6 +299,9 @@
                             </div>
                             <div class="modal-body">
                                 <form id="paymentForm" class="form-minimal">
+                                    <!-- Hidden field to store invoice ID -->
+                                    <input type="hidden" id="hiddenInvoiceId" value="">
+                                    
                                     <div class="mb-3">
                                         <label class="form-label">
                                             <i class="ri-money-cny-circle-line"></i>Total Amount Due (RM)
@@ -373,21 +399,67 @@
                     cancelButtonText: 'No, cancel!'
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Add validation for currentInvoiceId with fallback to hidden field
+                        let invoiceIdToUse = currentInvoiceId;
+                        
+                        // If currentInvoiceId is null, try to get it from the hidden field
+                        if (!invoiceIdToUse) {
+                            invoiceIdToUse = document.getElementById('hiddenInvoiceId').value;
+                            console.log('currentInvoiceId was null, using hiddenInvoiceId:', invoiceIdToUse);
+                        }
+                        
+                        if (!invoiceIdToUse) {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Invoice ID is missing. Please close this modal and try clicking the Payment button again.',
+                                icon: 'error'
+                            });
+                            return;
+                        }
+                        
+                        console.log('Submitting payment for invoice:', invoiceIdToUse, 'amount:', amountPaidInput.value);
+                        
                         const formData = new FormData();
-                        formData.append('invoice_id', currentInvoiceId);
+                        formData.append('invoice_id', invoiceIdToUse);
                         formData.append('amount_paid', amountPaidInput.value);
                         formData.append('is_first_payment', totalAmount === parseFloat(amountPaidInput.value));
+                        
+                        // Debug: log FormData contents
+                        for (let [key, value] of formData.entries()) {
+                            console.log('FormData:', key, '=', value);
+                        }
                         
                         fetch('../private/view-order-tabs-backend.php?action=submit_payment', {
                             method: 'POST',
                             body: formData
                         })
-                        .then(res => res.json())
+                        .then(res => {
+                            // Log the raw response for debugging
+                            console.log('Raw response status:', res.status);
+                            console.log('Raw response headers:', res.headers);
+                            
+                            // Clone response to read as text first for debugging
+                            return res.clone().text().then(text => {
+                                console.log('Raw response text:', text);
+                                
+                                // Check if the response is valid JSON
+                                try {
+                                    const data = JSON.parse(text);
+                                    return data;
+                                } catch (jsonError) {
+                                    console.error('JSON Parse Error:', jsonError);
+                                    console.error('Response text that failed to parse:', text);
+                                    throw new Error('Server returned invalid JSON response. Check console for details.');
+                                }
+                            });
+                        })
                         .then(data => {
+                            console.log('Parsed response data:', data);
+                            
                             if(data.success) {
                                 Swal.fire({
                                     title: 'Payment Successful!',
-                                    text: 'The payment has been recorded successfully.',
+                                    text: data.message || 'The payment has been recorded successfully.',
                                     icon: 'success',
                                     confirmButtonText: 'OK'
                                 }).then(() => window.location.reload());
@@ -396,10 +468,12 @@
                             }
                         })
                         .catch(error => {
+                            console.error('Payment submission error:', error);
                             Swal.fire({
                                 title: 'Error!',
                                 text: 'Error processing payment: ' + error.message,
-                                icon: 'error'
+                                icon: 'error',
+                                footer: 'Check the browser console for more details.'
                             });
                         });
                     }
@@ -595,10 +669,42 @@
 
         // Prepare payment modal
         window.preparePayment = function(invoiceId, totalAmount) {
+            console.log('preparePayment called with:', { invoiceId, totalAmount });
+            
+            // Validate inputs
+            if (!invoiceId) {
+                console.error('preparePayment: invoiceId is missing!');
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Invoice ID is missing. Cannot prepare payment.',
+                    icon: 'error'
+                });
+                return;
+            }
+            
+            if (!totalAmount || totalAmount <= 0) {
+                console.error('preparePayment: totalAmount is invalid!', totalAmount);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Total amount is invalid. Cannot prepare payment.',
+                    icon: 'error'
+                });
+                return;
+            }
+            
             currentInvoiceId = invoiceId;
             document.getElementById('totalAmount').value = totalAmount.toFixed(2);
             document.getElementById('amountPaid').value = '';
             document.getElementById('remainingAmount').value = '';
+            document.getElementById('hiddenInvoiceId').value = invoiceId; // Set hidden field as backup
+            console.log('currentInvoiceId set to:', currentInvoiceId);
+            console.log('hiddenInvoiceId set to:', invoiceId);
+            
+            // Add a visible indicator in the modal title to show which invoice
+            const modalTitle = document.querySelector('#paymentModal .modal-title');
+            if (modalTitle) {
+                modalTitle.textContent = `Payment for Invoice #${invoiceId}`;
+            }
         };
 
         // Toggle order status
@@ -645,6 +751,55 @@
                         });
                     });
                 }
+            });
+        };
+
+        // Debug invoice function
+        window.debugInvoice = function(invoiceId) {
+            console.log('Debug invoice called for ID:', invoiceId);
+            
+            fetch('../private/view-order-tabs-backend.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=debug_invoice&invoice_id=${invoiceId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Debug invoice response:', data);
+                
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Invoice Debug Info',
+                        html: `
+                            <div style="text-align: left;">
+                                <strong>Invoice ID:</strong> ${data.invoice_id}<br>
+                                <strong>Status:</strong> ${data.status}<br>
+                                <strong>Total Amount:</strong> RM ${data.total_amount}<br>
+                                <strong>Customer:</strong> ${data.customer_name}<br>
+                                <strong>Date:</strong> ${data.date}<br>
+                                <strong>Items Count:</strong> ${data.items_count}
+                            </div>
+                        `,
+                        icon: 'info',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Debug Error',
+                        text: data.message || 'Failed to get invoice debug info',
+                        icon: 'error'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Debug invoice error:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Failed to debug invoice: ' + error.message,
+                    icon: 'error'
+                });
             });
         };
 
