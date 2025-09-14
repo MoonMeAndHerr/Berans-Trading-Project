@@ -2,6 +2,8 @@
 
 require_once __DIR__ . '/../../global/main_configuration.php';
 
+session_start();
+
 $db = openDB();
 
 if (!isset($_GET['id']) || !isset($_GET['action'])) {
@@ -42,7 +44,7 @@ case "rollback":
 
             $db->exec("SET FOREIGN_KEY_CHECKS=1");
 
-            header("Location: ../public/logout.php");
+            header("Location: ../private/logout.php");
         } catch (Exception $e) {
             $_SESSION['result'] = "❌ Database rollback failed: " . $e->getMessage();
             header("Location: ../public/database-backup.php");
@@ -66,7 +68,7 @@ case "rollback":
 
             unlink($tmpZip);
 
-            header("Location: ../public/logout.php");
+            header("Location: ../private/logout.php");
         } catch (Exception $e) {
             $_SESSION['result'] = "❌ Website rollback failed: " . $e->getMessage();
             header("Location: ../public/website-backup.php");
