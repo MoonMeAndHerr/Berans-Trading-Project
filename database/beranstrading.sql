@@ -598,12 +598,6 @@ ALTER TABLE `schedule`
 --
 ALTER TABLE `section`
   ADD PRIMARY KEY (`section_id`);
-
--- Indexes for table `price_shipping`
---
-ALTER TABLE `price_shipping`
-  ADD PRIMARY KEY (`shipping_price_id`);
-
 --
 -- Indexes for table `sessions`
 --
