@@ -432,6 +432,7 @@ CREATE TABLE `staff` (
   `password_hash` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `role` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
   `is_active` tinyint(1) DEFAULT '1',
+  `is_superadmin` int DEFAULT '0',
   `remember_token` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `remember_expiry` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `last_login` datetime DEFAULT NULL,

@@ -29,12 +29,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // If DELETE button is pressed
     if (isset($_POST['delete_staff']) && $_POST['delete_staff'] === '1') {
         try {
-            $stmt = $pdo->prepare("DELETE FROM staff WHERE staff_id = :staff_id");
+            $stmt = $pdo->prepare("DELETE FROM staff WHERE staff_id = :staff_id AND is_superadmin = 0");
             $stmt->execute([':staff_id' => $staffId]);
 
-            $_SESSION['successDelete'] = '✅ Staff deleted successfully!';
-            header('Location: staff-add.php');
-            exit;
+            if($stmt->rowCount() > 0) {
+
+                $_SESSION['successDelete'] = '✅ Staff deleted successfully!';
+                header('Location: staff-add.php');
+                exit;
+
+            } else {
+
+                $_SESSION['successDelete'] = 'SuperAdmin accounts cannot be deleted.';
+                header('Location: staff-add.php');
+                exit;
+
+            }
+
         } catch (PDOException $e) {
             $_SESSION['errors'] = ['Error deleting staff: ' . $e->getMessage()];
             header('Location: ' . $_SERVER['PHP_SELF'] . '?staff_id=' . urlencode($staffId));
@@ -122,7 +133,7 @@ try {
 
 // Fetch companies for dropdown
 try {
-    $stmt = $pdo->query("SELECT company_id, company_name FROM Company ORDER BY company_name");
+    $stmt = $pdo->query("SELECT company_id, company_name FROM site_config ORDER BY company_name");
     $companies = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $companies = [];

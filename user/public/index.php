@@ -3,6 +3,27 @@
 	require_once('../include/header.php');
 	require_once('../include/navbar.php');
 
+        $pdo = openDB();
+
+        $stmt = $pdo->query("SELECT * FROM customer");
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $totalClient = 42 + count($results);
+
+		$stmt = $pdo->query("SELECT * FROM product");
+		$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$totalProduct = count($results);
+
+		$stmt = $pdo->query("SELECT * FROM invoice");
+		$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$totalOrder = 407 + count($results);
+
+		$date1 = new DateTime("2023-12-20"); // your fixed date
+		$date2 = new DateTime(); // current date
+		$interval = $date1->diff($date2);
+		$yearsInService = $interval->y;
+
+        closeDB($pdo);
+
 ?>
 
 <style>
@@ -220,26 +241,26 @@
 						<div class="row counters counters-sm counters-text-light">
 							<div class="col-sm-6 col-lg-3 mb-5 mb-lg-0">
 								<div class="counter">
-									<strong data-to="250" data-append="+">0</strong>
+									<strong data-to="<?php echo $totalClient; ?>" data-append="+">0</strong>
 									<label class="opacity-5 text-4 mt-1">Happy Clients</label>
 								</div>
 							</div>
 							<div class="col-sm-6 col-lg-3 mb-5 mb-lg-0">
 								<div class="counter">
-									<strong data-to="6500" data-append="+">0</strong>
+									<strong data-to="<?php echo $totalOrder; ?>" data-append="+">0</strong>
 									<label class="opacity-5 text-4 mt-1">Order Placed</label>
 								</div>
 							</div>
 							<div class="col-sm-6 col-lg-3 mb-5 mb-sm-0">
 								<div class="counter">
-									<strong data-to="100" data-append="+">0</strong>
+									<strong data-to="<?php echo $totalProduct; ?>" data-append="+">0</strong>
 									<label class="opacity-5 text-4 mt-1">Product Supplied</label>
 								</div>
 							</div>
 							<div class="col-sm-6 col-lg-3">
 								<div class="counter">
-									<strong data-to="3000" data-append="+">0</strong>
-									<label class="opacity-5 text-4 mt-1">Growing Community</label>
+									<strong data-to="<?php echo $yearsInService; ?>" data-append="+">0</strong>
+									<label class="opacity-5 text-4 mt-1">Years In Service</label>
 								</div>
 							</div>
 						</div>
