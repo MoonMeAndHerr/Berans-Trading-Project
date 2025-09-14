@@ -32,9 +32,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("DELETE FROM staff WHERE staff_id = :staff_id AND is_superadmin = 0");
             $stmt->execute([':staff_id' => $staffId]);
 
-            $_SESSION['successDelete'] = '✅ Staff deleted successfully!';
-            header('Location: staff-add.php');
-            exit;
+            if($stmt->rowCount() > 0) {
+
+                $_SESSION['successDelete'] = '✅ Staff deleted successfully!';
+                header('Location: staff-add.php');
+                exit;
+
+            } else {
+
+                $_SESSION['successDelete'] = 'SuperAdmin accounts cannot be deleted.';
+                header('Location: staff-add.php');
+                exit;
+
+            }
+
         } catch (PDOException $e) {
             $_SESSION['errors'] = ['Error deleting staff: ' . $e->getMessage()];
             header('Location: ' . $_SERVER['PHP_SELF'] . '?staff_id=' . urlencode($staffId));
