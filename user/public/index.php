@@ -23,7 +23,7 @@
 									<div class="row justify-content-center align-items-center h-100">
 										<div class="col-lg-6">
 											<div class="d-flex flex-column align-items-center">
-												<h3 class="position-relative text-color-light text-4 line-height-5 font-weight-medium px-4 mb-2 appear-animation" data-appear-animation="fadeInDownShorter" data-plugin-options="{'minWindowWidth': 0}">
+												<h3 class="position-relative text-color-dark text-4 line-height-5 font-weight-medium px-4 mb-2 appear-animation" data-appear-animation="fadeInDownShorter" data-plugin-options="{'minWindowWidth': 0}">
 													<span class="position-absolute right-100pct top-50pct transform3dy-n50 opacity-3">
 														<img src="img/slides/slide-title-border.png" class="w-auto appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="250" data-plugin-options="{'minWindowWidth': 0}" alt="" />
 													</span>
@@ -32,8 +32,8 @@
 														<img src="img/slides/slide-title-border.png" class="w-auto appear-animation" data-appear-animation="fadeInRightShorter" data-appear-animation-delay="250" data-plugin-options="{'minWindowWidth': 0}" alt="" />
 													</span>
 												</h3>
-												<h2 class="porto-big-title text-color-light font-weight-extra-bold mb-3" data-plugin-animated-letters data-plugin-options="{'startDelay': 1000, 'minWindowWidth': 0, 'animationSpeed': 300, 'animationName': 'fadeInRightShorterOpacity', 'letterClass': 'd-inline-block'}">BERANS</h2>
-												<p class="text-4 text-color-light font-weight-light text-center mb-0" data-plugin-animated-letters data-plugin-options="{'startDelay': 2000, 'minWindowWidth': 0}">The best choice for your startup business goods supplier</p>
+												<h2 class="porto-big-title text-color-dark font-weight-extra-bold mb-3" data-plugin-animated-letters data-plugin-options="{'startDelay': 1000, 'minWindowWidth': 0, 'animationSpeed': 300, 'animationName': 'fadeInRightShorterOpacity', 'letterClass': 'd-inline-block'}">BERANS</h2>
+												<p class="text-4 text-color-dark font-weight-dark text-center mb-0" data-plugin-animated-letters data-plugin-options="{'startDelay': 2000, 'minWindowWidth': 0}">The best choice for your startup business goods supplier</p>
 											</div>
 										</div>
 									</div>
@@ -44,7 +44,7 @@
 							<div class="owl-item position-relative overlay overlay-color-primary overlay-show overlay-op-8" style="background-image: url(img/beransbanner.jpg); background-size: cover; background-position: center; height: 600px;">
 								<div class="container position-relative z-index-3 h-100">
 									<div class="d-flex flex-column align-items-center justify-content-center h-100">
-										<h3 class="position-relative text-color-light text-5 line-height-5 font-weight-medium px-4 mb-2 appear-animation" data-appear-animation="fadeInDownShorter" data-plugin-options="{'minWindowWidth': 0}">
+										<h3 class="position-relative text-color-dark text-5 line-height-5 font-weight-medium px-4 mb-2 appear-animation" data-appear-animation="fadeInDownShorter" data-plugin-options="{'minWindowWidth': 0}">
 											<span class="position-absolute right-100pct top-50pct transform3dy-n50 opacity-3">
 												<img src="img/slides/slide-title-border.png" class="w-auto appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="250" data-plugin-options="{'minWindowWidth': 0}" alt="" />
 											</span>
@@ -53,8 +53,8 @@
 												<img src="img/slides/slide-title-border.png" class="w-auto appear-animation" data-appear-animation="fadeInRightShorter" data-appear-animation-delay="250" data-plugin-options="{'minWindowWidth': 0}" alt="" />
 											</span>
 										</h3>
-										<h1 class="text-color-light font-weight-extra-bold text-13 mb-3 appear-animation" data-appear-animation="blurIn" data-appear-animation-delay="500" data-plugin-options="{'minWindowWidth': 0}">Business Needs?</h1>
-										<p class="text-4-5 text-color-light font-weight-light mb-0" data-plugin-animated-letters data-plugin-options="{'startDelay': 1000, 'minWindowWidth': 0}">Check out our packaging, furnitures, disposables and other goods</p>
+										<h1 class="text-color-dark font-weight-extra-bold text-13 mb-3 appear-animation" data-appear-animation="blurIn" data-appear-animation-delay="500" data-plugin-options="{'minWindowWidth': 0}">Business Needs?</h1>
+										<p class="text-4-5 text-color-dark font-weight-dark mb-0" data-plugin-animated-letters data-plugin-options="{'startDelay': 1000, 'minWindowWidth': 0}">Check out our packaging, furnitures, disposables and other goods</p>
 									</div>
 								</div>
 							</div>
@@ -215,7 +215,7 @@
 				</div>		
 				
 
-				<section class="section section-primary border-top-0 mb-0">
+				<section class="section section-secondary border-top-0 mb-0">
 					<div class="container">
 						<div class="row counters counters-sm counters-text-light">
 							<div class="col-sm-6 col-lg-3 mb-5 mb-lg-0">
