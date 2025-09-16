@@ -69,11 +69,11 @@
 							<div class="row mt-3 mb-5">
 								<div class="col-md-4 appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="800">
 									<h3 class="font-weight-bold text-4 mb-2">Our Mission</h3>
-									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce elementum, nulla vel pellentesque consequat, ante nulla hendrerit arcu.</p>
+									<p>At Berans Trading, our mission is to empower restaurants with high-quality products and tailored solutions — from packaging and printed essentials to furniture and professional attire. We are committed to providing dependable supply, personalized service, and competitive value to help our clients succeed in a fast-paced food and beverage industry.</p>
 								</div>
 								<div class="col-md-4 appear-animation" data-appear-animation="fadeIn" data-appear-animation-delay="600">
 									<h3 class="font-weight-bold text-4 mb-2">Our Vision</h3>
-									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce nulla vel pellentesque consequat, ante nulla hendrerit arcu.</p>
+									<p>To be the leading one-stop supplier for restaurants in Johor Bahru, recognized for quality, reliability, and innovative solutions that enhance dining experiences and support business growth.</p>
 								</div>
 								<div class="col-md-4 appear-animation" data-appear-animation="fadeInRightShorter" data-appear-animation-delay="800">
 									<h3 class="font-weight-bold text-4 mb-2">Why Us</h3>
