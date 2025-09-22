@@ -206,6 +206,7 @@ include __DIR__ . '/../include/header.php';
                                                 <option value="inch">inch</option>
                                                 <option value="kg">kg</option>
                                                 <option value="g">g</option>
+                                                <option value="ml">ml</option>
                                             </select>
                                         </div>
                                     </div>
