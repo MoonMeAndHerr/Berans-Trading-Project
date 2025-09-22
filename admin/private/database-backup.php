@@ -47,14 +47,12 @@ function backupDatabase($triggeredBy) {
         $stmt->bindParam(2, $historyId, PDO::PARAM_INT);
         $stmt->execute();
 
-        exit();
-
         return true;
+
     } catch (Exception $e) {
         if (isset($historyId)) {
             $stmt = $db->prepare("UPDATE backup_history SET status = 'Failed', error_message = ? WHERE id = ?");
             $stmt->execute([$e->getMessage(), $historyId]);
-            exit();
         }
         return false;
     }

@@ -14,5 +14,6 @@ if(isset($_GET['action'])){
 } else {
     backupDatabase('cron');
     backupSourceCode(__DIR__, 'cron');
+    exit();
 }
 
