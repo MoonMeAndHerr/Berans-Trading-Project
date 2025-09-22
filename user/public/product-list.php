@@ -30,7 +30,7 @@
 											JOIN product_type pt ON p.product_type_id = pt.product_type_id
 											JOIN subcategory sc ON p.subcategory_id = sc.subcategory_id
 											JOIN category c ON p.category_id = c.category_id
-											JOIN section s ON p.section_id = s.section_id WHERE p.section_id = :rule ";
+											JOIN section s ON p.section_id = s.section_id WHERE p.section_id = :rule AND deleted_at IS NULL";
 									$stmt = $pdo->prepare($sql);
 									$stmt->execute(['rule' => $rule]);
 									closeDB($pdo);
@@ -45,7 +45,7 @@
 											JOIN product_type pt ON p.product_type_id = pt.product_type_id
 											JOIN subcategory sc ON p.subcategory_id = sc.subcategory_id
 											JOIN category c ON p.category_id = c.category_id
-											JOIN section s ON p.section_id = s.section_id WHERE p.category_id = :rule ";
+											JOIN section s ON p.section_id = s.section_id WHERE p.category_id = :rule AND deleted_at IS NULL";
 									$stmt = $pdo->prepare($sql);
 									$stmt->execute(['rule' => $rule]);
 									closeDB($pdo);
@@ -61,7 +61,7 @@
 											JOIN product_type pt ON p.product_type_id = pt.product_type_id
 											JOIN subcategory sc ON p.subcategory_id = sc.subcategory_id
 											JOIN category c ON p.category_id = c.category_id
-											JOIN section s ON p.section_id = s.section_id WHERE p.subcategory_id = :rule ";
+											JOIN section s ON p.section_id = s.section_id WHERE p.subcategory_id = :rule AND deleted_at IS NULL";
 									$stmt = $pdo->prepare($sql);
 									$stmt->execute(['rule' => $rule]);
 									closeDB($pdo);
@@ -75,7 +75,7 @@
 											JOIN product_type pt ON p.product_type_id = pt.product_type_id
 											JOIN subcategory sc ON p.subcategory_id = sc.subcategory_id
 											JOIN category c ON p.category_id = c.category_id
-											JOIN section s ON p.section_id = s.section_id";
+											JOIN section s ON p.section_id = s.section_id WHERE deleted_at IS NULL";
 									$stmt = $pdo->query($sql);
 									closeDB($pdo);
 
