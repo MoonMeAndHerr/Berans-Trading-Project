@@ -52,9 +52,9 @@ if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
         $product_id = $_POST['product_id'];
         
         // --- Handle sizes (same as forms-product-add-new.php) ---
-        $size1 = !empty($_POST['size_1']) && !empty($_POST['metric_1']) ? $_POST['size_1'].' '.$_POST['metric_1'] : null;
-        $size2 = !empty($_POST['size_2']) && !empty($_POST['metric_2']) ? $_POST['size_2'].' '.$_POST['metric_2'] : null;
-        $size3 = !empty($_POST['size_3']) && !empty($_POST['metric_3']) ? $_POST['size_3'].' '.$_POST['metric_3'] : null;
+        $size1 = !empty($_POST['size_1']) && !empty($_POST['metric_1']) ? $_POST['size_1'].''.$_POST['metric_1'] : null;
+        $size2 = !empty($_POST['size_2']) && !empty($_POST['metric_2']) ? $_POST['size_2'].''.$_POST['metric_2'] : null;
+        $size3 = !empty($_POST['size_3']) && !empty($_POST['metric_3']) ? $_POST['size_3'].''.$_POST['metric_3'] : null;
 
         if (!empty($_FILES['product_image']['name'])) {
             $ext = pathinfo($_FILES['product_image']['name'], PATHINFO_EXTENSION);
@@ -70,6 +70,12 @@ if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
         }
 
             $productName = $_POST['material_name'].' '.$_POST['product_type_name'].' '.$size1.'*'.$size2.'*'.$size3.' '.$_POST['variant'];
+            
+            if (strlen($productName) > 50) {
+                $_SESSION['errorMsg'] = "Product name exceeds 50 characters limit for Xero integration.";
+                header("Location: ".$_SERVER['PHP_SELF']);
+                exit;
+            }
 
             try {
 
@@ -239,6 +245,27 @@ if (isset($_POST['delete_product']) && isset($_POST['product_id'])) {
         $_SESSION['show_success'] = true;
     } catch (Exception $e) {
         $_SESSION['error'] = "Error deleting product: " . $e->getMessage();
+        $_SESSION['show_error'] = true;
+    }
+    
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit();
+}
+
+// Handle change visibility action
+if (isset($_POST['change_visibility']) && isset($_POST['product_id'])) {
+    try {
+        $product_id = $_POST['product_id'];
+        $visibility = $_POST['visibility'];
+        
+        // Change Visibility
+        $stmt = $pdo->prepare("UPDATE product SET visibility = ? WHERE product_id = ?");
+        $stmt->execute([$visibility, $product_id]);
+
+        $_SESSION['success'] = "Product visibility successfully changed!";
+        $_SESSION['show_success'] = true;
+    } catch (Exception $e) {
+        $_SESSION['error'] = "Error changing product visibility: " . $e->getMessage();
         $_SESSION['show_error'] = true;
     }
     

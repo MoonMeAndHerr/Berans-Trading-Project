@@ -10,7 +10,15 @@ require_once __DIR__ . '/../private/auth_check.php';
 ?>
 
 <!doctype html>
-<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg">
+<html lang="en"   
+  data-layout="<?php echo $_SESSION['web_layout']; ?>"
+  data-layout-mode="<?php echo $_SESSION['web_skin']; ?>"
+  data-layout-width="<?php echo $_SESSION['web_width']; ?>"
+  data-layout-position="<?php echo $_SESSION['layout_pos']; ?>"
+  data-topbar="<?php echo $_SESSION['topbar_color']; ?>"
+  data-sidebar-size="<?php echo $_SESSION['sidebar_size']; ?>"
+  data-sidebar="<?php echo $_SESSION['sidebar_color']; ?>"
+  data-sidebar-view="<?php echo $_SESSION['sidebar_view']; ?>">
 
 <head>
 

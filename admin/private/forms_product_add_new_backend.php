@@ -53,10 +53,35 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
         $uploadDir = '../../media/';
 
+        // --- Generate Product Code ---
+        $sectionName = $pdo->query("SELECT section_name FROM section WHERE section_id = ".$_POST['section'])->fetchColumn();
+        $categoryName = $pdo->query("SELECT category_name FROM category WHERE category_id = ".$_POST['category'])->fetchColumn();
+        $subcatName = $pdo->query("SELECT subcategory_name FROM subcategory WHERE subcategory_id = ".$_POST['subcategory'])->fetchColumn();
+        $product_code = strtoupper(substr($sectionName,0,1).substr($categoryName,0,1).substr($subcatName,0,1))
+                        .str_pad($product_id, 5, '0', STR_PAD_LEFT);
+
+        $stmt = $pdo->prepare("SELECT * FROM material WHERE material_id = ?");
+        $stmt->execute([$_POST['material_id']]);
+        $material = $stmt->fetch(PDO::FETCH_ASSOC);
+        $materrialName = $material['material_name'];
+
+        $stmt = $pdo->prepare("SELECT * FROM product_type WHERE product_type_id = ?");
+        $stmt->execute([$_POST['product_type_id']]);
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        $productType = $product['product_name'];
+
+        $productName = $materrialName.' '.$productType.' '.$size1.'*'.$size2.'*'.$size3.' '.$_POST['variant'];
+
+        if (strlen($productName) > 50) {
+            $_SESSION['errorMsg'] = "Product name exceeds 50 characters limit for Xero integration.";
+            header("Location: ".$_SERVER['PHP_SELF']);
+            exit;
+        } 
+
         // --- Handle sizes ---
-        $size1 = !empty($_POST['size_1']) && !empty($_POST['metric_1']) ? $_POST['size_1'].' '.$_POST['metric_1'] : null;
-        $size2 = !empty($_POST['size_2']) && !empty($_POST['metric_2']) ? $_POST['size_2'].' '.$_POST['metric_2'] : null;
-        $size3 = !empty($_POST['size_3']) && !empty($_POST['metric_3']) ? $_POST['size_3'].' '.$_POST['metric_3'] : null;
+        $size1 = !empty($_POST['size_1']) && !empty($_POST['metric_1']) ? $_POST['size_1'].''.$_POST['metric_1'] : null;
+        $size2 = !empty($_POST['size_2']) && !empty($_POST['metric_2']) ? $_POST['size_2'].''.$_POST['metric_2'] : null;
+        $size3 = !empty($_POST['size_3']) && !empty($_POST['metric_3']) ? $_POST['size_3'].''.$_POST['metric_3'] : null;
 
         if (!empty($_FILES['image']['name'])) {
 
@@ -90,25 +115,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         ]);
 
         $product_id = $pdo->lastInsertId();
-
-        // --- Generate Product Code ---
-        $sectionName = $pdo->query("SELECT section_name FROM section WHERE section_id = ".$_POST['section'])->fetchColumn();
-        $categoryName = $pdo->query("SELECT category_name FROM category WHERE category_id = ".$_POST['category'])->fetchColumn();
-        $subcatName = $pdo->query("SELECT subcategory_name FROM subcategory WHERE subcategory_id = ".$_POST['subcategory'])->fetchColumn();
-        $product_code = strtoupper(substr($sectionName,0,1).substr($categoryName,0,1).substr($subcatName,0,1))
-                        .str_pad($product_id, 5, '0', STR_PAD_LEFT);
-
-        $stmt = $pdo->prepare("SELECT * FROM material WHERE material_id = ?");
-        $stmt->execute([$_POST['material_id']]);
-        $material = $stmt->fetch(PDO::FETCH_ASSOC);
-        $materrialName = $material['material_name'];
-
-        $stmt = $pdo->prepare("SELECT * FROM product_type WHERE product_type_id = ?");
-        $stmt->execute([$_POST['product_type_id']]);
-        $product = $stmt->fetch(PDO::FETCH_ASSOC);
-        $productType = $product['product_name'];
-
-        $productName = $materrialName.' '.$productType.' '.$size1.'*'.$size2.'*'.$size3.' '.$_POST['variant'];
 
         try {
 

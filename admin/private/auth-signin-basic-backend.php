@@ -50,6 +50,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['username']   = $user['username'];
                     $_SESSION['role']       = $user['role'];
                     $_SESSION['staff_name'] = $user['staff_name'];
+                    $_SESSION['web_layout']   = $user['web_layout'];
+                    $_SESSION['web_skin']   = $user['web_skin'];
+                    $_SESSION['web_width']       = $user['web_width'];
+                    $_SESSION['layout_pos'] = $user['layout_pos'];
+                    $_SESSION['topbar_color']   = $user['topbar_color'];
+                    $_SESSION['sidebar_size']   = $user['sidebar_size'];
+                    $_SESSION['sidebar_color']       = $user['sidebar_color'];
+                    $_SESSION['sidebar_view'] = $user['sidebar_view'];
 
                     logDebug("Session created", [
                         'staff_id' => $user['staff_id'],
