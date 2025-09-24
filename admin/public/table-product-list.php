@@ -225,19 +225,19 @@ include __DIR__ . '/../include/header.php';
                             <div class="row g-3 mb-3">
                                 <div class="col-lg-2">
                                     <div class="form-floating">
-                                        <input type="number" step="0.01" class="form-control" name="carton[width][]" id="update_carton_width" placeholder="Width">
+                                        <input type="number" step="0.001" class="form-control" name="carton[width][]" id="update_carton_width" placeholder="Width">
                                         <label>Width (cm)</label>
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="form-floating">
-                                        <input type="number" step="0.01" class="form-control" name="carton[height][]" id="update_carton_height" placeholder="Height">
+                                        <input type="number" step="0.001" class="form-control" name="carton[height][]" id="update_carton_height" placeholder="Height">
                                         <label>Height (cm)</label>
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="form-floating">
-                                        <input type="number" step="0.01" class="form-control" name="carton[length][]" id="update_carton_length" placeholder="Length">
+                                        <input type="number" step="0.001" class="form-control" name="carton[length][]" id="update_carton_length" placeholder="Length">
                                         <label>Length (cm)</label>
                                     </div>
                                 </div>
@@ -249,7 +249,7 @@ include __DIR__ . '/../include/header.php';
                                 </div>
                                 <div class="col-lg-2">
                                     <div class="form-floating">
-                                        <input type="number" step="0.01" class="form-control" name="carton[weight][]" id="update_weight_carton" placeholder="Weight">
+                                        <input type="number" step="0.001" class="form-control" name="carton[weight][]" id="update_weight_carton" placeholder="Weight">
                                         <label>Weight (kg)</label>
                                     </div>
                                 </div>
@@ -740,6 +740,14 @@ include __DIR__ . '/../include/header.php';
             // Add CBM calculation event listeners
             $('#update_carton_width, #update_carton_height, #update_carton_length').off('input').on('input', calculateAllUpdateCBM);
 
+            // Add blur event handlers for 3-decimal formatting on carton dimensions
+            $('#update_carton_width, #update_carton_height, #update_carton_length, #update_weight_carton').off('blur').on('blur', function() {
+                const value = parseFloat($(this).val());
+                if (!isNaN(value)) {
+                    $(this).val(value.toFixed(3));
+                }
+            });
+
             // Show the modal
             $('#updateProductModal').modal('show');
         }
@@ -759,19 +767,19 @@ include __DIR__ . '/../include/header.php';
                 <div class="row g-3 mb-3" id="updateCartonRow${index}">
                     <div class="col-lg-2">
                         <div class="form-floating">
-                            <input type="number" step="0.01" class="form-control" name="carton[width][]" id="update_add_carton${index}_width" placeholder="Width" value="${product ? (product[`add_carton${index}_width`] || '') : ''}">
+                            <input type="number" step="0.001" class="form-control" name="carton[width][]" id="update_add_carton${index}_width" placeholder="Width" value="${product ? (product[`add_carton${index}_width`] || '') : ''}">
                             <label>Width (cm)</label>
                         </div>
                     </div>
                     <div class="col-lg-2">
                         <div class="form-floating">
-                            <input type="number" step="0.01" class="form-control" name="carton[height][]" id="update_add_carton${index}_height" placeholder="Height" value="${product ? (product[`add_carton${index}_height`] || '') : ''}">
+                            <input type="number" step="0.001" class="form-control" name="carton[height][]" id="update_add_carton${index}_height" placeholder="Height" value="${product ? (product[`add_carton${index}_height`] || '') : ''}">
                             <label>Height (cm)</label>
                         </div>
                     </div>
                     <div class="col-lg-2">
                         <div class="form-floating">
-                            <input type="number" step="0.01" class="form-control" name="carton[length][]" id="update_add_carton${index}_length" placeholder="Length" value="${product ? (product[`add_carton${index}_length`] || '') : ''}">
+                            <input type="number" step="0.001" class="form-control" name="carton[length][]" id="update_add_carton${index}_length" placeholder="Length" value="${product ? (product[`add_carton${index}_length`] || '') : ''}">
                             <label>Length (cm)</label>
                         </div>
                     </div>
@@ -783,7 +791,7 @@ include __DIR__ . '/../include/header.php';
                     </div>
                     <div class="col-lg-2">
                         <div class="form-floating">
-                            <input type="number" step="0.01" class="form-control" name="carton[weight][]" id="update_add_carton${index}_weight" placeholder="Weight" value="${product ? (product[`add_carton${index}_weight`] || '') : ''}">
+                            <input type="number" step="0.001" class="form-control" name="carton[weight][]" id="update_add_carton${index}_weight" placeholder="Weight" value="${product ? (product[`add_carton${index}_weight`] || '') : ''}">
                             <label>Weight (kg)</label>
                         </div>
                     </div>
@@ -801,6 +809,14 @@ include __DIR__ . '/../include/header.php';
 
             // Add CBM calculation event listeners
             $(`#update_add_carton${index}_width, #update_add_carton${index}_height, #update_add_carton${index}_length`).on('input', calculateAllUpdateCBM);
+
+            // Add blur event handlers for 3-decimal formatting on additional carton dimensions
+            $(`#update_add_carton${index}_width, #update_add_carton${index}_height, #update_add_carton${index}_length, #update_add_carton${index}_weight`).on('blur', function() {
+                const value = parseFloat($(this).val());
+                if (!isNaN(value)) {
+                    $(this).val(value.toFixed(3));
+                }
+            });
 
             // Attach remove event
             row.find('.remove-update-carton').on('click', function() {

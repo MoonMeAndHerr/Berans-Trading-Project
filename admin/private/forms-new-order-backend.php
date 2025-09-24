@@ -2,7 +2,7 @@
 if(session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/../private/auth_check.php';
 require_once __DIR__ . '/../../global/main_configuration.php';
-require_once __DIR__ . '/../public/refresh_xero_token.php';
+// refresh_xero_token.php is already included in main_configuration.php
 use League\OAuth2\Client\Provider\GenericProvider;
 use GuzzleHttp\Client;
 
@@ -121,8 +121,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     }
     
-    error_log("Form submitted. POST data: " . print_r($_POST, true));
-    
     if (!isset($_POST['products']) || !isset($_POST['customer_id'])) {
         $errorMsg = "Missing required data (products or customer)";
         error_log("Missing data - Products: " . isset($_POST['products']) . ", Customer: " . isset($_POST['customer_id']));
@@ -145,14 +143,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $selected_staff_id = $_POST['selected_staff'] ?? null;
         $staff_commission_percentage = $_POST['staff_commission_percentage'] ?? 0;
         $products = $_POST['products'];
-
+        
+        // Handle discount data
+        $discount_type = $_POST['discount_type'] ?? 'none';
+        $discount_value = $_POST['discount_value'] ?? 0;
+        $discount_amount = $_POST['discount_amount'] ?? 0;
+        $subtotal = $_POST['subtotal'] ?? 0;
+        $grand_total = $_POST['grand_total'] ?? 0;
+        
         $stmt = $pdo->prepare("SELECT * FROM customer WHERE customer_id = ?");
         $stmt->execute([$_POST['customer_id']]);
         $customer = $stmt->fetch(PDO::FETCH_ASSOC);
-        $xero_relation_customer = $customer['xero_relation'];
-
         
-        error_log("Products array received: " . print_r($products, true));
+        $xero_relation_customer = $customer['xero_relation'];
 
         // Get first product data to get price_id
         $first_product = json_decode($products[0], true);
@@ -208,15 +211,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 staff_id,
                 commission_staff_id,
                 commission_percentage,
+                discount_type,
+                discount_value,
+                discount_amount,
+                subtotal,
+                grand_total,
                 total_amount,
                 created_at,
                 updated_at
             ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, 
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
                 NOW(), 
                 NOW()
             )
         ");
+
+        // Use grand_total if available, otherwise fallback to calculated total_amount
+        $final_total = $grand_total > 0 ? $grand_total : $total_amount;
 
         error_log("Executing invoice insert with: " . print_r([
             $invoice_number, 
@@ -226,10 +237,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $staff_id,
             $selected_staff_id,
             $staff_commission_percentage,
-            $total_amount
+            $discount_type,
+            $discount_value,
+            $discount_amount,
+            $subtotal,
+            $grand_total,
+            $final_total
         ], true));
 
-        $stmt->execute([
+        $success = $stmt->execute([
             $invoice_number,
             $price_id,
             $customer_id,
@@ -237,11 +253,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $staff_id,
             $selected_staff_id,
             $staff_commission_percentage,
-            $total_amount
+            $discount_type,
+            $discount_value,
+            $discount_amount,
+            $subtotal,
+            $grand_total,
+            $final_total
         ]);
         
+        if (!$success) {
+            throw new Exception("Failed to insert invoice: " . implode(", ", $stmt->errorInfo()));
+        }
+        
         $invoice_id = $pdo->lastInsertId();
-        error_log("Invoice created with ID: " . $invoice_id);
 
         // Insert invoice items
         $stmt = $pdo->prepare("
@@ -258,16 +282,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ?, ?, ?, ?, ?, ?, NOW(), NOW()
             )
         ");
-
         foreach ($products as $product) {
             $product_data = json_decode($product, true);
             if ($product_data === null) {
                 throw new Exception('Invalid product data format: ' . json_last_error_msg());
             }
             
-            error_log("Processing product: " . print_r($product_data, true));
-            
-            $stmt->execute([
+            $item_success = $stmt->execute([
                 $invoice_id,
                 $product_data['product_id'],
                 $product_data['product_name'], // Make sure this matches
@@ -275,6 +296,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $product_data['quantity'],
                 $product_data['total_price']
             ]);
+            
+            if (!$item_success) {
+                throw new Exception("Failed to insert invoice item: " . implode(", ", $stmt->errorInfo()));
+            }
         }
 
         $pdo->commit();
@@ -289,24 +314,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("SELECT * FROM product WHERE product_id = ?");
             $stmt->execute([$product_id]);
             $productfetch = $stmt->fetch(PDO::FETCH_ASSOC);
-            $product_code = $productfetch['product_code'] ?? 'UNKNOWN'; // Use product_code and add fallback
-
-            $price_id = $product['price_id'];
-            $stmt = $pdo->prepare("SELECT * FROM price WHERE price_id = ?");
-            $stmt->execute([$price_id]);
-            $pricefetch = $stmt->fetch(PDO::FETCH_ASSOC);
-            $price = $pricefetch['new_selling_price'];
+            $product_code = $productfetch['product_code'] ?? 'UNKNOWN';
 
             $quantity = $product['quantity'];
             $productName = $product['product_name'];
+            // Use the actual unit price from the order (not from database)
+            $unitPrice = $product['unit_price'];
 
             // Build line item
             $lineItems[] = [
                 'Description' => $productName,
                 'Quantity'    => $quantity,
-                'UnitAmount'  => $price,
+                'UnitAmount'  => $unitPrice,
                 'AccountCode' => '200', // default Sales account
                 'ItemCode'    => $product_code,
+            ];
+        }
+
+        // Add discount as a separate line item if there is a discount
+        if ($discount_type !== 'none' && $discount_amount > 0) {
+            $lineItems[] = [
+                'Description' => 'Discount (' . ucfirst($discount_type) . 
+                    ($discount_type === 'percentage' ? ': ' . $discount_value . '%' : '') . ')',
+                'Quantity' => 1,
+                'UnitAmount' => -$discount_amount, // Negative amount for discount
+                'AccountCode' => '200', // same sales account
             ];
         }
 
@@ -315,44 +347,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $customer = $stmt->fetch(PDO::FETCH_ASSOC);
             $xero_relation_customer = $customer['xero_relation'];
 
+            // Create Xero invoice
             try {
+                // Always refresh Xero tokens to ensure they're current
+                try {
+                    $tokenData = refreshXeroToken();
+                    $accessToken = $tokenData['access_token'];
+                    $tenantId = $tokenData['tenant_id'];
+                    error_log("XERO_INFO: Successfully refreshed Xero tokens for invoice creation");
+                } catch (Exception $refreshError) {
+                    error_log("XERO_WARNING: Failed to refresh Xero tokens: " . $refreshError->getMessage());
+                    // Skip Xero integration if refresh fails
+                    throw new Exception("Xero tokens unavailable: " . $refreshError->getMessage());
+                }
+                $xeroInvoiceData = [
+                        'Type' => 'ACCREC',
+                        'Contact' => [
+                            'ContactID' => $xero_relation_customer
+                        ],
+                        'Date' => date('Y-m-d'),
+                        'DueDate' => date('Y-m-d', strtotime('+30 days')),
+                        'InvoiceNumber' => $invoice_number,
+                        'Reference' => $invoice_number,
+                        'LineItems' => $lineItems,
+                        'Status' => 'AUTHORISED'
+                    ];
 
-                $xeroAuth = refreshXeroToken(); // always returns valid token
-                $accessToken = $xeroAuth['access_token'];
-                $tenantId    = $xeroAuth['tenant_id'];
-                                
-                $client = new Client();
+                    error_log("XERO_DEBUG: Creating invoice " . $invoice_number . " for customer " . $xero_relation_customer . " with " . count($lineItems) . " line items");
 
-                $response = $client->post('https://api.xero.com/api.xro/2.0/Invoices', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $accessToken,
-                    'Xero-tenant-id' => $tenantId,
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'Type' => 'ACCREC', // sales invoice
-                    'Contact' => [
-                        'ContactID' => $xero_relation_customer,
-                    ],
-                    'Date' => date('Y-m-d'),
-                    'DueDate' => date('Y-m-d', strtotime('+14 days')),
-                    'LineItems' => $lineItems,
-                    'Reference' => $invoice_number,
-                    'Status'    => 'AUTHORISED' 
-                ]
-            ]);
+                    $client = new Client();
+                    $response = $client->request('POST', 'https://api.xero.com/api.xro/2.0/Invoices', [
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $accessToken,
+                            'Xero-tenant-id' => $tenantId,
+                            'Content-Type' => 'application/json',
+                            'Accept' => 'application/json'
+                        ],
+                        'json' => $xeroInvoiceData
+                    ]);
 
-            $data = json_decode($response->getBody(), true);
-            $xero_relation = $data['Invoices'][0]['InvoiceID'];
-
-            $stmt = $pdo->prepare("UPDATE invoice SET xero_relation = ? WHERE invoice_id = ?");
-            $stmt->execute([$xero_relation, $invoice_id]);
-
+                    $responseBody = $response->getBody()->getContents();
+                    $xeroResponse = json_decode($responseBody, true);
+                    
+                    if (isset($xeroResponse['Invoices'][0]['InvoiceID'])) {
+                        $xero_invoice_id = $xeroResponse['Invoices'][0]['InvoiceID'];
+                        
+                        // Update the invoice with Xero ID
+                        $updateStmt = $pdo->prepare("UPDATE invoice SET xero_invoice_id = ? WHERE invoice_id = ?");
+                        $updateStmt->execute([$xero_invoice_id, $invoice_id]);
+                        
+                        error_log("XERO_SUCCESS: Xero invoice created successfully: " . $xero_invoice_id);
+                    } else {
+                        error_log("XERO_ERROR: Xero invoice creation failed: " . print_r($xeroResponse, true));
+                    }
             } catch (Exception $e) {
-                // Log error but continue
-                $output = var_export($e->getMessage(), true);
-                echo "<script>console.log('Problem: " . $output . "' );</script>";
+                // Log error but continue - don't let Xero issues block invoice creation
+                error_log("XERO_ERROR: Exception caught: " . $e->getMessage());
+                error_log("XERO_ERROR: Exception trace: " . $e->getTraceAsString());
+                // Don't throw the exception - just log it and continue
             }
 
         $_SESSION['success'] = "Invoice #$invoice_number created successfully!";
@@ -371,10 +423,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Exception $e) {
         $pdo->rollBack();
         $errorMsg = "Error creating invoice: " . $e->getMessage();
+        $errorMsg .= " | File: " . $e->getFile() . " | Line: " . $e->getLine();
         if (isset($stmt) && $stmt->errorInfo()[2]) {
-            $errorMsg .= " SQL Error: " . $stmt->errorInfo()[2];
+            $errorMsg .= " | SQL Error: " . $stmt->errorInfo()[2];
         }
-        error_log($errorMsg);
+        error_log("INVOICE_ERROR: " . $errorMsg);
         
         if ($isAjax) {
             ob_clean(); // Clear any output buffer content

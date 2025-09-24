@@ -229,15 +229,29 @@ if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
 // Handle delete action
 if (isset($_POST['delete_product']) && isset($_POST['product_id'])) {
     try {
+        $pdo->beginTransaction();
+        
         $product_id = $_POST['product_id'];
         
-        // Soft delete - update deleted_at timestamp
-        $stmt = $pdo->prepare("UPDATE product SET deleted_at = NOW() WHERE product_id = ?");
+        // Hard delete - completely remove the product and related data
+        // Delete from price table first (foreign key constraint)
+        $stmt = $pdo->prepare("DELETE FROM price WHERE product_id = ?");
         $stmt->execute([$product_id]);
         
-        $_SESSION['success'] = "Product deleted successfully!";
+        // Delete from invoice_item table if any invoices reference this product
+        $stmt = $pdo->prepare("DELETE FROM invoice_item WHERE product_id = ?");
+        $stmt->execute([$product_id]);
+        
+        // Finally delete the product itself
+        $stmt = $pdo->prepare("DELETE FROM product WHERE product_id = ?");
+        $stmt->execute([$product_id]);
+        
+        $pdo->commit();
+        
+        $_SESSION['success'] = "Product deleted permanently!";
         $_SESSION['show_success'] = true;
     } catch (Exception $e) {
+        $pdo->rollBack();
         $_SESSION['error'] = "Error deleting product: " . $e->getMessage();
         $_SESSION['show_error'] = true;
     }

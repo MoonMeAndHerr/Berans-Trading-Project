@@ -38,19 +38,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $existing = $checkStmt->fetch(PDO::FETCH_ASSOC);
 
         $data = [
-            ':new_price_yen' => $_POST['new_price_yen'] ?? null,
+            ':new_price_yen' => isset($_POST['new_price_yen']) ? number_format(floatval($_POST['new_price_yen']), 3, '.', '') : null,
             ':new_moq_quantity' => $_POST['new_moq_quantity'] ?? null,
-            ':new_shipping_moq_yen' => $_POST['new_shipping_moq_yen'] ?? null,
-            ':new_additional_price_moq_yen' => $_POST['new_additional_price_moq_yen'] ?? null,
-            ':new_conversion_rate' => $currentConversionRate, // Use database value
-            ':new_unit_price_yen' => $_POST['new_unit_price_yen'] ?? null,
+            ':new_shipping_moq_yen' => isset($_POST['new_shipping_moq_yen']) ? number_format(floatval($_POST['new_shipping_moq_yen']), 3, '.', '') : null,
+            ':new_additional_price_moq_yen' => isset($_POST['new_additional_price_moq_yen']) ? number_format(floatval($_POST['new_additional_price_moq_yen']), 3, '.', '') : null,
+            ':new_conversion_rate' => number_format(floatval($currentConversionRate), 3, '.', ''), // Use database value with 3 decimals
+            ':new_unit_price_yen' => isset($_POST['new_unit_price_yen']) ? number_format(floatval($_POST['new_unit_price_yen']), 3, '.', '') : null,
             ':new_freight_method' => $_POST['new_freight_method'] ?? null,
-            ':new_total_cbm_moq' => $_POST['new_total_cbm_moq'] ?? null,
-            ':new_total_weight_moq' => $_POST['new_total_weight_moq'] ?? null,
-            ':new_unit_price_rm' => $_POST['new_unit_price_rm'] ?? null,
-            ':new_unit_freight_cost_rm' => $_POST['new_unit_freight_cost_rm'] ?? null,
-            ':new_unit_profit_rm' => $_POST['new_unit_profit_rm'] ?? null,
-            ':new_selling_price' => $_POST['selling_price_unit'] ?? null,
+            ':new_total_cbm_moq' => isset($_POST['new_total_cbm_moq']) ? number_format(floatval($_POST['new_total_cbm_moq']), 3, '.', '') : null,
+            ':new_total_weight_moq' => isset($_POST['new_total_weight_moq']) ? number_format(floatval($_POST['new_total_weight_moq']), 3, '.', '') : null,
+            ':new_unit_price_rm' => isset($_POST['new_unit_price_rm']) ? number_format(floatval($_POST['new_unit_price_rm']), 3, '.', '') : null,
+            ':new_unit_freight_cost_rm' => isset($_POST['new_unit_freight_cost_rm']) ? number_format(floatval($_POST['new_unit_freight_cost_rm']), 3, '.', '') : null,
+            ':new_unit_profit_rm' => isset($_POST['new_unit_profit_rm']) ? number_format(floatval($_POST['new_unit_profit_rm']), 3, '.', '') : null,
+            ':new_selling_price' => isset($_POST['selling_price_unit']) ? number_format(floatval($_POST['selling_price_unit']), 3, '.', '') : null,
         ];
 
         if ($existing) {

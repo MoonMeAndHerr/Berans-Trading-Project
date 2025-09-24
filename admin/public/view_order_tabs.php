@@ -7,25 +7,7 @@
         <!-- Minimal CSS for Order Tabs -->
         <link href="assets/css/order-tabs-minimal.css" rel="stylesheet" type="text/css" />
 
-        <!-            // Handle payment form submission
-            paymentForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Debug: Log the currentInvoiceId at form submission
-                console.log('Form submission - currentInvoiceId:', currentInvoiceId);
-                console.log('Form submission - typeof currentInvoiceId:', typeof currentInvoiceId);
-                
-                const paidAmount = parseFloat(amountPaidInput.value);
-                const totalAmount = parseFloat(totalAmountInput.value);
-
-                if (paidAmount <= 0) {
-                    Swal.fire({
-                        title: 'Invalid Amount',
-                        text: 'Please enter a valid payment amount.',
-                        icon: 'error'
-                    });
-                    return;
-                }================================================== -->
+        <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
         <div class="main-content">
@@ -275,7 +257,7 @@
                                             <th class="text-end">Weight</th>
                                             <th class="text-center">PCS/Carton</th>
                                             <th class="text-end">CBM/Carton</th>
-                                            <th class="text-end">CBM/MOQ</th>
+                                            <th class="text-end">Carton Quantity</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -627,7 +609,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if(data.success && data.details && data.details.length > 0) {
-                        tbody.innerHTML = data.details.map(detail => {
+                        const rowsData = data.details.map(detail => {
                             const totalCBMCarton = parseFloat(detail.cbm_carton || 0) +
                                 parseFloat(detail.add_carton1_total_cbm || 0) +
                                 parseFloat(detail.add_carton2_total_cbm || 0) +
@@ -635,8 +617,14 @@
                                 parseFloat(detail.add_carton4_total_cbm || 0) +
                                 parseFloat(detail.add_carton5_total_cbm || 0) +
                                 parseFloat(detail.add_carton6_total_cbm || 0);
+                            
+                            // Calculate Carton Quantity: PCS/CARTON / QTY
+                            const orderedQty = parseFloat(detail.quantity || 1);
+                            const pcsPerCarton = parseFloat(detail.pcs_per_carton || 0);
+                            const cartonQuantity = orderedQty > 0 ? pcsPerCarton / orderedQty : 0;
 
-                            return `
+                            return {
+                                html: `
                                 <tr>
                                     <td>
                                         <strong>${htmlEscape(detail.product_name)}</strong>
@@ -654,10 +642,26 @@
                                         </span>
                                     </td>
                                     <td class="text-end">${formatNumber(totalCBMCarton)}</td>
-                                    <td class="text-end">${formatNumber(detail.new_total_cbm_moq || 0)}</td>
+                                    <td class="text-end">${formatNumber(cartonQuantity)}</td>
                                 </tr>
-                            `;
-                        }).join('');
+                                `,
+                                totalCBM: totalCBMCarton * cartonQuantity
+                            };
+                        });
+
+                        // Calculate total CBM
+                        const totalCBM = rowsData.reduce((sum, row) => sum + row.totalCBM, 0);
+                        
+                        // Generate HTML with total row
+                        const rowsHTML = rowsData.map(row => row.html).join('');
+                        const totalRowHTML = `
+                            <tr style="background: var(--order-bg-tertiary); font-weight: 600; border-top: 2px solid var(--order-border);">
+                                <td colspan="5" style="text-align: right; padding: 1rem;"><strong>Total CBM:</strong></td>
+                                <td class="text-end" style="padding: 1rem;"><strong>${formatNumber(totalCBM)}</strong></td>
+                            </tr>
+                        `;
+                        
+                        tbody.innerHTML = rowsHTML + totalRowHTML;
                     } else {
                         tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="color: var(--order-text-muted); padding: 2rem;">No carton details found</td></tr>';
                     }
