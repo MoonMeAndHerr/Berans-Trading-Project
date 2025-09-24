@@ -51,6 +51,7 @@ include __DIR__ . '/../include/header.php';
                                                     <th>Description</th>
                                                     <th>Selling Price</th>
                                                     <th>Profit</th>
+                                                    <th>Visibility</th>
                                                     <th>Created</th>
                                                     <th>Actions</th>
                                                 </tr>
@@ -76,6 +77,7 @@ include __DIR__ . '/../include/header.php';
                                                     <td>
                                                         <?= $product['new_unit_profit_rm'] ? 'RM ' . number_format($product['new_unit_profit_rm'], 2) : 'Price N/A' ?>
                                                     </td>
+                                                    <td><?= htmlspecialchars($product['visibility']) ?></td>
                                                     <td><?= date('d/m/Y', strtotime($product['created_at'])) ?></td>
                                                     <td>
                                                         <div class="d-flex gap-1">
@@ -93,6 +95,40 @@ include __DIR__ . '/../include/header.php';
                                                                class="btn btn-sm btn-warning" title="Update Pricing">
                                                                 <i class="ri-price-tag-3-line"></i>
                                                             </a>
+                                                            <?php
+
+                                                                if ($product['visibility'] == "Shown") {
+
+                                                                    $changeVisibility = "Hidden";
+
+                                                            ?>
+
+                                                            <button type="button" class="btn btn-sm btn-secondary" 
+                                                                    onclick="changeVisibility(<?= $product['product_id'] ?>, '<?= htmlspecialchars($product['product_code']) ?>', '<?= $changeVisibility ?>')" 
+                                                                    title="Hide Product">
+                                                                <i class="ri-eye-off-line"></i>
+                                                            </button>
+                                                    
+                                                            <?php
+
+                                                                } else {
+
+                                                                    $changeVisibility = "Shown";
+
+                                                            ?>
+
+                                                            <button type="button" class="btn btn-sm btn-secondary" 
+                                                                    onclick="changeVisibility(<?= $product['product_id'] ?>, '<?= htmlspecialchars($product['product_code']) ?>', '<?= $changeVisibility ?>')" 
+                                                                    title="Shown Product">
+                                                                <i class="ri-search-eye-line"></i>
+                                                            </button> 
+
+                                                            <?php
+
+                                                                }
+
+                                                            ?>
+
                                                             <button type="button" class="btn btn-sm btn-danger" 
                                                                     onclick="deleteProduct(<?= $product['product_id'] ?>, '<?= htmlspecialchars($product['product_code']) ?>')" 
                                                                     title="Delete Product">
@@ -184,12 +220,11 @@ include __DIR__ . '/../include/header.php';
                                         <label>Production Lead Time (Days)</label>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- <div class="col-lg-12">
-                                    <label>Product Image</label>
-                                    <input type="file" class="form-control" name="product_image">
+                                <div class="col-lg-12">
+                                        <label>Product Image</label>
+                                        <input type="file" accept="image/*" class="form-control" name="product_image" id="product_image" >
+                                    </div>
                                 </div>
-                            </div> -->
 
                             <!-- Size 1,2,3 with metrics -->
                             <?php for($i=1;$i<=3;$i++): ?>
@@ -873,6 +908,61 @@ include __DIR__ . '/../include/header.php';
                     form.append($('<input>', {
                         type: 'hidden',
                         name: 'delete_product',
+                        value: '1'
+                    }));
+                    
+                    $('body').append(form);
+                    form.submit();
+                }
+            });
+        }
+
+        function changeVisibility(productId, productCode, newVisibility) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Do you want to change visibility for product "${productCode}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, change it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading
+                    Swal.fire({
+                        title: 'Changing...',
+                        text: 'Please wait while we change visibility of the product.',
+                        icon: 'info',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    // Create form and submit
+                    const form = $('<form>', {
+                        method: 'POST',
+                        action: ''
+                    });
+                    
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: 'product_id',
+                        value: productId
+                    }));
+                    
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: 'visibility',
+                        value: newVisibility
+                    }));
+
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: 'change_visibility',
                         value: '1'
                     }));
                     

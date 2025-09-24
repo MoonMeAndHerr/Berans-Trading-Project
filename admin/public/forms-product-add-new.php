@@ -43,8 +43,9 @@
                                             <div class="alert alert-success" id="successAlert"><?= $successMsg ?></div>
                                         <?php endif; ?>
 
-                                        <?php if(!empty($errorMsg)): ?>
-                                            <div class="alert alert-danger"><?= $errorMsg ?></div>
+                                        <?php if(!empty($_SESSION['errorMsg'])): ?>
+                                            <div class="alert alert-danger"><?= $_SESSION['errorMsg']; ?></div>
+                                            <?php unset($_SESSION['errorMsg']); ?>
                                         <?php endif; ?>
 
                                         <div class="live-preview">

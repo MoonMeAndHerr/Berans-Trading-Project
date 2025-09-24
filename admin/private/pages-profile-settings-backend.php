@@ -110,5 +110,36 @@ if (isset($_POST['submit_change_password'])) {
     }
 }
 
+if (isset($_POST['submit_change_themecustomizer'])) {
+
+    $stmt = $pdo->prepare("UPDATE staff SET web_layout = :web_layout, web_skin = :web_skin, web_width = :web_width, layout_pos = :layout_pos, topbar_color = :topbar_color, sidebar_size = :sidebar_size, sidebar_color = :sidebar_color, sidebar_view = :sidebar_view WHERE staff_id = :staff_id");
+    $stmt->execute([
+        ':web_layout' => $_POST['websitelayout'],
+        ':web_skin' => $_POST['websiteskin'],
+        ':web_width' => $_POST['layoutwidth'],
+        ':layout_pos' => $_POST['layoutposition'],
+        ':topbar_color' => $_POST['topbarcolour'],
+        ':sidebar_size' => $_POST['sidebarsize'],
+        ':sidebar_color' => $_POST['sidebarcolour'],
+        ':sidebar_view' => $_POST['sidebarview'],
+        ':staff_id' => $_POST['staff_id']
+    ]);
+
+    $_SESSION['web_layout']   = $_POST['websitelayout'];
+    $_SESSION['web_skin']   = $_POST['websiteskin'];
+    $_SESSION['web_width']       = $_POST['layoutwidth'];
+    $_SESSION['layout_pos'] = $_POST['layoutposition'];
+    $_SESSION['topbar_color']   = $_POST['topbarcolour'];
+    $_SESSION['sidebar_size']   = $_POST['sidebarsize'];
+    $_SESSION['sidebar_color']       = $_POST['sidebarcolour'];
+    $_SESSION['sidebar_view'] = $_POST['sidebarview'];
+
+    $_SESSION['success_message'] = "Theme Customizer settings updated successfully. Please Relog to Apply Changes.";
+    header("Location: ../public/pages-profile-settings.php");
+    exit();
+
+
+}
+
 
 ?>

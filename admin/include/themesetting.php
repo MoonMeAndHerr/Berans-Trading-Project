@@ -139,7 +139,7 @@
                             <div class="col-4">
                                 <div class="form-check card-radio dark">
                                     <input class="form-check-input" type="radio" name="data-layout-mode"
-                                        id="layout-mode-dark" value="dark">
+                                        id="layout-mode-dark" value="dark" checked>
                                     <label class="form-check-label p-0 avatar-md w-100 bg-dark" for="layout-mode-dark">
                                         <span class="d-flex gap-1 h-100">
                                             <span class="flex-shrink-0">
