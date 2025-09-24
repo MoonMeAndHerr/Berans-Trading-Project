@@ -32,10 +32,10 @@ include __DIR__ . '/../include/header.php';
                                         <!-- Conversion Rate -->
                                         <div class="mb-3">
                                             <label class="form-label">Conversion Rate (YEN to MYR) </label>
-                                            <input type="number" step="0.0001" class="form-control" 
-                                                   name="conversion_rate" 
-                                                   placeholder="Leave empty to keep current rate (<?= number_format($currentConversionRate, 4) ?>)">
-                                            <small class="text-muted">Current rate: <?= number_format($currentConversionRate, 4) ?></small>
+                                            <input type="number" step="0.001" class="form-control" 
+                                                   name="conversion_rate" id="conversion_rate"
+                                                   placeholder="Leave empty to keep current rate (<?= number_format($currentConversionRate, 3) ?>)">
+                                            <small class="text-muted">Current rate: <?= number_format($currentConversionRate, 3) ?></small>
                                         </div>
 
                                         <!-- Freight Rates -->
@@ -46,9 +46,9 @@ include __DIR__ . '/../include/header.php';
                                                 <span class="input-group-text" style="width: 230px; justify-content: flex-start;">
                                                     <?= htmlspecialchars($rate['shipping_code']) ?> - <?= htmlspecialchars($rate['shipping_name']) ?>
                                                 </span>
-                                                <input type="number" step="0.01" class="form-control" 
+                                                <input type="number" step="0.001" class="form-control freight-rate-input" 
                                                     name="shipping_rates[<?= $rate['shipping_price_id'] ?>]" 
-                                                    value="<?= $rate['freight_rate'] ?>" required>
+                                                    value="<?= number_format($rate['freight_rate'], 3) ?>" required>
                                             </div>
                                             <?php endforeach; ?>
                                         </div>
@@ -110,6 +110,30 @@ include __DIR__ . '/../include/header.php';
                 });
                 <?php unset($_SESSION['error']); ?>
             <?php endif; ?>
+
+            // Add blur event handlers for 3-decimal formatting
+            const conversionRateInput = document.getElementById('conversion_rate');
+            const freightRateInputs = document.querySelectorAll('.freight-rate-input');
+
+            // Format conversion rate to 3 decimal places on blur
+            if (conversionRateInput) {
+                conversionRateInput.addEventListener('blur', function() {
+                    const value = parseFloat(this.value);
+                    if (!isNaN(value) && value > 0) {
+                        this.value = value.toFixed(3);
+                    }
+                });
+            }
+
+            // Format freight rates to 3 decimal places on blur
+            freightRateInputs.forEach(function(input) {
+                input.addEventListener('blur', function() {
+                    const value = parseFloat(this.value);
+                    if (!isNaN(value) && value > 0) {
+                        this.value = value.toFixed(3);
+                    }
+                });
+            });
 
             // SweetAlert confirmation for price update
             document.getElementById('updatePricesBtn').addEventListener('click', function() {

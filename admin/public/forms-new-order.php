@@ -7,10 +7,9 @@
 ?>
 
         <!-- Minimal CSS for Forms -->
-        <link href="assets/css/forms-new-order-minimal.css" rel="stylesheet" type="text/css" />
+        <link href="assets/css/forms-new-order-minimal.css?v=<?php echo time(); ?>" rel="stylesheet" type="text/css" />
 
         <!-- Scripts -->
-        <script src="assets/js/layout.js"></script>
         <script src="assets/libs/choices.js/public/assets/scripts/choices.min.js"></script>
 
 
@@ -239,6 +238,55 @@
                                                     </tbody>
                                                 </table>
                                             </div>
+
+                                            <!-- Order Summary Section -->
+                                            <div class="order-summary-section" id="orderSummary" style="display: none;">
+                                                <div class="summary-card">
+                                                    <div class="summary-header">
+                                                        <h6><i class="ri-calculator-line"></i> Order Summary</h6>
+                                                    </div>
+                                                    
+                                                    <!-- Discount Section -->
+                                                    <div class="discount-section">
+                                                        <div class="form-row-minimal cols-3">
+                                                            <div class="form-field-minimal">
+                                                                <label for="discountType">Discount Type</label>
+                                                                <select class="form-select" id="discountType" name="discount_type">
+                                                                    <option value="none">No Discount</option>
+                                                                    <option value="percentage">Percentage (%)</option>
+                                                                    <option value="amount">Amount (RM)</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-field-minimal">
+                                                                <label for="discountValue">Discount Value</label>
+                                                                <input type="number" id="discountValue" name="discount_value" class="form-control" 
+                                                                       min="0" step="0.01" placeholder="0.00" disabled>
+                                                            </div>
+                                                            <div class="form-field-minimal">
+                                                                <label for="discountAmount">Discount Amount (RM)</label>
+                                                                <input type="number" id="discountAmount" name="discount_amount" class="form-control" 
+                                                                       readonly placeholder="0.00">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Totals -->
+                                                    <div class="totals-section">
+                                                        <div class="total-row">
+                                                            <span class="total-label">Subtotal:</span>
+                                                            <span class="total-value" id="subtotalAmount">RM 0.00</span>
+                                                        </div>
+                                                        <div class="total-row">
+                                                            <span class="total-label">Discount:</span>
+                                                            <span class="total-value" id="displayDiscountAmount">RM 0.00</span>
+                                                        </div>
+                                                        <div class="total-row total-final">
+                                                            <span class="total-label">Grand Total:</span>
+                                                            <span class="total-value" id="grandTotalAmount">RM 0.00</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -269,6 +317,9 @@
         <script src="assets/js/plugins.js"></script>
         <script src="assets/libs/prismjs/prism.js"></script>
         <script src="assets/js/app.js"></script>
+
+        <!-- SweetAlert2 -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <!-- Custom Scripts -->
         <script>
@@ -316,6 +367,110 @@
                 const addProductBtn = document.getElementById('addProduct');
                 const productList = document.getElementById('productList').getElementsByTagName('tbody')[0];
                 window.productCount = 1; // Make it global so it can be reset
+
+                // Order Summary Elements
+                const orderSummary = document.getElementById('orderSummary');
+                const discountTypeSelect = document.getElementById('discountType');
+                const discountValueInput = document.getElementById('discountValue');
+                const discountAmountInput = document.getElementById('discountAmount');
+                const subtotalElement = document.getElementById('subtotalAmount');
+                const displayDiscountElement = document.getElementById('displayDiscountAmount');
+                const grandTotalElement = document.getElementById('grandTotalAmount');
+
+                // Initialize discount functionality
+                window.currentSubtotal = 0; // Make it global
+
+                // Calculation Functions
+                function updateOrderSummary() {
+                    const rows = productList.querySelectorAll('tr:not(.empty-state-minimal)');
+                    
+                    if (rows.length === 0) {
+                        orderSummary.style.display = 'none';
+                        window.currentSubtotal = 0;
+                        return;
+                    }
+                    
+                    // Show order summary
+                    orderSummary.style.display = 'block';
+                    
+                    // Calculate subtotal
+                    window.currentSubtotal = 0;
+                    rows.forEach(row => {
+                        const totalPriceCell = row.cells[4]; // Total Price column
+                        if (totalPriceCell) {
+                            const amount = parseFloat(totalPriceCell.textContent) || 0;
+                            window.currentSubtotal += amount;
+                        }
+                    });
+                    
+                    // Update display
+                    subtotalElement.textContent = `RM ${window.currentSubtotal.toFixed(2)}`;
+                    
+                    // Recalculate discount and grand total
+                    calculateDiscount();
+                }
+
+                function calculateDiscount() {
+                    const discountType = discountTypeSelect.value;
+                    const discountValue = parseFloat(discountValueInput.value) || 0;
+                    let discountAmount = 0;
+                    
+                    if (discountType === 'percentage' && discountValue > 0) {
+                        discountAmount = (window.currentSubtotal * discountValue) / 100;
+                        // Prevent discount from exceeding subtotal
+                        discountAmount = Math.min(discountAmount, window.currentSubtotal);
+                    } else if (discountType === 'amount' && discountValue > 0) {
+                        discountAmount = Math.min(discountValue, window.currentSubtotal);
+                    }
+                    
+                    const grandTotal = window.currentSubtotal - discountAmount;
+                    
+                    // Update displays
+                    discountAmountInput.value = discountAmount.toFixed(2);
+                    displayDiscountElement.textContent = `RM ${discountAmount.toFixed(2)}`;
+                    grandTotalElement.textContent = `RM ${grandTotal.toFixed(2)}`;
+                }
+
+                // Discount Event Handlers
+                discountTypeSelect.addEventListener('change', function() {
+                    const discountType = this.value;
+                    
+                    if (discountType === 'none') {
+                        discountValueInput.disabled = true;
+                        discountValueInput.value = '';
+                    } else {
+                        discountValueInput.disabled = false;
+                        if (discountType === 'percentage') {
+                            discountValueInput.max = '100';
+                            discountValueInput.placeholder = 'Enter percentage (0-100)';
+                        } else if (discountType === 'amount') {
+                            discountValueInput.max = window.currentSubtotal.toString();
+                            discountValueInput.placeholder = 'Enter amount in RM';
+                        }
+                    }
+                    
+                    calculateDiscount();
+                });
+
+                discountValueInput.addEventListener('input', function() {
+                    const discountType = discountTypeSelect.value;
+                    let value = parseFloat(this.value) || 0;
+                    
+                    // Validation
+                    if (discountType === 'percentage') {
+                        if (value > 100) {
+                            this.value = 100;
+                            value = 100;
+                        }
+                    } else if (discountType === 'amount') {
+                        if (value > window.currentSubtotal) {
+                            this.value = window.currentSubtotal.toFixed(2);
+                            value = window.currentSubtotal;
+                        }
+                    }
+                    
+                    calculateDiscount();
+                });
 
                 function clearProductAndMOQ() {
                     chProduct.removeActiveItems();
@@ -399,12 +554,7 @@
                         return;
                     }
 
-                    // Debug logging
-                    console.log('Selected product data:', {
-                        price: productData.price,
-                        moq: productData.moq,
-                        priceId: productData.priceId
-                    });
+
 
                     // Check if price exists
                     if (!productData.price || productData.price === 'null' || productData.price === '0') {
@@ -481,6 +631,9 @@
 
                     window.productCount++;
 
+                    // Update order summary
+                    updateOrderSummary();
+
                     // Reset form - using Choices.js methods
                     chProduct.setChoiceByValue('');
                     quantityInput.value = '';
@@ -525,13 +678,16 @@
                                 </tr>
                             `;
                         }
+                        
+                        // Update order summary
+                        updateOrderSummary();
                     }
                 });
             }
 
             function prepareSubmission() {
                 const products = [];
-                const rows = document.querySelectorAll('#productList tbody tr');
+                const rows = document.querySelectorAll('#productList tbody tr:not(.empty-state-minimal)');
                 
                 if (rows.length === 0) {
                     Swal.fire({
@@ -543,6 +699,7 @@
                 }
 
                 const customerId = document.getElementById('customer').value;
+                
                 if (!customerId) {
                     Swal.fire({
                         title: 'Error!',
@@ -606,15 +763,35 @@
                             formData.append('staff_commission_percentage', commissionPercentage);
                         }
 
-                        // Submit via AJAX
+                        // Add discount information
+                        const discountType = document.getElementById('discountType').value;
+                        const discountValue = document.getElementById('discountValue').value;
+                        const discountAmount = document.getElementById('discountAmount').value;
+                        const subtotal = window.currentSubtotal || 0;
+                        const grandTotal = subtotal - (parseFloat(discountAmount) || 0);
+
+                        formData.append('discount_type', discountType);
+                        formData.append('discount_value', discountValue || '0');
+                        formData.append('discount_amount', discountAmount || '0');
+                        formData.append('subtotal', subtotal.toString());
+                        formData.append('grand_total', grandTotal.toString());
+
+
+
+                        // Submit via AJAX with timeout
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+                        
                         fetch('', {
                             method: 'POST',
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest'
                             },
-                            body: formData
+                            body: formData,
+                            signal: controller.signal
                         })
                         .then(response => {
+                            clearTimeout(timeoutId); // Clear timeout on successful response
                             // Check if response is JSON
                             const contentType = response.headers.get('content-type');
                             if (contentType && contentType.includes('application/json')) {
@@ -661,18 +838,29 @@
                                         }
                                     });
                                     
-                                    // Reset product count
+                                    // Reset product count and order summary
                                     window.productCount = 1;
+                                    updateOrderSummary();
                                 });
                             } else {
                                 throw new Error(data.error || 'Unknown error occurred');
                             }
                         })
                         .catch(error => {
+                            clearTimeout(timeoutId); // Clear timeout on error
                             console.error('Error:', error);
+                            
+                            let errorMessage = 'There was an error creating the invoice. Please try again.';
+                            
+                            if (error.name === 'AbortError') {
+                                errorMessage = 'Request timed out. The server took too long to respond. Please try again.';
+                            } else if (error.message) {
+                                errorMessage = error.message;
+                            }
+                            
                             Swal.fire({
                                 title: 'Error!',
-                                text: error.message || 'There was an error creating the invoice. Please try again.',
+                                text: errorMessage,
                                 icon: 'error'
                             });
                         });

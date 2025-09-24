@@ -179,19 +179,19 @@
                                                                 <div class="row g-3 mb-3">
                                                                     <div class="col-lg-2">
                                                                         <div class="form-floating">
-                                                                            <input type="number" step="0.01" class="form-control" name="carton[width][]" id="carton_width" placeholder="Width" required>
+                                                                            <input type="number" step="0.001" class="form-control" name="carton[width][]" id="carton_width" placeholder="Width" required>
                                                                             <label>Carton Width (cm)</label>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-lg-2">
                                                                         <div class="form-floating">
-                                                                            <input type="number" step="0.01" class="form-control" name="carton[height][]" id="carton_height" placeholder="Height" required>
+                                                                            <input type="number" step="0.001" class="form-control" name="carton[height][]" id="carton_height" placeholder="Height" required>
                                                                             <label>Carton Height (cm)</label>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-lg-2">
                                                                         <div class="form-floating">
-                                                                            <input type="number" step="0.01" class="form-control" name="carton[length][]" id="carton_length" placeholder="Length" required>
+                                                                            <input type="number" step="0.001" class="form-control" name="carton[length][]" id="carton_length" placeholder="Length" required>
                                                                             <label>Carton Length (cm)</label>
                                                                         </div>
                                                                     </div>
@@ -203,13 +203,13 @@
                                                                     </div>
                                                                     <div class="col-lg-2">
                                                                         <div class="form-floating">
-                                                                            <input type="number" step="0.01" class="form-control" name="carton[weight][]" id="weight_carton" placeholder="Carton Weight" required>
+                                                                            <input type="number" step="0.001" class="form-control" name="carton[weight][]" id="weight_carton" placeholder="Carton Weight" required>
                                                                             <label>Carton Weight (kg)</label>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-lg-2">
                                                                         <div class="form-floating">
-                                                                            <input type="number" step="0.000001" class="form-control" name="carton[cbm][]" id="cbm_carton" placeholder="CBM/Carton" readonly>
+                                                                            <input type="number" step="0.001" class="form-control" name="carton[cbm][]" id="cbm_carton" placeholder="CBM/Carton" readonly>
                                                                             <label>CBM / Carton (m³)</label>
                                                                         </div>
                                                                     </div>
@@ -289,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
             getFloat('carton_width'),
             getFloat('carton_height'),
             getFloat('carton_length')
-        ).toFixed(6);
+        ).toFixed(3);
 
         // Additional cartons
         for (let i = 1; i <= additionalCount; i++) {
@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     getFloat(`add_carton${i}_width`),
                     getFloat(`add_carton${i}_height`),
                     getFloat(`add_carton${i}_length`)
-                ).toFixed(6);
+                ).toFixed(3);
             }
         }
     }
@@ -321,19 +321,19 @@ document.addEventListener('DOMContentLoaded', () => {
         row.innerHTML = `
             <div class="col-lg-2">
                 <div class="form-floating">
-                    <input type="number" step="0.01" class="form-control" name="carton[width][]" id="add_carton${i}_width" placeholder="Width" required>
+                    <input type="number" step="0.001" class="form-control" name="carton[width][]" id="add_carton${i}_width" placeholder="Width" required>
                     <label>Carton Width (cm)</label>
                 </div>
             </div>
             <div class="col-lg-2">
                 <div class="form-floating">
-                    <input type="number" step="0.01" class="form-control" name="carton[height][]" id="add_carton${i}_height" placeholder="Height" required>
+                    <input type="number" step="0.001" class="form-control" name="carton[height][]" id="add_carton${i}_height" placeholder="Height" required>
                     <label>Carton Height (cm)</label>
                 </div>
             </div>
             <div class="col-lg-2">
                 <div class="form-floating">
-                    <input type="number" step="0.01" class="form-control" name="carton[length][]" id="add_carton${i}_length" placeholder="Length" required>
+                    <input type="number" step="0.001" class="form-control" name="carton[length][]" id="add_carton${i}_length" placeholder="Length" required>
                     <label>Carton Length (cm)</label>
                 </div>
             </div>
@@ -345,13 +345,13 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="col-lg-2">
                 <div class="form-floating">
-                    <input type="number" step="0.01" class="form-control" name="carton[weight][]" id="add_carton${i}_weight" placeholder="Carton Weight" required>
+                    <input type="number" step="0.001" class="form-control" name="carton[weight][]" id="add_carton${i}_weight" placeholder="Carton Weight" required>
                     <label>Carton Weight (kg)</label>
                 </div>
             </div>
             <div class="col-lg-2 d-flex align-items-start gap-2">
                 <div class="form-floating flex-grow-1">
-                    <input type="number" step="0.000001" class="form-control" name="carton[cbm][]" id="add_carton${i}_cbm" placeholder="CBM/Carton" readonly required>
+                    <input type="number" step="0.001" class="form-control" name="carton[cbm][]" id="add_carton${i}_cbm" placeholder="CBM/Carton" readonly required>
                     <label>CBM / Carton (m³)</label>
                 </div>
                 <button type="button" class="btn btn-danger btn-sm mt-2 remove-carton" data-id="${i}">X</button>
@@ -362,8 +362,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Recalculate CBM whenever dimensions change
         ['width', 'height', 'length'].forEach(f => {
-            document.getElementById(`add_carton${i}_${f}`).addEventListener('input', calculateAll);
+            const input = document.getElementById(`add_carton${i}_${f}`);
+            input.addEventListener('input', calculateAll);
+            addBlurFormatting(input);
         });
+        
+        // Add formatting to weight input
+        addBlurFormatting(document.getElementById(`add_carton${i}_weight`));
 
         // Attach remove event
         row.querySelector('.remove-carton').addEventListener('click', e => {
@@ -371,6 +376,22 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(`cartonRow${id}`).remove();
             calculateAll();
         });
+    });
+
+    // Format decimal inputs to 3 decimal places when user finishes editing
+    function addBlurFormatting(input) {
+        if (input && input.type === 'number' && input.step === '0.001') {
+            input.addEventListener('blur', function() {
+                if (this.value && !isNaN(this.value)) {
+                    this.value = parseFloat(this.value).toFixed(3);
+                }
+            });
+        }
+    }
+
+    // Add formatting to main carton inputs
+    ['carton_width', 'carton_height', 'carton_length', 'weight_carton'].forEach(id => {
+        addBlurFormatting(document.getElementById(id));
     });
 
     // Initial calculation
