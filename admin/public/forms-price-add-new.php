@@ -123,7 +123,7 @@ include __DIR__ . '/../include/header.php';
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.01" class="form-control" name="new_price_yen" placeholder="Price (YEN)" required>
+                                                        <input type="number" step="0.001" class="form-control" name="new_price_yen" placeholder="Price (YEN)" required>
                                                         <label>Price (YEN)</label>
                                                     </div>
                                                 </div>
@@ -137,23 +137,23 @@ include __DIR__ . '/../include/header.php';
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.01" class="form-control" name="new_shipping_moq_yen" placeholder="Shipping / MOQ (YEN)" required>
+                                                        <input type="number" step="0.001" class="form-control" name="new_shipping_moq_yen" placeholder="Shipping / MOQ (YEN)" required>
                                                         <label>Shipping / MOQ (YEN)</label>
                                                     </div>
                                                 </div>
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.01" class="form-control" name="new_additional_price_moq_yen" placeholder="Additional Price / MOQ (YEN)" required>
+                                                        <input type="number" step="0.001" class="form-control" name="new_additional_price_moq_yen" placeholder="Additional Price / MOQ (YEN)" required>
                                                         <label>Additional Price / MOQ (YEN)</label>
                                                     </div>
                                                 </div>
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.0001" class="form-control" 
+                                                        <input type="number" step="0.001" class="form-control" 
                                                                id="conversion_rate" 
-                                                               value="<?= number_format($currentConversionRate, 4) ?>" 
+                                                               value="<?= number_format($currentConversionRate, 3) ?>" 
                                                                readonly>
                                                         <label>Conversion Rate (Auto-fetched)</label>
                                                     </div>
@@ -162,7 +162,7 @@ include __DIR__ . '/../include/header.php';
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.01" class="form-control" name="new_unit_price_yen" placeholder="Unit Price (YEN)" readonly>
+                                                        <input type="number" step="0.001" class="form-control" name="new_unit_price_yen" placeholder="Unit Price (YEN)" readonly>
                                                         <label>Unit Price (YEN)</label>
                                                     </div>
                                                 </div>
@@ -196,14 +196,14 @@ include __DIR__ . '/../include/header.php';
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.0001" class="form-control" name="new_total_cbm_moq" placeholder="Total CBM / MOQ (m³)" readonly>
+                                                        <input type="number" step="0.001" class="form-control" name="new_total_cbm_moq" placeholder="Total CBM / MOQ (m³)" readonly>
                                                         <label>Total CBM / MOQ (m³)</label>
                                                     </div>
                                                 </div>
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.01" class="form-control" name="new_total_weight_moq" placeholder="Total Weight / MOQ (kg)" readonly>
+                                                        <input type="number" step="0.001" class="form-control" name="new_total_weight_moq" placeholder="Total Weight / MOQ (kg)" readonly>
                                                         <label>Total Weight / MOQ (kg)</label>
                                                     </div>
                                                 </div>
@@ -224,7 +224,7 @@ include __DIR__ . '/../include/header.php';
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.01" class="form-control" 
+                                                        <input type="number" step="0.001" class="form-control" 
                                                                name="selling_price_unit" id="selling_price_unit" 
                                                                placeholder="Selling Price (RM)">
                                                         <label>Selling Price (RM)</label>
@@ -233,35 +233,35 @@ include __DIR__ . '/../include/header.php';
                                                 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.0001" class="form-control" name="display_cbm_rate" id="display_cbm_rate" placeholder="Choosen CBM Rate" readonly>
+                                                        <input type="number" step="0.001" class="form-control" name="display_cbm_rate" id="display_cbm_rate" placeholder="Choosen CBM Rate" readonly>
                                                         <label>Choosen CBM Rate</label>
                                                     </div>
                                                 </div>
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.0001" class="form-control" name="display_total_cbm" id="display_total_cbm" placeholder="Total CBM" readonly>
+                                                        <input type="number" step="0.001" class="form-control" name="display_total_cbm" id="display_total_cbm" placeholder="Total CBM" readonly>
                                                         <label>Total CBM</label>
                                                     </div>
                                                 </div>
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.01" class="form-control" name="new_unit_price_rm" placeholder="Unit Price (RM)" readonly>
+                                                        <input type="number" step="0.001" class="form-control" name="new_unit_price_rm" placeholder="Unit Price (RM)" readonly>
                                                         <label>Unit Price (RM)</label>
                                                     </div>
                                                 </div>
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.01" class="form-control" name="new_unit_freight_cost_rm" placeholder="Unit Freight Cost (RM)" readonly>
+                                                        <input type="number" step="0.001" class="form-control" name="new_unit_freight_cost_rm" placeholder="Unit Freight Cost (RM)" readonly>
                                                         <label>Unit Freight Cost (RM)</label>
                                                     </div>
                                                 </div>
 
                                                 <div class="col-lg-4">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.01" class="form-control" name="new_unit_profit_rm" placeholder="Unit Profit (RM)" readonly>
+                                                        <input type="number" step="0.001" class="form-control" name="new_unit_profit_rm" placeholder="Unit Profit (RM)" readonly>
                                                         <label>Unit Profit (RM)</label>
                                                     </div>
                                                 </div>
@@ -551,7 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Set conversion rate from database
     const conversionRate = <?= $currentConversionRate ?>;
-    conversionRateInput.value = conversionRate.toFixed(4);
+    conversionRateInput.value = conversionRate.toFixed(3);
 
     const productCartonData = {};
     <?php foreach($products as $p): ?>
@@ -572,7 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <?php endforeach; ?>
 
     let selectedCartonData = null;
-
+    
     function calculateUnitPriceYen() {
         const priceYen = parseFloat(priceYenInput.value) || 0;
         const moq = parseInt(moqInput.value) || 0;
@@ -583,7 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const amount1 = priceYen * moq;
             const amount2 = amount1 + shippingMoq + additionalFee;
             const unitPrice = amount2 / moq;
-            unitPriceYenInput.value = unitPrice.toFixed(2);
+            unitPriceYenInput.value = unitPrice.toFixed(3);
         } else {
             unitPriceYenInput.value = '';
         }
@@ -623,8 +623,8 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Total CBM:', totalCBM, 'Total Weight:', totalWeight);
 
         totalCbmField.value = totalCBM.toFixed(3);
-        totalWeightField.value = totalWeight.toFixed(2);
-        displayTotalCBMField.value = totalCBM.toFixed(6);
+        totalWeightField.value = totalWeight.toFixed(3);
+        displayTotalCBMField.value = totalCBM.toFixed(3);
 
         // Get freight rate from selected option
         const freightOption = freightSelect.selectedOptions[0];
@@ -635,7 +635,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const freightRate = parseFloat(freightOption.dataset.freightRate) || 0;
         console.log('Freight rate:', freightRate);
-        displayCbmRateField.value = freightRate.toFixed(4);
+        displayCbmRateField.value = freightRate.toFixed(3);
 
         const unitPriceYen = parseFloat(unitPriceYenInput.value) || 0;
         const sellingPrice = parseFloat(sellingPriceField.value) || 0;
@@ -666,15 +666,20 @@ document.addEventListener('DOMContentLoaded', () => {
             unitProfitRM
         });
 
-        unitPriceRMField.value = unitPriceRM.toFixed(2);
-        unitFreightRMField.value = unitFreightRM.toFixed(2);
-        unitProfitRMField.value = unitProfitRM.toFixed(2);
+        unitPriceRMField.value = unitPriceRM.toFixed(3);
+        unitFreightRMField.value = unitFreightRM.toFixed(3);
+        unitProfitRMField.value = unitProfitRM.toFixed(3);
     }
+
+    // Make calculateTotals globally accessible for pre-population
+    window.calculateTotals = calculateTotals;
+    window.selectedCartonData = selectedCartonData;
 
     // Use Select2 event listener instead of regular change event
     $('#product').on('change', function() {
         const pid = $(this).val();
         selectedCartonData = productCartonData[pid] || null;
+        window.selectedCartonData = selectedCartonData;
 
         // Clear previous calculations
         totalCbmField.value = '';
@@ -699,6 +704,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Use jQuery for freight select to ensure compatibility
     $(freightSelect).on('change', calculateTotals);
     sellingPriceField.addEventListener('input', calculateTotals);
+
+    // Format decimal inputs to 3 decimal places when user finishes editing
+    const decimalInputs = [
+        priceYenInput,
+        additionalFeeInput,
+        document.querySelector('input[name="new_shipping_moq_yen"]'),
+        sellingPriceField
+    ];
+    
+    decimalInputs.forEach(input => {
+        if (input) {
+            input.addEventListener('blur', function() {
+                if (this.value && !isNaN(this.value)) {
+                    this.value = parseFloat(this.value).toFixed(3);
+                }
+            });
+        }
+    });
 });
 </script>
 
@@ -851,50 +874,29 @@ document.addEventListener('DOMContentLoaded', function() {
             freightSelect.value = data.new_freight_method;
         }
         
-        // Freight calculations
-        const totalCbmInput = document.querySelector('input[name="new_total_cbm_moq"]');
-        if (totalCbmInput && data.new_total_cbm_moq) {
-            totalCbmInput.value = data.new_total_cbm_moq;
-        }
-        
-        const totalWeightInput = document.querySelector('input[name="new_total_weight_moq"]');
-        if (totalWeightInput && data.new_total_weight_moq) {
-            totalWeightInput.value = data.new_total_weight_moq;
-        }
-        
-        // Final pricing
+        // Final pricing - set selling price first as it's needed for calculations
         const sellingPriceInput = document.getElementById('selling_price_unit');
         if (sellingPriceInput && data.new_selling_price) {
             sellingPriceInput.value = data.new_selling_price;
         }
         
-        const unitPriceRMInput = document.querySelector('input[name="new_unit_price_rm"]');
-        if (unitPriceRMInput && data.new_unit_price_rm) {
-            unitPriceRMInput.value = data.new_unit_price_rm;
-        }
+        // Don't set CBM/Weight/Pricing calculations directly - let calculateTotals() handle it
+        // This ensures additional cartons are properly included
         
-        const unitFreightRMInput = document.querySelector('input[name="new_unit_freight_cost_rm"]');
-        if (unitFreightRMInput && data.new_unit_freight_cost_rm) {
-            unitFreightRMInput.value = data.new_unit_freight_cost_rm;
-        }
+        console.log('Field population completed, triggering fresh calculations...');
         
-        const unitProfitRMInput = document.querySelector('input[name="new_unit_profit_rm"]');
-        if (unitProfitRMInput && data.new_unit_profit_rm) {
-            unitProfitRMInput.value = data.new_unit_profit_rm;
-        }
-        
-        // Display fields
-        const displayCbmRateInput = document.getElementById('display_cbm_rate');
-        if (displayCbmRateInput && data.freight_rate) {
-            displayCbmRateInput.value = data.freight_rate;
-        }
-        
-        const displayTotalCBMInput = document.getElementById('display_total_cbm');
-        if (displayTotalCBMInput && data.new_total_cbm_moq) {
-            displayTotalCBMInput.value = data.new_total_cbm_moq;
-        }
-        
-        console.log('Field population completed');
+        // Trigger fresh calculation to ensure all cartons (main + additional) are included
+        setTimeout(function() {
+            if (typeof window.calculateTotals === 'function' && window.selectedCartonData) {
+                console.log('Calling calculateTotals to recalculate CBM with additional cartons...');
+                console.log('Current selectedCartonData:', window.selectedCartonData);
+                window.calculateTotals();
+            } else {
+                console.log('calculateTotals function or selectedCartonData not available yet');
+                console.log('calculateTotals available:', typeof window.calculateTotals);
+                console.log('selectedCartonData:', window.selectedCartonData);
+            }
+        }, 200);
         
         // Show success message
         Swal.fire({

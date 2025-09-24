@@ -171,6 +171,13 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $pcs    = $cartonPcs[$index] ?? 0;
             $weight = $cartonWeights[$index] ?? 0;
             $cbm    = calculateCBM($width,$height,$length);
+            
+            // Format decimal values to 3 decimal places
+            $width = number_format(floatval($width), 3, '.', '');
+            $height = number_format(floatval($height), 3, '.', '');
+            $length = number_format(floatval($length), 3, '.', '');
+            $weight = number_format(floatval($weight), 3, '.', '');
+            $cbm = number_format(floatval($cbm), 3, '.', '');
 
             if($index === 0){
                 // Main carton

@@ -211,7 +211,7 @@ function getCartonDetails($invoice_id) {
     $query = "
         SELECT 
             ii.product_name,
-            ii.quantity as ordered_quantity,
+            ii.quantity,
             p.carton_width,
             p.carton_height,
             p.carton_length,
