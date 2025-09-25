@@ -34,7 +34,7 @@ function getTotalCustomer(){
 function getTotalProduct(){
 
     global $db;
-    $stmt = $db->query("SELECT COUNT(*) as total FROM product");
+    $stmt = $db->query("SELECT COUNT(*) as total FROM product WHERE deleted_at IS NULL");
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     return $result['total'];
 
