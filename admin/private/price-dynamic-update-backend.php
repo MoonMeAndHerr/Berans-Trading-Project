@@ -18,6 +18,19 @@ function recalculatePrice($price, $newConversionRate, $newFreightRates) {
     $totalCBM = $totalCartons * $price['cbm_carton'];
     $totalWeight = $totalCartons * $price['carton_weight'];
 
+    // Include additional cartons (add_carton1 through add_carton6) - matching forms-price-add-new.php logic
+    for ($i = 1; $i <= 6; $i++) {
+        $addCartonPcs = $price["add_carton{$i}_pcs"] ?? 0;
+        $addCartonCBM = $price["add_carton{$i}_total_cbm"] ?? 0;
+        $addCartonWeight = $price["add_carton{$i}_weight"] ?? 0;
+        
+        if ($addCartonPcs > 0) {
+            $extraCartons = ceil($price['new_moq_quantity'] / $addCartonPcs);
+            $totalCBM += $extraCartons * $addCartonCBM;
+            $totalWeight += $extraCartons * $addCartonWeight;
+        }
+    }
+
     // Get freight rate based on shipping code
     $shippingCode = $price['new_freight_method'];
     $freightRate = 0;
