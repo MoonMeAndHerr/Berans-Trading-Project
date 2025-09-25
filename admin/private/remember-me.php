@@ -33,6 +33,14 @@ $configPath = __DIR__ . '/../../global/main_configuration.php';
                 $_SESSION['username'] = $login['username'];
                 $_SESSION['role'] = $login['role'];
                 $_SESSION['staff_name'] = $login['staff_name'];
+                $_SESSION['web_layout']   = $login['web_layout'];
+                $_SESSION['web_skin']   = $login['web_skin'];
+                $_SESSION['web_width']       = $login['web_width'];
+                $_SESSION['layout_pos'] = $login['layout_pos'];
+                $_SESSION['topbar_color']   = $login['topbar_color'];
+                $_SESSION['sidebar_size']   = $login['sidebar_size'];
+                $_SESSION['sidebar_color']       = $login['sidebar_color'];
+                $_SESSION['sidebar_view'] = $login['sidebar_view'];
 
                 header("Location: $dashboardPage");
                 exit;

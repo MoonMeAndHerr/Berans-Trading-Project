@@ -146,7 +146,7 @@
 													JOIN product_type pt ON p.product_type_id = pt.product_type_id
 													JOIN subcategory sc ON p.subcategory_id = sc.subcategory_id
 													JOIN category c ON p.category_id = c.category_id
-													JOIN section s ON p.section_id = s.section_id WHERE p.deleted_at IS NULL";
+													JOIN section s ON p.section_id = s.section_id WHERE visibility = 'Shown' AND p.deleted_at IS NULL";
 											$stmt = $pdo->query($sql);
 											closeDB($pdo);
 
