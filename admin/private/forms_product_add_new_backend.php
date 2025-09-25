@@ -57,8 +57,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         $sectionName = $pdo->query("SELECT section_name FROM section WHERE section_id = ".$_POST['section'])->fetchColumn();
         $categoryName = $pdo->query("SELECT category_name FROM category WHERE category_id = ".$_POST['category'])->fetchColumn();
         $subcatName = $pdo->query("SELECT subcategory_name FROM subcategory WHERE subcategory_id = ".$_POST['subcategory'])->fetchColumn();
-        $product_code = strtoupper(substr($sectionName,0,1).substr($categoryName,0,1).substr($subcatName,0,1))
-                        .str_pad($product_id, 5, '0', STR_PAD_LEFT);
 
         $stmt = $pdo->prepare("SELECT * FROM material WHERE material_id = ?");
         $stmt->execute([$_POST['material_id']]);
@@ -70,6 +68,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         $product = $stmt->fetch(PDO::FETCH_ASSOC);
         $productType = $product['product_name'];
 
+        // --- Handle sizes ---
+        $size1 = !empty($_POST['size_1']) && !empty($_POST['metric_1']) ? $_POST['size_1'].''.$_POST['metric_1'] : null;
+        $size2 = !empty($_POST['size_2']) && !empty($_POST['metric_2']) ? $_POST['size_2'].''.$_POST['metric_2'] : null;
+        $size3 = !empty($_POST['size_3']) && !empty($_POST['metric_3']) ? $_POST['size_3'].''.$_POST['metric_3'] : null;
+
         $productName = $materrialName.' '.$productType.' '.$size1.'*'.$size2.'*'.$size3.' '.$_POST['variant'];
 
         if (strlen($productName) > 50) {
@@ -77,11 +80,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             header("Location: ".$_SERVER['PHP_SELF']);
             exit;
         } 
-
-        // --- Handle sizes ---
-        $size1 = !empty($_POST['size_1']) && !empty($_POST['metric_1']) ? $_POST['size_1'].''.$_POST['metric_1'] : null;
-        $size2 = !empty($_POST['size_2']) && !empty($_POST['metric_2']) ? $_POST['size_2'].''.$_POST['metric_2'] : null;
-        $size3 = !empty($_POST['size_3']) && !empty($_POST['metric_3']) ? $_POST['size_3'].''.$_POST['metric_3'] : null;
 
         if (!empty($_FILES['image']['name'])) {
 
@@ -115,6 +113,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         ]);
 
         $product_id = $pdo->lastInsertId();
+
+        $product_code = strtoupper(substr($sectionName,0,1).substr($categoryName,0,1).substr($subcatName,0,1))
+                        .str_pad($product_id, 5, '0', STR_PAD_LEFT);
 
         try {
 

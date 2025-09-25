@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                              LEFT JOIN category c ON p.category_id = c.category_id
                              LEFT JOIN subcategory sc ON p.subcategory_id = sc.subcategory_id
                              LEFT JOIN material mt ON p.material_id = mt.material_id
-                             LEFT JOIN product_type pt ON p.product_type_id = pt.product_type_id WHERE p.deleted_at IS NULL");
+                             LEFT JOIN product_type pt ON p.product_type_id = pt.product_type_id WHERE visibility = 'Shown' AND p.deleted_at IS NULL");
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $rowCount = count($results);
         closeDB($pdo);
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                    OR sc.subcategory_name COLLATE utf8mb4_general_ci LIKE ?
                    OR mt.material_name COLLATE utf8mb4_general_ci LIKE ?
                    OR pt.product_name COLLATE utf8mb4_general_ci LIKE ?
-                   AND p.deleted_at IS NULL";
+                   AND visibility = 'Shown' AND p.deleted_at IS NULL";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$search, $search, $search, $search, $search, $search]);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 LEFT JOIN subcategory sc ON p.subcategory_id = sc.subcategory_id
                 LEFT JOIN material mt ON p.material_id = mt.material_id
                 LEFT JOIN product_type pt ON p.product_type_id = pt.product_type_id
-                WHERE s.section_id = ? AND p.deleted_at IS NULL";
+                WHERE visibility = 'Shown' AND s.section_id = ? AND p.deleted_at IS NULL";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$sectionId]);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     OR sc.subcategory_name COLLATE utf8mb4_general_ci LIKE ?
                     OR mt.material_name COLLATE utf8mb4_general_ci LIKE ?
                     OR pt.product_name COLLATE utf8mb4_general_ci LIKE ?)
-                  AND p.section_id = ? AND p.deleted_at IS NULL";
+                   AND visibility = 'Shown'  AND p.section_id = ? AND p.deleted_at IS NULL";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$search, $search, $search, $search, $search, $search, $sectionId]);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
