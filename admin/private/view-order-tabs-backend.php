@@ -421,7 +421,12 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
                     }
                 } catch (Exception $e) {
                     // Log Xero error but don't fail the payment
-                    error_log("Xero API Error (non-critical): " . $e->getMessage());
+                    if (ob_get_level() > 0) { ob_clean(); }
+                
+                    echo json_encode([
+                        'success' => false,
+                        'error' => $e->getMessage(),
+                    ]);
                 }
 
                 // Database transaction
