@@ -745,11 +745,12 @@ include __DIR__ . '/../include/header.php';
             for (let i = 1; i <= 3; i++) {
                 const sizeValue = product[`size_${i}`] || '';
                 if (sizeValue) {
-                    const parts = sizeValue.split(' ');
-                    $(`#update_size_${i}`).val(parts[0] || '');
-                    if (parts[1]) {
-                        $(`#update_metric_${i}`).val(parts[1]);
-                    }
+                    // Separate number and metric using regex
+                    const numberPart = sizeValue.match(/[\d.]+/);   // 10, 15.5, etc.
+                    const metricPart = sizeValue.match(/[a-zA-Z]+/); // cm, mm, in, etc.
+
+                    $(`#update_size_${i}`).val(numberPart ? numberPart[0] : '');
+                    $(`#update_metric_${i}`).val(metricPart ? metricPart[0] : '');
                 }
             }
 
