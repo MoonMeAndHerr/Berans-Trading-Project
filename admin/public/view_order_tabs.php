@@ -618,10 +618,11 @@
                                 parseFloat(detail.add_carton5_total_cbm || 0) +
                                 parseFloat(detail.add_carton6_total_cbm || 0);
                             
-                            // Calculate Carton Quantity: PCS/CARTON / QTY
+                            // Calculate Carton Quantity: QTY / PCS/CARTON, minimum 1
                             const orderedQty = parseFloat(detail.quantity || 1);
-                            const pcsPerCarton = parseFloat(detail.pcs_per_carton || 0);
-                            const cartonQuantity = orderedQty > 0 ? pcsPerCarton / orderedQty : 0;
+                            const pcsPerCarton = parseFloat(detail.pcs_per_carton || 1);
+                            let cartonQuantity = pcsPerCarton > 0 ? orderedQty / pcsPerCarton : 0;
+                            cartonQuantity = cartonQuantity < 1 ? 1 : Math.ceil(cartonQuantity);
 
                             return {
                                 html: `
@@ -635,14 +636,14 @@
                                             ${detail.carton_width} × ${detail.carton_height} × ${detail.carton_length}
                                         </small>
                                     </td>
-                                    <td class="text-end">${formatNumber(detail.carton_weight)} kg</td>
+                                    <td class="text-end">${formatNumber3Decimal(detail.carton_weight)} kg</td>
                                     <td class="text-center">
                                         <span style="background: var(--order-accent-light); color: var(--order-accent); padding: 0.125rem 0.375rem; border-radius: var(--order-radius); font-weight: 500;">
                                             ${detail.pcs_per_carton}
                                         </span>
                                     </td>
-                                    <td class="text-end">${formatNumber(totalCBMCarton)}</td>
-                                    <td class="text-end">${formatNumber(cartonQuantity)}</td>
+                                    <td class="text-end">${formatNumber3Decimal(totalCBMCarton)}</td>
+                                    <td class="text-end">${formatNumber3Decimal(cartonQuantity)}</td>
                                 </tr>
                                 `,
                                 totalCBM: totalCBMCarton * cartonQuantity
@@ -657,7 +658,7 @@
                         const totalRowHTML = `
                             <tr style="background: var(--order-bg-tertiary); font-weight: 600; border-top: 2px solid var(--order-border);">
                                 <td colspan="5" style="text-align: right; padding: 1rem;"><strong>Total CBM:</strong></td>
-                                <td class="text-end" style="padding: 1rem;"><strong>${formatNumber(totalCBM)}</strong></td>
+                                <td class="text-end" style="padding: 1rem;"><strong>${formatNumber3Decimal(totalCBM)}</strong></td>
                             </tr>
                         `;
                         
@@ -821,6 +822,13 @@
             return parseFloat(value || 0).toLocaleString('en-MY', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
+            });
+        }
+
+        function formatNumber3Decimal(value) {
+            return parseFloat(value || 0).toLocaleString('en-MY', {
+                minimumFractionDigits: 3,
+                maximumFractionDigits: 3
             });
         }
     </script>
