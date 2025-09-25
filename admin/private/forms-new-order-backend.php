@@ -367,13 +367,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ],
                         'Date' => date('Y-m-d'),
                         'DueDate' => date('Y-m-d', strtotime('+30 days')),
-                        'InvoiceNumber' => $invoice_number,
                         'Reference' => $invoice_number,
                         'LineItems' => $lineItems,
                         'Status' => 'AUTHORISED'
                     ];
-
-                    error_log("XERO_DEBUG: Creating invoice " . $invoice_number . " for customer " . $xero_relation_customer . " with " . count($lineItems) . " line items");
 
                     $client = new Client();
                     $response = $client->request('POST', 'https://api.xero.com/api.xro/2.0/Invoices', [
@@ -393,7 +390,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $xero_invoice_id = $xeroResponse['Invoices'][0]['InvoiceID'];
                         
                         // Update the invoice with Xero ID
-                        $updateStmt = $pdo->prepare("UPDATE invoice SET xero_invoice_id = ? WHERE invoice_id = ?");
+                        $updateStmt = $pdo->prepare("UPDATE invoice SET xero_relation = ? WHERE invoice_id = ?");
                         $updateStmt->execute([$xero_invoice_id, $invoice_id]);
                         
                         error_log("XERO_SUCCESS: Xero invoice created successfully: " . $xero_invoice_id);
@@ -407,7 +404,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Don't throw the exception - just log it and continue
             }
 
-        $_SESSION['success'] = "Invoice #$invoice_number created successfully!";
+        // $_SESSION['success'] = "Invoice #$invoice_number created successfully!";
         error_log("Transaction committed successfully");
         
         if ($isAjax) {
