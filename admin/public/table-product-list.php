@@ -72,10 +72,10 @@ include __DIR__ . '/../include/header.php';
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <?= $product['new_selling_price'] ? 'RM ' . number_format($product['new_selling_price'], 2) : 'N/A' ?>
+                                                        <?= $product['new_selling_price'] ? 'RM ' . number_format($product['new_selling_price'], 3) : 'N/A' ?>
                                                     </td>
                                                     <td>
-                                                        <?= $product['new_unit_profit_rm'] ? 'RM ' . number_format($product['new_unit_profit_rm'], 2) : 'Price N/A' ?>
+                                                        <?= $product['new_unit_profit_rm'] ? 'RM ' . number_format($product['new_unit_profit_rm'], 3) : 'Price N/A' ?>
                                                     </td>
                                                     <td><?= htmlspecialchars($product['visibility']) ?></td>
                                                     <td><?= date('d/m/Y', strtotime($product['created_at'])) ?></td>
@@ -996,9 +996,9 @@ include __DIR__ . '/../include/header.php';
             // Specifications
             $('#view_dimensions').text(product.dimensions || 'N/A');
             $('#view_supplier').text(product.supplier_name || 'N/A');
-            $('#view_selling_price').text(product.new_selling_price ? 'RM ' + parseFloat(product.new_selling_price).toFixed(2) : 'N/A');
-            $('#view_unit_price_rm').text(product.new_unit_price_rm ? 'RM ' + parseFloat(product.new_unit_price_rm).toFixed(2) : 'Price N/A');
-            $('#view_profit').text(product.new_unit_profit_rm ? 'RM ' + parseFloat(product.new_unit_profit_rm).toFixed(2) : 'Price N/A');
+            $('#view_selling_price').text(product.new_selling_price ? 'RM ' + parseFloat(product.new_selling_price).toFixed(3) : 'N/A');
+            $('#view_unit_price_rm').text(product.new_unit_price_rm ? 'RM ' + parseFloat(product.new_unit_price_rm).toFixed(3) : 'Price N/A');
+            $('#view_profit').text(product.new_unit_profit_rm ? 'RM ' + parseFloat(product.new_unit_profit_rm).toFixed(3) : 'Price N/A');
             $('#view_created_at').text(product.created_at ? new Date(product.created_at).toLocaleString() : 'N/A');
             $('#view_updated_at').text(product.updated_at ? new Date(product.updated_at).toLocaleString() : 'N/A');
             
