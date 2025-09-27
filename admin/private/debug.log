@@ -1131,3 +1131,8 @@
 [2025-09-25 11:57:41] Last login updated - {
     "staff_id": "1"
 }
+[2025-09-25 16:27:28] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
