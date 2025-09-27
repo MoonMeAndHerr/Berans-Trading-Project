@@ -307,86 +307,7 @@ include __DIR__ . '/../include/header.php';
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
 
-    <!-- Custom CSS for Select2 Bootstrap styling -->
-    <style>
-        .select2-container {
-            width: 100% !important;
-        }
-        
-        .select2-container--default .select2-selection--single {
-            height: 58px !important;
-            border: 1px solid #dee2e6 !important;
-            border-radius: 0.375rem !important;
-            background-color: #fff !important;
-            padding: 16px 12px 8px 12px !important;
-            font-size: 0.875rem !important;
-            line-height: 1.25rem !important;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
-        }
-        
-        .select2-container--default .select2-selection--single:focus,
-        .select2-container--default.select2-container--focus .select2-selection--single {
-            border-color: #86b7fe !important;
-            outline: 0 !important;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
-        }
-        
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            color: #212529 !important;
-            padding: 0 !important;
-            line-height: 1.25rem !important;
-        }
-        
-        .select2-container--default .select2-selection--single .select2-selection__placeholder {
-            color: #6c757d !important;
-        }
-        
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 56px !important;
-            right: 8px !important;
-        }
-        
-        .select2-dropdown {
-            border: 1px solid #dee2e6 !important;
-            border-radius: 0.375rem !important;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-        }
-        
-        .select2-container--default .select2-results__option {
-            padding: 8px 12px !important;
-            font-size: 0.875rem !important;
-        }
-        
-        .select2-container--default .select2-results__option--highlighted {
-            background-color: #0d6efd !important;
-            color: #fff !important;
-        }
-        
-        .select2-container--default .select2-results__option[aria-selected=true] {
-            background-color: #e7f1ff !important;
-            color: #0d6efd !important;
-        }
-        
-        .select2-container--default .select2-search--dropdown .select2-search__field {
-            border: 1px solid #dee2e6 !important;
-            border-radius: 0.375rem !important;
-            padding: 8px 12px !important;
-            font-size: 0.875rem !important;
-        }
-        
-        /* Make it look like floating labels */
-        .form-floating .select2-container {
-            position: relative;
-        }
-        
-        .form-floating .select2-container .select2-selection {
-            background-color: transparent !important;
-        }
-        
-        .form-floating label {
-            z-index: 10;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/select2-dark-theme.css">
 
     <!-- prismjs plugin -->
     <script src="assets/libs/prismjs/prism.js"></script>
@@ -424,35 +345,104 @@ document.addEventListener('DOMContentLoaded', function () {
             supplierName: opt.dataset.supplierName || ''
         }));
 
-    // Initialize Select2 with custom styling
+    // Initialize Select2 with custom styling and search placeholders
     function initSelect2() {
         $('#section').select2({
             placeholder: 'Choose Section...',
             allowClear: false,
-            width: '100%'
+            width: '100%',
+            language: {
+                searching: function() {
+                    return 'Searching sections...';
+                },
+                inputTooShort: function() {
+                    return 'Type to search sections';
+                }
+            }
         });
         
         $('#category').select2({
             placeholder: 'Choose Category...',
             allowClear: false,
-            width: '100%'
+            width: '100%',
+            language: {
+                searching: function() {
+                    return 'Searching categories...';
+                },
+                inputTooShort: function() {
+                    return 'Type to search categories';
+                }
+            }
         });
         
         $('#subcategory').select2({
             placeholder: 'Choose Subcategory...',
             allowClear: false,
-            width: '100%'
+            width: '100%',
+            language: {
+                searching: function() {
+                    return 'Searching subcategories...';
+                },
+                inputTooShort: function() {
+                    return 'Type to search subcategories';
+                }
+            }
         });
         
         $('#product').select2({
             placeholder: 'Choose Product...',
             allowClear: false,
-            width: '100%'
+            width: '100%',
+            language: {
+                searching: function() {
+                    return 'Searching products...';
+                },
+                inputTooShort: function() {
+                    return 'Type to search products';
+                }
+            }
         });
     }
 
     // Call initialization
     initSelect2();
+
+    // Add custom placeholder text to search fields when dropdowns open
+    $('#section').on('select2:open', function() {
+        setTimeout(function() {
+            const searchField = document.querySelector('.select2-search__field');
+            if (searchField) {
+                searchField.placeholder = 'Search sections...';
+            }
+        }, 1);
+    });
+
+    $('#category').on('select2:open', function() {
+        setTimeout(function() {
+            const searchField = document.querySelector('.select2-search__field');
+            if (searchField) {
+                searchField.placeholder = 'Search categories...';
+            }
+        }, 1);
+    });
+
+    $('#subcategory').on('select2:open', function() {
+        setTimeout(function() {
+            const searchField = document.querySelector('.select2-search__field');
+            if (searchField) {
+                searchField.placeholder = 'Search subcategories...';
+            }
+        }, 1);
+    });
+
+    $('#product').on('select2:open', function() {
+        setTimeout(function() {
+            const searchField = document.querySelector('.select2-search__field');
+            if (searchField) {
+                searchField.placeholder = 'Search products...';
+            }
+        }, 1);
+    });
 
     function clearProductAndSupplier() {
         $('#product').val('').trigger('change');
