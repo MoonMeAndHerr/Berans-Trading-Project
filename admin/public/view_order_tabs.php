@@ -84,7 +84,7 @@
                                     <div class="order-amounts">
                                         <div class="amount-row">
                                             <span class="amount-label">Total:</span>
-                                            <span class="amount-total">RM <?= number_format($order['total_amount'], 2) ?></span>
+                                            <span class="amount-total">RM <?= number_format($order['original_total'], 2) ?></span>
                                         </div>
                                         <?php if(isset($order['total_paid']) && $order['total_paid'] > 0): ?>
                                         <div class="amount-row">
@@ -93,7 +93,7 @@
                                         </div>
                                         <div class="amount-row">
                                             <span class="amount-label">Balance:</span>
-                                            <span class="amount-remaining">RM <?= number_format($order['total_amount'] - $order['total_paid'], 2) ?></span>
+                                            <span class="amount-remaining">RM <?= number_format($order['original_total'] - $order['total_paid'], 2) ?></span>
                                         </div>
                                         <?php else: ?>
                                         <div class="amount-row">
@@ -122,7 +122,7 @@
                                                 Items
                                             </button>
                                             
-                                            <button class="btn-compact btn-success" onclick="preparePayment(<?= $order['invoice_id'] ?>, <?= $order['total_amount'] ?>)" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                                            <button class="btn-compact btn-success" onclick="preparePayment(<?= $order['invoice_id'] ?>, <?= $order['original_total'] ?>)" data-bs-toggle="modal" data-bs-target="#paymentModal">
                                                 <i class="ri-money-dollar-circle-line"></i>
                                                 Payment
                                             </button>

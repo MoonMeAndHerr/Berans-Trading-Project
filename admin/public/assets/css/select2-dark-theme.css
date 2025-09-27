@@ -1,0 +1,167 @@
+/* Select2 Dark Theme Support for Berans Trading */
+/* Custom CSS for Select2 Bootstrap styling with Dark Mode Support */
+
+.select2-container {
+    width: 100% !important;
+}
+
+/* Base styles that adapt to theme */
+.select2-container--default .select2-selection--single {
+    height: 58px !important;
+    border: 1px solid var(--bs-border-color, #dee2e6) !important;
+    border-radius: 0.375rem !important;
+    background-color: var(--bs-body-bg, #fff) !important;
+    color: var(--bs-body-color, #212529) !important;
+    padding: 16px 12px 8px 12px !important;
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+.select2-container--default .select2-selection--single:focus,
+.select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: #86b7fe !important;
+    outline: 0 !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: var(--bs-body-color, #212529) !important;
+    padding: 0 !important;
+    line-height: 1.25rem !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+    color: var(--bs-secondary-color, #6c757d) !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 56px !important;
+    right: 8px !important;
+}
+
+.select2-dropdown {
+    border: 1px solid var(--bs-border-color, #dee2e6) !important;
+    border-radius: 0.375rem !important;
+    background-color: var(--bs-body-bg, #fff) !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.select2-container--default .select2-results__option {
+    padding: 8px 12px !important;
+    font-size: 0.875rem !important;
+    background-color: var(--bs-body-bg, #fff) !important;
+    color: var(--bs-body-color, #212529) !important;
+}
+
+.select2-container--default .select2-results__option--highlighted {
+    background-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: var(--bs-primary-bg-subtle, #e7f1ff) !important;
+    color: var(--bs-primary, #0d6efd) !important;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 2px solid var(--bs-border-color, #dee2e6) !important;
+    border-radius: 0.375rem !important;
+    background-color: var(--bs-body-bg, #fff) !important;
+    color: var(--bs-body-color, #212529) !important;
+    padding: 10px 12px !important;
+    font-size: 0.875rem !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field:focus {
+    border-color: #86b7fe !important;
+    outline: 0 !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+/* Dark Mode Specific Overrides - Using the correct theme selector */
+[data-layout-mode="dark"] .select2-container--default .select2-selection--single {
+    background-color: var(--vz-card-bg, #212529) !important;
+    border-color: var(--vz-border-color, #32383e) !important;
+    color: var(--vz-body-color, #ced4da) !important;
+}
+
+[data-layout-mode="dark"] .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: var(--vz-body-color, #ced4da) !important;
+}
+
+[data-layout-mode="dark"] .select2-container--default .select2-selection--single .select2-selection__placeholder {
+    color: var(--vz-gray-500, #adb5bd) !important;
+}
+
+[data-layout-mode="dark"] .select2-dropdown {
+    background-color: var(--vz-dropdown-bg, #292e33) !important;
+    border-color: var(--vz-border-color, #32383e) !important;
+}
+
+[data-layout-mode="dark"] .select2-container--default .select2-results__option {
+    background-color: var(--vz-dropdown-bg, #292e33) !important;
+    color: var(--vz-dropdown-link-color, #adb5bd) !important;
+}
+
+[data-layout-mode="dark"] .select2-container--default .select2-results__option--highlighted {
+    background-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+[data-layout-mode="dark"] .select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: var(--vz-dropdown-link-hover-bg, #2f343a) !important;
+    color: var(--vz-dropdown-link-hover-color, #b9bfc4) !important;
+}
+
+[data-layout-mode="dark"] .select2-container--default .select2-search--dropdown .select2-search__field {
+    background-color: var(--vz-input-bg, #262a2f) !important;
+    border: 2px solid #3b3b3b !important;
+    color: var(--vz-body-color, #ced4da) !important;
+    box-shadow: 0 3px 8px rgba(141, 141, 141, 0.2), inset 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-layout-mode="dark"] .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 0.25rem rgba(134, 183, 254, 0.4), 0 3px 8px rgba(13, 110, 253, 0.3), inset 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Search container styling */
+.select2-container--default .select2-search--dropdown {
+    padding: 8px !important;
+    background-color: var(--bs-body-bg, #fff) !important;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6) !important;
+}
+
+[data-layout-mode="dark"] .select2-container--default .select2-search--dropdown {
+    background-color: var(--vz-dropdown-bg, #292e33) !important;
+    border-bottom: 2px solid #495057 !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Placeholder text styling */
+.select2-container--default .select2-search--dropdown .select2-search__field::placeholder {
+    color: var(--bs-secondary-color, #6c757d) !important;
+    opacity: 0.8 !important;
+    font-style: italic !important;
+}
+
+[data-layout-mode="dark"] .select2-container--default .select2-search--dropdown .select2-search__field::placeholder {
+    color: var(--vz-gray-500, #adb5bd) !important;
+    opacity: 0.7 !important;
+}
+
+/* Make it look like floating labels */
+.form-floating .select2-container {
+    position: relative;
+}
+
+.form-floating .select2-container .select2-selection {
+    background-color: transparent !important;
+}
+
+.form-floating label {
+    z-index: 10;
+}
