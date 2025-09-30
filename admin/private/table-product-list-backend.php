@@ -69,7 +69,7 @@ if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
             $stmt->execute();
         }
 
-            $productName = $_POST['material_name'].' '.$_POST['product_type_name'].' '.$size1.'*'.$size2.'*'.$size3.' '.$_POST['variant'];
+            $productName = $_POST['material_name'].' '.$_POST['product_type_name'].' '.$size1.'*'.$size2.' '.$_POST['variant'];
             
             if (strlen($productName) > 50) {
                 $_SESSION['errorMsg'] = "Product name exceeds 50 characters limit for Xero integration.";

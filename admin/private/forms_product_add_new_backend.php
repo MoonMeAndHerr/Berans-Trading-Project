@@ -73,7 +73,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         $size2 = !empty($_POST['size_2']) && !empty($_POST['metric_2']) ? $_POST['size_2'].''.$_POST['metric_2'] : null;
         $size3 = !empty($_POST['size_3']) && !empty($_POST['metric_3']) ? $_POST['size_3'].''.$_POST['metric_3'] : null;
 
-        $productName = $materrialName.' '.$productType.' '.$size1.'*'.$size2.'*'.$size3.' '.$_POST['variant'];
+        $productName = $materrialName.' '.$productType.' '.$size1.'*'.$size2.' '.$_POST['variant'];
 
         if (strlen($productName) > 50) {
             $_SESSION['errorMsg'] = "Product name exceeds 50 characters limit for Xero integration.";
