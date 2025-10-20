@@ -395,9 +395,12 @@ include __DIR__ . '/../include/header.php';
                                                                 <div class="input-group">
                                                                     <span class="input-group-text bg-light border-end-0">RM</span>
                                                                     <input type="number" class="form-control border-start-0 ps-0" id="supplierPaymentAmount" 
-                                                                           name="amount" step="0.01" min="0" placeholder="0.00" required>
+                                                                           name="amount" step="0.0001" placeholder="0.0000" required>
                                                                 </div>
-                                                                <small class="text-muted">Amount in Malaysian Ringgit</small>
+                                                                <small class="text-muted">Amount in Malaysian Ringgit (up to 4 decimal places)</small>
+                                                                <div class="mt-1">
+                                                                    <small class="text-info"><i class="ri-information-line"></i> <strong>Tip:</strong> Enter negative amount (e.g., -200) to deduct/reverse a payment</small>
+                                                                </div>
                                                             </div>
                                                             
                                                             <div class="mb-3">
@@ -480,9 +483,12 @@ include __DIR__ . '/../include/header.php';
                                                                 <div class="input-group">
                                                                     <span class="input-group-text bg-light border-end-0">RM</span>
                                                                     <input type="number" class="form-control border-start-0 ps-0" id="shippingPaymentAmount" 
-                                                                           name="amount" step="0.01" min="0" placeholder="0.00" required>
+                                                                           name="amount" step="0.0001" placeholder="0.0000" required>
                                                                 </div>
-                                                                <small class="text-muted">Amount in Malaysian Ringgit</small>
+                                                                <small class="text-muted">Amount in Malaysian Ringgit (up to 4 decimal places)</small>
+                                                                <div class="mt-1">
+                                                                    <small class="text-info"><i class="ri-information-line"></i> <strong>Tip:</strong> Enter negative amount (e.g., -200) to deduct/reverse a payment</small>
+                                                                </div>
                                                             </div>
                                                             
                                                             <div class="mb-3">
@@ -559,7 +565,11 @@ include __DIR__ . '/../include/header.php';
                                                                 <div class="input-group">
                                                                     <span class="input-group-text bg-success text-white border-0">RM</span>
                                                                     <input type="number" class="form-control ps-3" id="commissionPaymentAmount" 
-                                                                           step="0.01" min="0" placeholder="0.00">
+                                                                           step="0.0001" placeholder="0.0000">
+                                                                </div>
+                                                                <small class="text-muted">Amount in Malaysian Ringgit (up to 4 decimal places)</small>
+                                                                <div class="mt-1">
+                                                                    <small class="text-info"><i class="ri-information-line"></i> <strong>Tip:</strong> Enter negative amount (e.g., -200) to deduct/reverse a payment</small>
                                                                 </div>
                                                             </div>
                                                             
@@ -1136,14 +1146,48 @@ include __DIR__ . '/../include/header.php';
                     e.preventDefault();
                     
                     const invoiceId = document.getElementById('supplierInvoiceId').value;
-                    const amount = document.getElementById('supplierPaymentAmount').value;
+                    const amount = parseFloat(document.getElementById('supplierPaymentAmount').value);
                     const description = document.getElementById('supplierPaymentDescription').value;
                     
-                    if (!amount || amount <= 0) {
+                    if (!amount || amount === 0 || isNaN(amount)) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Invalid Amount',
-                            text: 'Please enter a valid payment amount'
+                            text: 'Please enter a valid payment amount (cannot be zero)'
+                        });
+                        return;
+                    }
+                    
+                    // If negative amount, show confirmation dialog
+                    if (amount < 0) {
+                        Swal.fire({
+                            title: 'Confirm Payment Deduction',
+                            html: `
+                                <div class="text-start">
+                                    <p class="mb-2"><strong>You are about to DEDUCT a payment:</strong></p>
+                                    <ul class="mb-3">
+                                        <li>Amount to deduct: <strong class="text-danger">RM ${formatNumber(Math.abs(amount))}</strong></li>
+                                        <li>This will <strong>reduce</strong> the total paid amount</li>
+                                        <li>Use this to correct overpayments or mistakes</li>
+                                    </ul>
+                                    <p class="text-muted small mb-0">Note: ${description || 'No description provided'}</p>
+                                </div>
+                            `,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#dc3545',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: 'Yes, Deduct Payment',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                const formData = new FormData();
+                                formData.append('action', 'add_supplier_payment');
+                                formData.append('invoice_id', invoiceId);
+                                formData.append('amount', amount);
+                                formData.append('description', description);
+                                submitPayment(formData, 'supplier');
+                            }
                         });
                         return;
                     }
@@ -1163,14 +1207,48 @@ include __DIR__ . '/../include/header.php';
                     e.preventDefault();
                     
                     const invoiceId = document.getElementById('shippingInvoiceId').value;
-                    const amount = document.getElementById('shippingPaymentAmount').value;
+                    const amount = parseFloat(document.getElementById('shippingPaymentAmount').value);
                     const description = document.getElementById('shippingPaymentDescription').value;
                     
-                    if (!amount || amount <= 0) {
+                    if (!amount || amount === 0 || isNaN(amount)) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Invalid Amount',
-                            text: 'Please enter a valid payment amount'
+                            text: 'Please enter a valid payment amount (cannot be zero)'
+                        });
+                        return;
+                    }
+                    
+                    // If negative amount, show confirmation dialog
+                    if (amount < 0) {
+                        Swal.fire({
+                            title: 'Confirm Payment Deduction',
+                            html: `
+                                <div class="text-start">
+                                    <p class="mb-2"><strong>You are about to DEDUCT a payment:</strong></p>
+                                    <ul class="mb-3">
+                                        <li>Amount to deduct: <strong class="text-danger">RM ${formatNumber(Math.abs(amount))}</strong></li>
+                                        <li>This will <strong>reduce</strong> the total paid amount</li>
+                                        <li>Use this to correct overpayments or mistakes</li>
+                                    </ul>
+                                    <p class="text-muted small mb-0">Note: ${description || 'No description provided'}</p>
+                                </div>
+                            `,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#dc3545',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: 'Yes, Deduct Payment',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                const formData = new FormData();
+                                formData.append('action', 'add_shipping_payment');
+                                formData.append('invoice_id', invoiceId);
+                                formData.append('amount', amount);
+                                formData.append('description', description);
+                                submitPayment(formData, 'shipping');
+                            }
                         });
                         return;
                     }
@@ -1238,14 +1316,48 @@ include __DIR__ . '/../include/header.php';
                     e.preventDefault();
                     
                     const invoiceId = document.getElementById('commissionInvoiceId').value;
-                    const amount = document.getElementById('commissionPaymentAmount').value;
+                    const amount = parseFloat(document.getElementById('commissionPaymentAmount').value);
                     const notes = document.getElementById('commissionPaymentDescription').value;
                     
-                    if (!amount || amount <= 0) {
+                    if (!amount || amount === 0 || isNaN(amount)) {
                         Swal.fire({
                             icon: 'warning',
                             title: 'Invalid Amount',
-                            text: 'Please enter a valid payment amount greater than 0'
+                            text: 'Please enter a valid payment amount (cannot be zero)'
+                        });
+                        return;
+                    }
+                    
+                    // If negative amount, show confirmation dialog
+                    if (amount < 0) {
+                        Swal.fire({
+                            title: 'Confirm Commission Deduction',
+                            html: `
+                                <div class="text-start">
+                                    <p class="mb-2"><strong>You are about to DEDUCT a commission payment:</strong></p>
+                                    <ul class="mb-3">
+                                        <li>Amount to deduct: <strong class="text-danger">RM ${formatNumber(Math.abs(amount))}</strong></li>
+                                        <li>This will <strong>reduce</strong> the commission paid amount</li>
+                                        <li>Use this to correct overpayments or mistakes</li>
+                                    </ul>
+                                    <p class="text-muted small mb-0">Note: ${notes || 'No description provided'}</p>
+                                </div>
+                            `,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#dc3545',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: 'Yes, Deduct Payment',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                const formData = new FormData();
+                                formData.append('action', 'pay_staff_commission');
+                                formData.append('invoice_id', invoiceId);
+                                formData.append('amount', amount);
+                                formData.append('notes', notes);
+                                submitCommissionPayment(formData);
+                            }
                         });
                         return;
                     }
@@ -1270,14 +1382,14 @@ include __DIR__ . '/../include/header.php';
             submitButton.disabled = true;
             
             // Validate form data
-            const amount = formData.get('amount');
+            const amount = parseFloat(formData.get('amount'));
             const invoiceId = formData.get('invoice_id');
             
-            if (!amount || amount <= 0) {
+            if (!amount || amount === 0 || isNaN(amount)) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Invalid Amount',
-                    text: 'Please enter a valid payment amount greater than 0',
+                    text: 'Please enter a valid payment amount (cannot be zero)',
                     confirmButtonColor: '#dc3545'
                 });
                 submitButton.innerHTML = originalText;
@@ -1326,10 +1438,15 @@ include __DIR__ . '/../include/header.php';
                     console.log('Parsed response:', data);
                     
                     if (data.success) {
+                        const paymentAmount = parseFloat(formData.get('amount'));
+                        const isDeduction = paymentAmount < 0;
+                        
                         Swal.fire({
                             icon: 'success',
-                            title: 'Payment Processed',
-                            text: `${type.charAt(0).toUpperCase() + type.slice(1)} payment has been recorded successfully`,
+                            title: isDeduction ? 'Payment Deducted' : 'Payment Processed',
+                            text: isDeduction 
+                                ? `${type.charAt(0).toUpperCase() + type.slice(1)} payment deduction of RM ${formatNumber(Math.abs(paymentAmount))} has been recorded`
+                                : `${type.charAt(0).toUpperCase() + type.slice(1)} payment of RM ${formatNumber(paymentAmount)} has been recorded successfully`,
                             timer: 2000,
                             showConfirmButton: false,
                             confirmButtonColor: '#28a745'
@@ -1395,10 +1512,15 @@ include __DIR__ . '/../include/header.php';
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    const paymentAmount = parseFloat(formData.get('amount'));
+                    const isDeduction = paymentAmount < 0;
+                    
                     Swal.fire({
                         icon: 'success',
-                        title: 'Payment Recorded',
-                        text: `Commission payment of RM ${formatNumber(data.payment_amount)} recorded for ${data.staff_name}`,
+                        title: isDeduction ? 'Commission Deducted' : 'Payment Recorded',
+                        text: isDeduction
+                            ? `Commission deduction of RM ${formatNumber(Math.abs(paymentAmount))} recorded for ${data.staff_name}`
+                            : `Commission payment of RM ${formatNumber(paymentAmount)} recorded for ${data.staff_name}`,
                         timer: 3000,
                         showConfirmButton: false
                     });
@@ -1445,17 +1567,20 @@ include __DIR__ . '/../include/header.php';
         function formatCurrency(amount) {
             // Handle null, undefined, empty string, or NaN values
             if (amount === null || amount === undefined || amount === '' || isNaN(amount)) {
-                return '0';
+                return '0.0000';
             }
             
             const numValue = parseFloat(amount);
             
             // Check if the parsed value is still NaN
             if (isNaN(numValue)) {
-                return '0';
+                return '0.0000';
             }
             
-            return new Intl.NumberFormat('ja-JP').format(numValue);
+            return new Intl.NumberFormat('en-MY', {
+                minimumFractionDigits: 4,
+                maximumFractionDigits: 4
+            }).format(numValue);
         }
 
         function formatNumber(value) {
@@ -1688,6 +1813,17 @@ include __DIR__ . '/../include/header.php';
             }
 
             const rows = orders.map(order => {
+                // DEBUG: Log commission calculation data
+                if (order.commission_staff_id) {
+                    console.log('DEBUG - Order:', order.order_number, {
+                        total_revenue: order.total_revenue,
+                        commission_percentage: order.commission_percentage,
+                        commission_paid_amount: order.commission_paid_amount,
+                        calculated_commission_due: order.total_revenue * (order.commission_percentage / 100),
+                        calculated_remaining: (order.total_revenue * (order.commission_percentage / 100)) - parseFloat(order.commission_paid_amount || 0)
+                    });
+                }
+                
                 // Use the backend calculated values - convert to RM like modal
                 const supplierCostYen = parseFloat(order.total_supplier_cost_yen || 0);
                 const shippingCostRm = parseFloat(order.total_shipping_cost_rm || 0);
@@ -1695,7 +1831,7 @@ include __DIR__ . '/../include/header.php';
                 const shippingPaidRm = parseFloat(order.shipping_payments_total || 0);
                 const avgConversionRate = parseFloat(order.avg_conversion_rate || 0.032);
                 
-                // Convert supplier amounts to RM (same calculation as modal)
+                // Convert supplier amounts to RM (Yen ÷ rate = RM, where rate is Yen per 1 RM)
                 const supplierCostRm = supplierCostYen / avgConversionRate;
                 const supplierPaidRm = supplierPaidYen / avgConversionRate;
                 
@@ -1764,15 +1900,17 @@ include __DIR__ . '/../include/header.php';
                             ${order.staff_name ? `
                                 <div style="font-weight: 500;">${order.staff_name}</div>
                                 <div style="font-size: 12px; color: ${(() => {
-                                    // Use revenue for commission calculation
-                                    const commissionDue = order.total_revenue * (order.commission_percentage / 100);
+                                    // Use pre-discount revenue for commission calculation
+                                    const revenueForCommission = parseFloat(order.total_revenue_before_discount || order.total_revenue);
+                                    const commissionDue = revenueForCommission * (order.commission_percentage / 100);
                                     const paidAmount = parseFloat(order.commission_paid_amount || 0);
                                     const remaining = commissionDue - paidAmount;
                                     return remaining <= 0 ? '#059669' : '#dc2626';
                                 })()};">
                                     ${(() => {
-                                        // Use revenue for commission calculation
-                                        const commissionDue = order.total_revenue * (order.commission_percentage / 100);
+                                        // Use pre-discount revenue for commission calculation
+                                        const revenueForCommission = parseFloat(order.total_revenue_before_discount || order.total_revenue);
+                                        const commissionDue = revenueForCommission * (order.commission_percentage / 100);
                                         const paidAmount = parseFloat(order.commission_paid_amount || 0);
                                         const remaining = commissionDue - paidAmount;
                                         return remaining <= 0 ? 'Paid' : `Remaining: RM${formatNumber(remaining)}`;
@@ -1812,27 +1950,19 @@ include __DIR__ . '/../include/header.php';
         function formatNumber(value) {
             // Handle null, undefined, empty string, or NaN values
             if (value === null || value === undefined || value === '' || isNaN(value)) {
-                return '0.00';
+                return '0.0000';
             }
             
             const numValue = parseFloat(value);
             
             // Check if the parsed value is still NaN
             if (isNaN(numValue)) {
-                return '0.00';
-            }
-            
-            // For very small values, use more decimal places to avoid showing 0.00
-            if (Math.abs(numValue) > 0 && Math.abs(numValue) < 0.01) {
-                return new Intl.NumberFormat('en-MY', {
-                    minimumFractionDigits: 4,
-                    maximumFractionDigits: 4
-                }).format(numValue);
+                return '0.0000';
             }
             
             return new Intl.NumberFormat('en-MY', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
+                minimumFractionDigits: 4,
+                maximumFractionDigits: 4
             }).format(numValue);
         }
 
@@ -2031,41 +2161,54 @@ include __DIR__ . '/../include/header.php';
             const summary = data.summary;
             
             let itemsHtml = '';
+            
+            // Calculate discount ratio for proportional distribution
+            const totalRevenueTemp = parseFloat(summary?.total_revenue || 0);
+            const totalRevenueBeforeDiscountTemp = parseFloat(summary?.total_revenue_before_discount || 0);
+            const discountRatio = totalRevenueBeforeDiscountTemp > 0 ? totalRevenueTemp / totalRevenueBeforeDiscountTemp : 1;
+            
             items.forEach(item => {
-                const itemProfit = parseFloat(item.item_profit || 0);
-                const profitClass = itemProfit >= 0 ? 'text-success' : 'text-danger';
-                
                 // Safely extract and format values
                 const quantity = parseFloat(item.quantity || 0);
                 const unitPrice = parseFloat(item.unit_price || 0);
                 const itemRevenue = parseFloat(item.item_revenue || 0);
+                const itemRevenueTable = itemRevenue * discountRatio; // Apply discount proportionally
                 const unitSupplierCost = parseFloat(item.unit_supplier_cost_yen || 0);
-                const conversionRate = parseFloat(item.conversion_rate || 0.032); // Use actual conversion rate
-                const unitSupplierCostRm = unitSupplierCost / conversionRate; // Correct calculation: yen / conversion_rate
+                const conversionRate = parseFloat(item.conversion_rate || 0.032);
+                const unitSupplierCostRm = unitSupplierCost / conversionRate;
                 const unitShippingCost = parseFloat(item.unit_shipping_cost_rm || 0);
-                const totalCostRm = parseFloat(item.total_cost_rm || 0);
+                
+                // Calculate total costs and profit
+                const totalSupplierCost = unitSupplierCostRm * quantity;
+                const totalShippingCost = unitShippingCost * quantity;
+                const totalCost = totalSupplierCost + totalShippingCost;
+                const itemProfit = itemRevenueTable - totalCost; // Use discounted revenue for profit calculation
+                const profitClass = itemProfit >= 0 ? 'text-success' : 'text-danger';
                 
                 itemsHtml += `
                     <tr>
                         <td>${item.product_name || 'N/A'}</td>
                         <td>${formatNumber(quantity)}</td>
                         <td>RM ${formatNumber(unitPrice)}</td>
-                        <td>RM ${formatNumber(itemRevenue)}</td>
-                        <td>¥${formatNumber(unitSupplierCost)} / RM ${formatNumber(unitSupplierCostRm)}</td>
-                        <td>RM ${formatNumber(unitShippingCost)}</td>
-                        <td>RM ${formatNumber(totalCostRm)}</td>
-                        <td class="${profitClass}">RM ${formatNumber(Math.abs(itemProfit))}</td>
+                        <td>RM ${formatNumber(itemRevenueTable)}</td>
+                        <td>RM ${formatNumber(totalSupplierCost)} | RM ${formatNumber(unitSupplierCostRm)}</td>
+                        <td>RM ${formatNumber(totalShippingCost)} | RM ${formatNumber(unitShippingCost)}</td>
+                        <td>RM ${formatNumber(totalCost)}</td>
+                        <td class="${profitClass}">RM ${formatNumber(Math.abs(itemProfit))}${itemProfit < 0 ? ' (Loss)' : ''}</td>
                     </tr>
                 `;
             });
 
             // Safely extract summary values
-            const totalRevenue = parseFloat(summary?.total_revenue || 0);
+            const totalRevenue = parseFloat(summary?.total_revenue || 0); // After discount (what customer pays)
+            const totalRevenueBeforeDiscount = parseFloat(summary?.total_revenue_before_discount || 0); // Before discount (sum of items)
+            const priceDeduction = totalRevenueBeforeDiscount - totalRevenue; // Calculate discount amount
             const totalSupplierCost = parseFloat(summary?.total_supplier_cost_yen || 0);
             const avgConversionRate = parseFloat(summary?.avg_conversion_rate || 0.032);
-            const totalSupplierCostRm = totalSupplierCost / avgConversionRate; // Use correct calculation
+            const totalSupplierCostRm = totalSupplierCost / avgConversionRate;
             const totalShippingCost = parseFloat(summary?.total_shipping_cost_rm || 0);
-            const totalProfit = parseFloat(summary?.total_profit || 0);
+            const totalCost = totalSupplierCostRm + totalShippingCost;
+            const totalProfit = totalRevenue - totalCost;
             const totalProfitClass = totalProfit >= 0 ? 'text-success' : 'text-danger';
             
             const html = `
@@ -2079,8 +2222,9 @@ include __DIR__ . '/../include/header.php';
                     </div>
                     <div class="col-md-6">
                         <h6 class="fw-bold">Financial Summary</h6>
-                        <p><strong>Total Revenue:</strong> RM ${formatNumber(totalRevenue)}</p>
-                        <p><strong>Supplier Cost:</strong> ¥${formatNumber(totalSupplierCost)} / RM ${formatNumber(totalSupplierCostRm)}</p>
+                        <p><strong>Total Revenue:</strong> RM ${formatNumber(totalRevenueBeforeDiscount)}</p>
+                        <p><strong>Price Deduction Discount:</strong> <span class="text-danger">- RM ${formatNumber(priceDeduction)}</span></p>
+                        <p><strong>Supplier Cost:</strong> RM ${formatNumber(totalSupplierCostRm)}</p>
                         <p><strong>Shipping Cost:</strong> RM ${formatNumber(totalShippingCost)}</p>
                         <p><strong>Total Profit:</strong> <span class="${totalProfitClass}">RM ${formatNumber(Math.abs(totalProfit))}</span></p>
                     </div>
@@ -2095,10 +2239,10 @@ include __DIR__ . '/../include/header.php';
                                 <th>Qty</th>
                                 <th>Selling Price</th>
                                 <th>Revenue</th>
-                                <th>Supplier Cost</th>
-                                <th>Shipping Cost</th>
+                                <th>Total Supplier Cost | Per Unit</th>
+                                <th>Total Shipping Cost | Per Unit</th>
                                 <th>Total Cost</th>
-                                <th>Profit/Loss</th>
+                                <th>Total Profit/Loss</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -2229,10 +2373,10 @@ include __DIR__ . '/../include/header.php';
             // Calculate due amounts - keep currencies separate like main table
             const supplierDue = summary.total_supplier_cost_yen;
             const avgConversionRate = parseFloat(summary.avg_conversion_rate || 0.032);
-            const supplierDueRm = supplierDue / avgConversionRate; // Use correct calculation
+            const supplierDueRm = supplierDue / avgConversionRate; // Yen ÷ rate = RM
             const shippingDue = summary.total_shipping_cost_rm; // Fixed: use RM for shipping
             const supplierPaid = summary.supplier_payments_made;
-            const supplierPaidRm = supplierPaid / avgConversionRate; // Use correct calculation
+            const supplierPaidRm = supplierPaid / avgConversionRate; // Yen ÷ rate = RM
             const shippingPaid = summary.shipping_payments_made;
             const supplierBalance = supplierDueRm - supplierPaidRm; // Use RM for balance
             const shippingBalance = shippingDue - shippingPaid;
@@ -2292,11 +2436,15 @@ include __DIR__ . '/../include/header.php';
             let supplierHistoryHtml = '';
             // avgConversionRate already declared above in this function scope
             supplierPayments.forEach(payment => {
-                const amountRm = payment.amount / avgConversionRate; // Use correct calculation
+                const amountRm = payment.amount / avgConversionRate; // Yen ÷ rate = RM
+                const isDeduction = amountRm < 0;
+                const amountClass = isDeduction ? 'text-danger' : 'text-success';
+                const amountPrefix = isDeduction ? '-' : '+';
+                
                 supplierHistoryHtml += `
                     <tr>
                         <td>${payment.date}</td>
-                        <td>RM ${formatCurrency(amountRm)}</td>
+                        <td class="${amountClass} fw-medium">${amountPrefix}RM ${formatCurrency(Math.abs(amountRm))}</td>
                         <td>${payment.description || 'N/A'}</td>
                     </tr>
                 `;
@@ -2304,10 +2452,14 @@ include __DIR__ . '/../include/header.php';
 
             let shippingHistoryHtml = '';
             shippingPayments.forEach(payment => {
+                const isDeduction = payment.amount < 0;
+                const amountClass = isDeduction ? 'text-danger' : 'text-success';
+                const amountPrefix = isDeduction ? '-' : '+';
+                
                 shippingHistoryHtml += `
                     <tr>
                         <td>${payment.date}</td>
-                        <td>RM ${formatNumber(payment.amount)}</td>
+                        <td class="${amountClass} fw-medium">${amountPrefix}RM ${formatNumber(Math.abs(payment.amount))}</td>
                         <td>${payment.description || 'N/A'}</td>
                     </tr>
                 `;
@@ -2315,10 +2467,14 @@ include __DIR__ . '/../include/header.php';
 
             let commissionHistoryHtml = '';
             commissionPayments.forEach(payment => {
+                const isDeduction = payment.amount < 0;
+                const amountClass = isDeduction ? 'text-danger' : 'text-success';
+                const amountPrefix = isDeduction ? '-' : '+';
+                
                 commissionHistoryHtml += `
                     <tr>
                         <td>${payment.date}</td>
-                        <td>RM ${formatNumber(payment.amount)}</td>
+                        <td class="${amountClass} fw-medium">${amountPrefix}RM ${formatNumber(Math.abs(payment.amount))}</td>
                         <td>${payment.description || 'N/A'}</td>
                     </tr>
                 `;
@@ -2334,59 +2490,82 @@ include __DIR__ . '/../include/header.php';
 
         function setupPaymentCalculations(orderData) {
             const summary = orderData.summary;
+            const avgConversionRate = parseFloat(summary.avg_conversion_rate || 0.032);
             
-            // Supplier payment calculation
+            // Supplier payment calculation - convert to RM
             const supplierAmountInput = document.getElementById('supplierPaymentAmount');
             const supplierImpactDiv = document.getElementById('supplierPaymentImpact');
             
             if (supplierAmountInput && supplierImpactDiv) {
-                supplierAmountInput.addEventListener('input', function() {
+                // Remove old listeners by cloning
+                const newSupplierInput = supplierAmountInput.cloneNode(true);
+                supplierAmountInput.parentNode.replaceChild(newSupplierInput, supplierAmountInput);
+                
+                newSupplierInput.addEventListener('input', function() {
                     const amount = parseFloat(this.value) || 0;
-                    const due = summary.total_supplier_cost_yen;
-                    const paid = summary.supplier_payments_made;
-                    const newTotal = paid + amount;
-                    const difference = newTotal - due;
+                    const dueYen = parseFloat(summary.total_supplier_cost_yen || 0);
+                    const paidYen = parseFloat(summary.supplier_payments_made || 0);
+                    const dueRm = dueYen / avgConversionRate; // Convert Yen to RM
+                    const paidRm = paidYen / avgConversionRate; // Convert Yen to RM
+                    const newTotalRm = paidRm + amount;
+                    const differenceRm = newTotalRm - dueRm;
                     
                     let impactHtml = '';
                     if (amount === 0) {
-                        impactHtml = 'Enter amount to see impact';
-                    } else if (difference > 0) {
-                        impactHtml = `<span class="text-warning">⚠️ Overpayment by ¥${formatCurrency(difference)}<br>This will reduce profit margin</span>`;
-                    } else if (difference < 0) {
-                        impactHtml = `<span class="text-info">ℹ️ Partial payment: ¥${formatCurrency(Math.abs(difference))} remaining<br>Remaining balance will maintain profit</span>`;
+                        impactHtml = '<span class="text-muted">Enter amount to see payment impact</span>';
+                    } else if (amount < 0) {
+                        // Deduction/reversal
+                        impactHtml = `<span class="text-danger"><i class="ri-subtract-line"></i> <strong>Deducting RM ${formatNumber(Math.abs(amount))}</strong><br><small>New total paid: RM ${formatNumber(newTotalRm)} | Remaining: RM ${formatNumber(dueRm - newTotalRm)}</small></span>`;
+                    } else if (differenceRm > 0.01) { // Small tolerance for floating point
+                        impactHtml = `<span class="text-warning"><i class="ri-error-warning-line"></i> Overpayment by RM ${formatNumber(differenceRm)}<br><small>This will reduce profit margin</small></span>`;
+                    } else if (differenceRm < -0.01) {
+                        impactHtml = `<span class="text-info"><i class="ri-information-line"></i> Partial payment: RM ${formatNumber(Math.abs(differenceRm))} remaining<br><small>Balance after this payment</small></span>`;
                     } else {
-                        impactHtml = `<span class="text-success">✅ Full payment: Exact amount due</span>`;
+                        impactHtml = `<span class="text-success"><i class="ri-checkbox-circle-line"></i> Full payment: Exact amount due</span>`;
                     }
                     
                     supplierImpactDiv.innerHTML = impactHtml;
                 });
+                
+                // Trigger initial update
+                newSupplierInput.dispatchEvent(new Event('input'));
             }
 
-            // Shipping payment calculation - use RM currency to match main table
+            // Shipping payment calculation - already in RM
             const shippingAmountInput = document.getElementById('shippingPaymentAmount');
             const shippingImpactDiv = document.getElementById('shippingPaymentImpact');
             
             if (shippingAmountInput && shippingImpactDiv) {
-                shippingAmountInput.addEventListener('input', function() {
+                // Remove old listeners by cloning
+                const newShippingInput = shippingAmountInput.cloneNode(true);
+                shippingAmountInput.parentNode.replaceChild(newShippingInput, shippingAmountInput);
+                
+                newShippingInput.addEventListener('input', function() {
                     const amount = parseFloat(this.value) || 0;
-                    const due = summary.total_shipping_cost_rm; // Fixed: use RM field
-                    const paid = summary.shipping_payments_made;
-                    const newTotal = paid + amount;
-                    const difference = newTotal - due;
+                    const dueRm = parseFloat(summary.total_shipping_cost_rm || 0);
+                    const paidRm = parseFloat(summary.shipping_payments_made || 0);
+                    const newTotalRm = paidRm + amount;
+                    const differenceRm = newTotalRm - dueRm;
                     
                     let impactHtml = '';
                     if (amount === 0) {
-                        impactHtml = 'Enter amount to see impact';
-                    } else if (difference > 0) {
-                        impactHtml = `<span class="text-warning">⚠️ Overpayment by RM ${formatNumber(difference)}<br>This will reduce profit margin</span>`;
-                    } else if (difference < 0) {
-                        impactHtml = `<span class="text-info">ℹ️ Partial payment: RM ${formatNumber(Math.abs(difference))} remaining<br>Remaining balance will maintain profit</span>`;
+                        impactHtml = '<span class="text-muted">Enter amount to see payment impact</span>';
+                    } else if (amount < 0) {
+                        // Deduction/reversal
+                        impactHtml = `<span class="text-danger"><i class="ri-subtract-line"></i> <strong>Deducting RM ${formatNumber(Math.abs(amount))}</strong><br><small>New total paid: RM ${formatNumber(newTotalRm)} | Remaining: RM ${formatNumber(dueRm - newTotalRm)}</small></span>`;
+                    } else if (differenceRm > 0.01) { // Small tolerance for floating point
+                        impactHtml = `<span class="text-warning"><i class="ri-error-warning-line"></i> Overpayment by RM ${formatNumber(differenceRm)}<br><small>This will reduce profit margin</small></span>`;
+                    } else if (differenceRm < -0.01) {
+                        impactHtml = `<span class="text-info"><i class="ri-information-line"></i> Partial payment: RM ${formatNumber(Math.abs(differenceRm))} remaining<br><small>Balance after this payment</small></span>`;
                     } else {
-                        impactHtml = `<span class="text-success">✅ Full payment: Exact amount due</span>`;
+                        impactHtml = `<span class="text-success"><i class="ri-checkbox-circle-line"></i> Full payment: Exact amount due</span>`;
                     }
                     
                     shippingImpactDiv.innerHTML = impactHtml;
                 });
+                
+                // Trigger initial update
+                newShippingInput.dispatchEvent(new Event('input'));
             }
         }
 
@@ -2408,7 +2587,7 @@ include __DIR__ . '/../include/header.php';
             
             // Calculate commission amounts
             const commissionPercentage = parseFloat(order.commission_percentage || 0);
-            const totalRevenue = parseFloat(orderData.summary?.total_revenue || 0); // Use revenue instead of profit
+            const totalRevenue = parseFloat(orderData.summary?.total_revenue || 0); // Use discounted revenue for commission
             const commissionDue = totalRevenue * (commissionPercentage / 100);
             const commissionPaid = parseFloat(order.commission_paid_amount || 0);
             const commissionRemaining = commissionDue - commissionPaid;
@@ -2456,24 +2635,34 @@ include __DIR__ . '/../include/header.php';
             const impactDiv = document.getElementById('commissionPaymentImpact');
             
             if (amountInput && impactDiv) {
-                amountInput.addEventListener('input', function() {
+                // Remove old listeners by cloning
+                const newAmountInput = amountInput.cloneNode(true);
+                amountInput.parentNode.replaceChild(newAmountInput, amountInput);
+                
+                newAmountInput.addEventListener('input', function() {
                     const amount = parseFloat(this.value) || 0;
                     const newTotal = commissionPaid + amount;
                     const difference = newTotal - commissionDue;
                     
                     let impactHtml = '';
                     if (amount === 0) {
-                        impactHtml = 'Enter amount to see impact';
-                    } else if (difference > 0) {
-                        impactHtml = `<span class="text-warning">⚠️ Overpayment by RM ${formatNumber(difference)}<br>Staff will be overpaid</span>`;
-                    } else if (difference < 0) {
-                        impactHtml = `<span class="text-info">ℹ️ Partial payment: RM ${formatNumber(Math.abs(difference))} remaining</span>`;
+                        impactHtml = '<span class="text-muted">Enter amount to see payment impact</span>';
+                    } else if (amount < 0) {
+                        // Deduction/reversal
+                        impactHtml = `<span class="text-danger"><i class="ri-subtract-line"></i> <strong>Deducting RM ${formatNumber(Math.abs(amount))}</strong><br><small>New total paid: RM ${formatNumber(newTotal)} | Remaining: RM ${formatNumber(commissionDue - newTotal)}</small></span>`;
+                    } else if (difference > 0.01) { // Small tolerance for floating point
+                        impactHtml = `<span class="text-warning"><i class="ri-error-warning-line"></i> Overpayment by RM ${formatNumber(difference)}<br><small>Staff will be overpaid</small></span>`;
+                    } else if (difference < -0.01) {
+                        impactHtml = `<span class="text-info"><i class="ri-information-line"></i> Partial payment: RM ${formatNumber(Math.abs(difference))} remaining<br><small>Balance after this payment</small></span>`;
                     } else {
-                        impactHtml = `<span class="text-success">✅ Full commission payment</span>`;
+                        impactHtml = `<span class="text-success"><i class="ri-checkbox-circle-line"></i> Full commission payment</span>`;
                     }
                     
                     impactDiv.innerHTML = impactHtml;
                 });
+                
+                // Trigger initial update
+                newAmountInput.dispatchEvent(new Event('input'));
             }
         }
 
@@ -2525,7 +2714,7 @@ include __DIR__ . '/../include/header.php';
                     const totalRevenue = parseFloat(summary.total_revenue || 0);
                     const actualProfitLoss = parseFloat(summary.actual_profit_loss || 0);
                     
-                    // Convert supplier amounts to RM (same as main table)
+                    // Convert supplier amounts to RM (Yen ÷ rate = RM)
                     const supplierCostRm = supplierCostYen / avgConversionRate;
                     const supplierPaidRm = supplierPaidYen / avgConversionRate;
                     

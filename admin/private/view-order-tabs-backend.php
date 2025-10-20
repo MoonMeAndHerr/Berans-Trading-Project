@@ -35,6 +35,12 @@ function getOrderTabs() {
             COALESCE(i.supplier_payments_total, 0) as supplier_payments_total,
             COALESCE(i.shipping_payments_total, 0) as shipping_payments_total,
             COALESCE(i.commission_paid_amount, 0) as commission_paid_amount,
+            (
+                SELECT COALESCE(AVG(p.new_conversion_rate), 0.032)
+                FROM invoice_item ii
+                LEFT JOIN price p ON ii.product_id = p.product_id
+                WHERE ii.invoice_id = i.invoice_id
+            ) as conversion_rate,
             CASE 
                 WHEN EXISTS (
                     SELECT 1 FROM payment_history 
