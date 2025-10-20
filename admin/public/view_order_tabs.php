@@ -7,6 +7,7 @@
         <!-- Minimal CSS for Order Tabs -->
         <link href="assets/css/order-tabs-minimal.css" rel="stylesheet" type="text/css" />
 
+
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
@@ -173,6 +174,14 @@
                                             <div class="detail-label">Quick Actions</div>
                                             <div class="detail-value">
                                                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                                    <button class="btn-compact btn-outline" onclick='confirmEditOrder(<?= $order['invoice_id'] ?>, {
+                                                        customerPayment: <?= isset($order['total_paid']) && $order['total_paid'] > 0 ? $order['total_paid'] : 0 ?>,
+                                                        supplierPayment: <?= isset($order['supplier_payments_total']) && $order['supplier_payments_total'] > 0 ? $order['supplier_payments_total'] : 0 ?>,
+                                                        shippingPayment: <?= isset($order['shipping_payments_total']) && $order['shipping_payments_total'] > 0 ? $order['shipping_payments_total'] : 0 ?>,
+                                                        commissionPayment: <?= isset($order['commission_paid_amount']) && $order['commission_paid_amount'] > 0 ? $order['commission_paid_amount'] : 0 ?>
+                                                    })'>
+                                                        <i class="ri-edit-line"></i> Edit Order
+                                                    </button>
                                                     <button class="btn-compact btn-outline" onclick="loadCartonDetails(<?= $order['invoice_id'] ?>)" data-bs-toggle="modal" data-bs-target="#cartonDetailModal">
                                                         <i class="ri-archive-line"></i> Carton Details
                                                     </button>
@@ -271,46 +280,115 @@
 
                 <!-- Payment Modal -->
                 <div class="modal fade" id="paymentModal" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">
-                                    <i class="ri-money-dollar-circle-line"></i>Add Payment
-                                </h5>
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content border-0 shadow-lg">
+                            <div class="modal-header bg-light border-0 py-4">
+                                <div>
+                                    <h5 class="modal-title fw-bold text-dark mb-1">
+                                        <i class="ri-money-dollar-circle-line me-2"></i>Customer Payment
+                                    </h5>
+                                    <p class="text-muted small mb-0">Record customer payment for this invoice</p>
+                                </div>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
-                            <div class="modal-body">
-                                <form id="paymentForm" class="form-minimal">
-                                    <!-- Hidden field to store invoice ID -->
-                                    <input type="hidden" id="hiddenInvoiceId" value="">
+                            <div class="modal-body p-4">
+                                <div class="row g-4">
+                                    <!-- Left Column: Payment Summary & Form -->
+                                    <div class="col-lg-6">
+                                        <!-- Payment Summary -->
+                                        <div class="bg-light rounded-3 p-4 mb-4">
+                                            <h6 class="fw-bold text-dark mb-3">
+                                                <i class="ri-calculator-line me-2"></i>Payment Summary
+                                            </h6>
+                                            
+                                            <!-- Hidden field to store invoice ID -->
+                                            <input type="hidden" id="hiddenInvoiceId" value="">
+                                            
+                                            <div class="mb-3">
+                                                <label class="form-label fw-medium text-dark small mb-1">Total Invoice Amount</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light border-end-0 text-muted">RM</span>
+                                                    <input type="text" class="form-control bg-light border-start-0 ps-0 fw-bold" id="totalAmount" readonly>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label class="form-label fw-medium text-dark small mb-1">Already Paid</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light border-end-0 text-success">RM</span>
+                                                    <input type="text" class="form-control bg-light border-start-0 ps-0 text-success fw-bold" id="alreadyPaid" readonly>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-0">
+                                                <label class="form-label fw-medium text-dark small mb-1">Outstanding Balance</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-warning bg-opacity-25 border-warning text-warning">RM</span>
+                                                    <input type="text" class="form-control border-warning bg-warning bg-opacity-10 fw-bold text-warning" id="outstandingBalance" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Payment Form -->
+                                        <div class="border rounded-3 p-4">
+                                            <h6 class="fw-bold text-dark mb-3">
+                                                <i class="ri-bank-card-line me-2"></i>Make Payment
+                                            </h6>
+                                            <form id="paymentForm">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-medium text-dark">Amount to Pay Now</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-light border-end-0">RM</span>
+                                                        <input type="number" class="form-control border-start-0 ps-0" id="amountPaid" 
+                                                               step="0.01" placeholder="0.00" required>
+                                                    </div>
+                                                    <small class="text-muted d-block mt-1">
+                                                        <i class="ri-information-line me-1"></i>Enter the amount customer is paying now
+                                                    </small>
+                                                    <small class="text-info d-block mt-1">
+                                                        <i class="ri-subtract-line me-1"></i><strong>Tip:</strong> Use negative value (e.g., -2000) to reverse/deduct a payment
+                                                    </small>
+                                                </div>
+                                                
+                                                <div class="border rounded p-2 mb-3" style="background-color: transparent;">
+                                                    <div class="d-flex align-items-start">
+                                                        <i class="ri-information-line text-muted me-2 mt-1"></i>
+                                                        <div class="flex-grow-1">
+                                                            <small class="fw-medium d-block mb-1">Remaining Balance After Payment</small>
+                                                            <div class="input-group input-group-sm">
+                                                                <span class="input-group-text bg-transparent border-0 text-muted ps-0">RM</span>
+                                                                <input type="text" class="form-control bg-transparent border-0 fw-bold" id="remainingAmount" readonly>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <button type="submit" class="btn btn-dark w-100 py-2">
+                                                    <i class="ri-secure-payment-line me-2"></i>Process Payment
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                     
-                                    <div class="mb-3">
-                                        <label class="form-label">
-                                            <i class="ri-money-cny-circle-line"></i>Total Amount Due (RM)
-                                        </label>
-                                        <input type="text" class="form-control" id="totalAmount" readonly>
+                                    <!-- Right Column: Payment History -->
+                                    <div class="col-lg-6">
+                                        <div class="h-100">
+                                            <h6 class="fw-bold text-dark mb-3">
+                                                <i class="ri-history-line me-2"></i>Payment History
+                                            </h6>
+                                            <div class="bg-light rounded-3 p-3 payment-history-scroll" style="max-height: 500px; overflow-y: auto;">
+                                                <div id="paymentHistorySection">
+                                                    <div class="text-center text-muted py-5">
+                                                        <div class="spinner-border spinner-border-sm" role="status">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                        </div>
+                                                        <div class="mt-2 small">Loading payment history...</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">
-                                            <i class="ri-bank-card-line"></i>Amount Paid (RM)
-                                        </label>
-                                        <input type="number" class="form-control" id="amountPaid" step="0.01" min="0" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">
-                                            <i class="ri-calculator-line"></i>Remaining Amount (RM)
-                                        </label>
-                                        <input type="text" class="form-control" id="remainingAmount" readonly>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn-compact btn-outline" data-bs-dismiss="modal">
-                                    <i class="ri-close-line"></i> Cancel
-                                </button>
-                                <button type="submit" form="paymentForm" class="btn-compact btn-success">
-                                    <i class="ri-check-line"></i> Submit Payment
-                                </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -350,37 +428,162 @@
 
             // Update remaining amount when paid amount changes
             amountPaidInput.addEventListener('input', function() {
-                const totalAmount = parseFloat(totalAmountInput.value) || 0;
+                const outstandingBalance = parseFloat(document.getElementById('outstandingBalance').value) || 0;
                 const paidAmount = parseFloat(this.value) || 0;
-                const remainingAmount = totalAmount - paidAmount;
+                const remainingAmount = outstandingBalance - paidAmount;
                 remainingAmountInput.value = remainingAmount.toFixed(2);
+                
+                const remainingContainer = remainingAmountInput.closest('.border');
+                
+                // Check if it's a negative payment (deduction)
+                if (paidAmount < 0) {
+                    // Deduction - show in orange/warning color
+                    remainingAmountInput.classList.add('text-warning', 'fw-bold');
+                    remainingAmountInput.classList.remove('text-danger');
+                    if (remainingContainer) {
+                        remainingContainer.classList.add('border-warning');
+                        remainingContainer.classList.remove('border-danger');
+                        remainingContainer.style.backgroundColor = 'rgba(245, 158, 11, 0.05)';
+                    }
+                }
+                // Check if overpayment (positive amount causing negative balance)
+                else if (remainingAmount < -0.01) {
+                    // Overpayment - show in red/danger color
+                    remainingAmountInput.classList.add('text-danger', 'fw-bold');
+                    remainingAmountInput.classList.remove('text-warning');
+                    if (remainingContainer) {
+                        remainingContainer.classList.add('border-danger');
+                        remainingContainer.classList.remove('border-warning');
+                        remainingContainer.style.backgroundColor = 'rgba(220, 53, 69, 0.05)';
+                    }
+                }
+                else {
+                    // Normal payment - remove special styling
+                    remainingAmountInput.classList.remove('text-danger', 'text-warning', 'fw-bold');
+                    if (remainingContainer) {
+                        remainingContainer.classList.remove('border-danger', 'border-warning');
+                        remainingContainer.style.backgroundColor = 'transparent';
+                    }
+                }
             });
 
             // Handle payment form submission
             paymentForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                
                 const paidAmount = parseFloat(amountPaidInput.value);
                 const totalAmount = parseFloat(totalAmountInput.value);
+                const alreadyPaid = parseFloat(document.getElementById('alreadyPaid').value) || 0;
+                const outstandingBalance = parseFloat(document.getElementById('outstandingBalance').value) || 0;
+                const remainingAmount = outstandingBalance - paidAmount;
 
-                if (paidAmount <= 0) {
+                console.log('Form submitted - Amount:', paidAmount, 'Total:', totalAmount, 'Already Paid:', alreadyPaid);
+
+                if (!paidAmount || isNaN(paidAmount) || paidAmount === 0) {
                     Swal.fire({
                         title: 'Error!',
-                        text: 'Please enter a valid payment amount',
+                        text: 'Please enter a valid payment amount (cannot be zero)',
                         icon: 'error'
                     });
                     return;
                 }
 
-                // Show confirmation dialog
+                // Check for negative payment (deduction/reversal)
+                if (paidAmount < 0) {
+                    const deductionAmount = Math.abs(paidAmount);
+                    
+                    // Validate that deduction doesn't exceed already paid amount
+                    if (deductionAmount > alreadyPaid) {
+                        Swal.fire({
+                            title: 'Invalid Deduction!',
+                            html: `
+                                <div class="text-start">
+                                    <p class="mb-3"><i class="ri-error-warning-line text-danger me-2"></i>Cannot deduct more than what has been paid.</p>
+                                    <hr>
+                                    <p class="mb-2"><strong>Already Paid:</strong> RM ${alreadyPaid.toFixed(2)}</p>
+                                    <p class="mb-2"><strong>Deduction Attempted:</strong> <span class="text-danger">RM ${deductionAmount.toFixed(2)}</span></p>
+                                    <p class="mb-3"><strong>Maximum Deduction Allowed:</strong> <span class="text-success">RM ${alreadyPaid.toFixed(2)}</span></p>
+                                    <hr>
+                                    <p class="text-muted small mb-0"><i class="ri-information-line me-1"></i>You can only reverse payments that have been made.</p>
+                                </div>
+                            `,
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#dc3545'
+                        });
+                        return;
+                    }
+                    
+                    Swal.fire({
+                        title: 'Payment Deduction/Reversal',
+                        html: `
+                            <div class="text-start">
+                                <p class="mb-2"><i class="ri-error-warning-line text-warning me-2"></i>You are about to <strong>deduct/reverse</strong> a payment:</p>
+                                <hr>
+                                <p class="mb-2"><strong>Already Paid:</strong> RM ${alreadyPaid.toFixed(2)}</p>
+                                <p class="mb-2"><strong>Deduction Amount:</strong> <span class="text-danger">RM ${deductionAmount.toFixed(2)}</span></p>
+                                <p class="mb-2"><strong>New Paid Amount:</strong> <span class="text-success">RM ${(alreadyPaid - deductionAmount).toFixed(2)}</span></p>
+                                <p class="mb-3"><strong>New Outstanding:</strong> <span class="text-warning">RM ${remainingAmount.toFixed(2)}</span></p>
+                                <hr>
+                                <p class="text-muted small mb-0"><i class="ri-information-line me-1"></i>This will increase the outstanding balance by RM ${deductionAmount.toFixed(2)}</p>
+                            </div>
+                        `,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, Deduct Payment',
+                        cancelButtonText: 'Cancel',
+                        confirmButtonColor: '#f59e0b'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            processPayment();
+                        }
+                    });
+                    return;
+                }
+
+                // Check for overpayment (positive amount exceeding balance)
+                if (remainingAmount < -0.01) {
+                    const overpayment = Math.abs(remainingAmount);
+                    Swal.fire({
+                        title: 'Overpayment Detected!',
+                        html: `
+                            <div class="text-start">
+                                <p class="mb-2"><strong>Outstanding Balance:</strong> RM ${outstandingBalance.toFixed(2)}</p>
+                                <p class="mb-2"><strong>Amount Entered:</strong> RM ${paidAmount.toFixed(2)}</p>
+                                <p class="mb-3"><strong class="text-danger">Overpayment:</strong> <span class="text-danger">RM ${overpayment.toFixed(2)}</span></p>
+                                <p class="text-muted small">This will result in a negative balance of RM ${remainingAmount.toFixed(2)}</p>
+                            </div>
+                        `,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Proceed Anyway',
+                        cancelButtonText: 'Cancel & Fix',
+                        confirmButtonColor: '#dc3545'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            processPayment();
+                        }
+                    });
+                    return;
+                }
+
+                // Show normal confirmation dialog
                 Swal.fire({
                     title: 'Confirm Payment',
-                    text: `Are you sure customer has made payment of RM${paidAmount.toFixed(2)}?`,
+                    text: `Are you sure customer has made payment of RM ${paidAmount.toFixed(2)}?`,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Yes, proceed!',
                     cancelButtonText: 'No, cancel!'
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        processPayment();
+                    }
+                });
+            });
+
+            // Extract payment processing logic into a function
+            function processPayment() {
                         // Add validation for currentInvoiceId with fallback to hidden field
                         let invoiceIdToUse = currentInvoiceId;
                         
@@ -400,6 +603,17 @@
                         }
                         
                         console.log('Submitting payment for invoice:', invoiceIdToUse, 'amount:', amountPaidInput.value);
+                        
+                        // Show loading indicator
+                        Swal.fire({
+                            title: 'Processing Payment...',
+                            html: 'Please wait while we record your payment.',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
                         
                         const formData = new FormData();
                         formData.append('invoice_id', invoiceIdToUse);
@@ -443,8 +657,22 @@
                                     title: 'Payment Successful!',
                                     text: data.message || 'The payment has been recorded successfully.',
                                     icon: 'success',
-                                    confirmButtonText: 'OK'
-                                }).then(() => window.location.reload());
+                                    confirmButtonText: 'OK',
+                                    timer: 2000
+                                }).then(() => {
+                                    // Reload the payment history in the modal
+                                    const invoiceId = currentInvoiceId || document.getElementById('hiddenInvoiceId').value;
+                                    if (invoiceId) {
+                                        loadPaymentHistory(invoiceId);
+                                        // Also update the preparePayment to refresh the summary
+                                        const totalAmount = parseFloat(document.getElementById('totalAmount').value);
+                                        if (totalAmount) {
+                                            preparePayment(invoiceId, totalAmount);
+                                        }
+                                    }
+                                    // Reload the page to update the main list
+                                    setTimeout(() => window.location.reload(), 500);
+                                });
                             } else {
                                 throw new Error(data.error || 'Failed to process payment');
                             }
@@ -458,9 +686,7 @@
                                 footer: 'Check the browser console for more details.'
                             });
                         });
-                    }
-                });
-            });
+            }
 
             // Enhanced search functionality
             const searchInput = document.getElementById('searchInput');
@@ -698,19 +924,153 @@
             }
             
             currentInvoiceId = invoiceId;
-            document.getElementById('totalAmount').value = totalAmount.toFixed(2);
-            document.getElementById('amountPaid').value = '';
-            document.getElementById('remainingAmount').value = '';
-            document.getElementById('hiddenInvoiceId').value = invoiceId; // Set hidden field as backup
-            console.log('currentInvoiceId set to:', currentInvoiceId);
-            console.log('hiddenInvoiceId set to:', invoiceId);
             
-            // Add a visible indicator in the modal title to show which invoice
-            const modalTitle = document.querySelector('#paymentModal .modal-title');
-            if (modalTitle) {
-                modalTitle.textContent = `Payment for Invoice #${invoiceId}`;
+            // Get the order item to find total_paid
+            const orderItem = document.querySelector(`[data-order-id="${invoiceId}"]`);
+            let totalPaid = 0;
+            
+            if (orderItem) {
+                // Try to find the "Paid:" amount from the order amounts section
+                const amountRows = orderItem.querySelectorAll('.amount-row');
+                amountRows.forEach(row => {
+                    const label = row.querySelector('.amount-label');
+                    if (label && label.textContent.includes('Paid:')) {
+                        const paidText = row.querySelector('.amount-paid').textContent;
+                        // Extract number from "RM 7,300.00" format
+                        const match = paidText.match(/[\d,]+\.?\d*/);
+                        if (match) {
+                            totalPaid = parseFloat(match[0].replace(/,/g, ''));
+                        }
+                    }
+                });
             }
+            
+            console.log('Total paid found:', totalPaid);
+            
+            const outstandingBalance = totalAmount - totalPaid;
+            
+            document.getElementById('totalAmount').value = totalAmount.toFixed(2);
+            document.getElementById('alreadyPaid').value = totalPaid.toFixed(2);
+            document.getElementById('outstandingBalance').value = outstandingBalance.toFixed(2);
+            document.getElementById('amountPaid').value = ''; // Keep blank for user to enter
+            document.getElementById('remainingAmount').value = outstandingBalance.toFixed(2); // Will update as user types
+            document.getElementById('hiddenInvoiceId').value = invoiceId;
+            
+            console.log('Payment modal initialized:', {
+                invoiceId,
+                totalAmount: totalAmount.toFixed(2),
+                totalPaid: totalPaid.toFixed(2),
+                outstandingBalance: outstandingBalance.toFixed(2)
+            });
+            
+            // Update modal title with invoice details
+            const modalTitle = document.querySelector('#paymentModal .modal-title');
+            const modalSubtitle = document.querySelector('#paymentModal .modal-header p');
+            if (modalTitle) {
+                modalTitle.innerHTML = `<i class="ri-money-dollar-circle-line me-2"></i>Customer Payment - Invoice #${invoiceId}`;
+            }
+            if (modalSubtitle) {
+                modalSubtitle.innerHTML = `Outstanding Balance: <strong class="text-warning">RM ${outstandingBalance.toFixed(2)}</strong>`;
+            }
+            
+            // Load payment history
+            loadPaymentHistory(invoiceId);
         };
+        
+        /**
+         * Load payment history for an invoice
+         */
+        function loadPaymentHistory(invoiceId) {
+            const section = document.getElementById('paymentHistorySection');
+            
+            // Show loading spinner
+            section.innerHTML = `
+                <div class="text-center text-muted py-3">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    Loading payment history...
+                </div>
+            `;
+            
+            fetch(`../private/view-order-tabs-backend.php?action=get_payment_history&invoice_id=${invoiceId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.payments && data.payments.length > 0) {
+                        displayPaymentHistory(data.payments);
+                    } else {
+                        section.innerHTML = '<p class="text-muted mb-0"><i class="ri-information-line"></i> No payment history found</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading payment history:', error);
+                    section.innerHTML = '<p class="text-danger mb-0"><i class="ri-error-warning-line"></i> Failed to load payment history</p>';
+                });
+        }
+        
+        /**
+         * Display payment history records
+         */
+        function displayPaymentHistory(payments) {
+            const section = document.getElementById('paymentHistorySection');
+            
+            console.log('Payment history data received:', payments); // Debug log
+            
+            let html = '<div class="table-responsive">';
+            html += '<table class="table table-sm mb-0">';
+            html += '<thead>';
+            html += '<tr class="border-0">';
+            html += '<th class="border-0 bg-transparent fw-medium text-muted small">DATE & TIME</th>';
+            html += '<th class="border-0 bg-transparent fw-medium text-muted small text-end">AMOUNT</th>';
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody>';
+            
+            let totalPaid = 0;
+            payments.forEach(payment => {
+                const amount = parseFloat(payment.amount_paid);
+                console.log('Processing payment:', payment.payment_id, 'Amount:', amount, 'Type:', typeof payment.amount_paid); // Debug log
+                totalPaid += amount;
+                
+                // Check if it's a deduction (negative payment)
+                const isDeduction = amount < 0;
+                const displayAmount = Math.abs(amount);
+                
+                html += '<tr>';
+                html += `<td class="border-0 py-2">`;
+                html += `<div class="d-flex align-items-center">`;
+                if (isDeduction) {
+                    html += `<i class="ri-indeterminate-circle-line text-danger me-2"></i>`;
+                } else {
+                    html += `<i class="ri-checkbox-circle-line text-success me-2"></i>`;
+                }
+                html += `<small class="text-dark">${payment.formatted_date}</small>`;
+                html += `</div>`;
+                html += `</td>`;
+                html += `<td class="border-0 py-2 text-end">`;
+                if (isDeduction) {
+                    html += `<small class="text-danger fw-medium">- RM ${displayAmount.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</small>`;
+                    html += `<br><small class="text-muted" style="font-size: 0.7rem;">(Deduction)</small>`;
+                } else {
+                    html += `<small class="text-success fw-medium">+ RM ${displayAmount.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</small>`;
+                }
+                html += `</td>`;
+                html += '</tr>';
+            });
+            
+            // Add total row with border on top
+            const totalTextClass = totalPaid >= 0 ? 'text-success' : 'text-danger';
+            html += '<tr class="border-top">';
+            html += '<td class="pt-3 pb-2 fw-bold text-dark border-0">Total Paid</td>';
+            html += `<td class="pt-3 pb-2 text-end fw-bold ${totalTextClass} border-0">RM ${totalPaid.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>`;
+            html += '</tr>';
+            
+            html += '</tbody>';
+            html += '</table>';
+            html += '</div>';
+            
+            section.innerHTML = html;
+        }
 
         // Toggle order status
         window.toggleOrderStatus = function(invoiceId, currentStatus) {
@@ -830,5 +1190,117 @@
                 minimumFractionDigits: 3,
                 maximumFractionDigits: 3
             });
+        }
+
+        // Confirm Edit Order with Payment Warning
+        function confirmEditOrder(invoiceId, payments) {
+            const hasCustomerPayment = payments.customerPayment > 0;
+            const hasSupplierPayment = payments.supplierPayment > 0;
+            const hasShippingPayment = payments.shippingPayment > 0;
+            const hasCommissionPayment = payments.commissionPayment > 0;
+            const hasAnyPayment = hasCustomerPayment || hasSupplierPayment || hasShippingPayment || hasCommissionPayment;
+            
+            if (hasAnyPayment) {
+                // Build payment details list
+                let paymentDetails = [];
+                
+                if (hasCustomerPayment) {
+                    paymentDetails.push(`
+                        <li style="margin-bottom: 8px;">
+                            <strong class="text-success">💰 Customer Payments:</strong> 
+                            <span class="text-success">RM ${payments.customerPayment.toLocaleString('en-MY', {minimumFractionDigits: 2})}</span>
+                            <br><small class="text-muted" style="margin-left: 20px;">Recorded in Order Management</small>
+                        </li>
+                    `);
+                }
+                
+                if (hasSupplierPayment) {
+                    paymentDetails.push(`
+                        <li style="margin-bottom: 8px;">
+                            <strong class="text-warning">🏭 Supplier Payments:</strong> 
+                            <span class="text-warning">¥ ${payments.supplierPayment.toLocaleString('en-MY', {minimumFractionDigits: 2})}</span>
+                            <br><small class="text-muted" style="margin-left: 20px;">Recorded in Profit & Loss</small>
+                        </li>
+                    `);
+                }
+                
+                if (hasShippingPayment) {
+                    paymentDetails.push(`
+                        <li style="margin-bottom: 8px;">
+                            <strong class="text-info">🚢 Shipping Payments:</strong> 
+                            <span class="text-info">RM ${payments.shippingPayment.toLocaleString('en-MY', {minimumFractionDigits: 2})}</span>
+                            <br><small class="text-muted" style="margin-left: 20px;">Recorded in Profit & Loss</small>
+                        </li>
+                    `);
+                }
+                
+                if (hasCommissionPayment) {
+                    paymentDetails.push(`
+                        <li style="margin-bottom: 8px;">
+                            <strong style="color: #8b5cf6;">👤 Commission Payments:</strong> 
+                            <span style="color: #7c3aed;">RM ${payments.commissionPayment.toLocaleString('en-MY', {minimumFractionDigits: 2})}</span>
+                            <br><small class="text-muted" style="margin-left: 20px;">Recorded in Profit & Loss</small>
+                        </li>
+                    `);
+                }
+                
+                // Show warning with specific payment details
+                Swal.fire({
+                    title: '⚠️ Payment Warning',
+                    html: `
+                        <div style="text-align: left; padding: 10px;">
+                            <p style="margin-bottom: 15px;">
+                                <strong class="text-danger">This order has existing payments recorded!</strong>
+                            </p>
+                            
+                            <div style="background: var(--vz-input-bg, rgba(243, 244, 246, 0.5)); padding: 12px; border-radius: 6px; margin-bottom: 15px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
+                                <p style="margin: 0 0 10px 0; font-weight: 600;">
+                                    <i class="ri-money-dollar-circle-line"></i> Payment Summary:
+                                </p>
+                                <ul style="margin: 0; padding-left: 20px; list-style: none;">
+                                    ${paymentDetails.join('')}
+                                </ul>
+                            </div>
+                            
+                            <p style="margin-bottom: 10px;" class="text-warning">
+                                <i class="ri-alert-line"></i> <strong>Editing this order will affect:</strong>
+                            </p>
+                            <ul style="margin: 10px 0; padding-left: 20px;" class="text-muted">
+                                <li>Cost calculations (supplier & shipping)</li>
+                                <li>Profit/loss margins</li>
+                                <li>Payment balances & reconciliation</li>
+                                ${hasCommissionPayment ? '<li>Staff commission amounts</li>' : ''}
+                            </ul>
+                            
+                            <div style="background: rgba(254, 243, 199, 0.2); border-left: 3px solid #f59e0b; padding: 10px; margin-top: 15px; border-radius: 4px;">
+                                <p style="margin: 0; font-size: 0.9em;" class="text-warning">
+                                    <i class="ri-information-line"></i> 
+                                    <strong>Important:</strong> After saving changes, you'll be prompted to adjust payment records automatically to maintain accurate financial records.
+                                </p>
+                            </div>
+                        </div>
+                    `,
+                    icon: 'warning',
+                    width: '600px',
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="ri-edit-line"></i> Yes, Continue Editing',
+                    cancelButtonText: '<i class="ri-close-line"></i> Cancel',
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#6c757d',
+                    customClass: {
+                        popup: 'payment-warning-popup',
+                        confirmButton: 'btn-confirm-edit',
+                        cancelButton: 'btn-cancel-edit'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Navigate to edit page
+                        window.location.href = `forms-update-order.php?invoice_id=${invoiceId}`;
+                    }
+                });
+            } else {
+                // No payments - directly navigate to edit page
+                window.location.href = `forms-update-order.php?invoice_id=${invoiceId}`;
+            }
         }
     </script>

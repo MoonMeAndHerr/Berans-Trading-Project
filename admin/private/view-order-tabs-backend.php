@@ -32,6 +32,9 @@ function getOrderTabs() {
             c.customer_company_name,
             c.customer_phone,
             (SELECT SUM(amount_paid) FROM payment_history WHERE invoice_id = i.invoice_id) as total_paid,
+            COALESCE(i.supplier_payments_total, 0) as supplier_payments_total,
+            COALESCE(i.shipping_payments_total, 0) as shipping_payments_total,
+            COALESCE(i.commission_paid_amount, 0) as commission_paid_amount,
             CASE 
                 WHEN EXISTS (
                     SELECT 1 FROM payment_history 
@@ -352,6 +355,51 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
             exit;
             break;
         
+        case 'get_payment_history':
+            try {
+                $invoice_id = $_GET['invoice_id'] ?? null;
+                if (!$invoice_id) {
+                    throw new Exception('Invoice ID required');
+                }
+                
+                // Get payment history
+                $stmt = $pdo->prepare("
+                    SELECT 
+                        payment_id,
+                        amount_paid,
+                        payment_date,
+                        description
+                    FROM payment_history 
+                    WHERE invoice_id = ? 
+                    ORDER BY payment_date DESC
+                ");
+                $stmt->execute([$invoice_id]);
+                $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                // Format dates
+                foreach ($payments as &$payment) {
+                    $payment['formatted_date'] = date('d M Y, g:i A', strtotime($payment['payment_date']));
+                }
+                
+                // Clean any buffered output before sending JSON
+                if (ob_get_level() > 0) { ob_clean(); }
+                
+                echo json_encode([
+                    'success' => true,
+                    'payments' => $payments
+                ]);
+            } catch(Exception $e) {
+                if (ob_get_level() > 0) { ob_clean(); }
+                
+                echo json_encode([
+                    'success' => false,
+                    'error' => $e->getMessage(),
+                    'payments' => []
+                ]);
+            }
+            exit;
+            break;
+        
         case 'submit_payment':
             // Start output buffering to capture any unwanted output
             if (ob_get_level() === 0) { ob_start(); }
@@ -368,8 +416,8 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
                     throw new Exception('Missing required parameters: invoice_id or amount_paid');
                 }
                 
-                if (!is_numeric($amount_paid) || $amount_paid <= 0) {
-                    throw new Exception('Invalid payment amount');
+                if (!is_numeric($amount_paid) || $amount_paid == 0) {
+                    throw new Exception('Invalid payment amount (cannot be zero)');
                 }
 
                 // Check if invoice exists with more detailed query
@@ -391,9 +439,10 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
                 $xero_relation = $invoiceData['xero_relation'];
 
                 // Try Xero API call (optional - don't fail if this fails)
+                // Skip Xero API for negative payments (reversals/deductions)
                 $xeroApiSuccess = false;
                 try {
-                    if (!empty($xero_relation)) {
+                    if (!empty($xero_relation) && $amount_paid > 0) {
                         $xeroAuth = refreshXeroToken();
                         $accessToken = $xeroAuth['access_token'];
                         $tenantId = $xeroAuth['tenant_id'];
@@ -418,6 +467,9 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
                             ]
                         ]);
                         $xeroApiSuccess = true;
+                    } elseif ($amount_paid < 0) {
+                        // For negative payments, log that we're skipping Xero
+                        error_log("Skipping Xero API for negative payment (deduction): " . $amount_paid);
                     }
                 } catch (Exception $e) {
                     // Log Xero error but don't fail the payment

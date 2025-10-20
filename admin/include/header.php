@@ -28,7 +28,7 @@ require_once __DIR__ . '/../private/auth_check.php';
     <meta content="<?php echo WEB_TAGLINE; ?>" name="description" />
     <meta content="Berans" name="author" />
     <!-- App favicon -->
-    <link rel="shortcut icon" href="../../media/<?php echo $favicon; ?>">
+    <link rel="shortcut icon" href="../media/<?php echo $favicon; ?>">
 
     <!-- Layout config Js -->
     <script src="assets/js/layout.js"></script>
@@ -42,6 +42,8 @@ require_once __DIR__ . '/../private/auth_check.php';
     <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
     <!-- SweetAlert2 Css -->
     <link rel="stylesheet" href="assets/libs/sweetalert2/sweetalert2.min.css">
+    <!-- SweetAlert2 Dark Mode Theme (Global) -->
+    <link rel="stylesheet" href="assets/css/sweetalert2-dark-mode.css">
     <!-- NPM Css -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
      <!-- Select Css -->

@@ -29,7 +29,7 @@ if(isset($_GET['ajax'], $_GET['type'], $_GET['parent_id'])){
             $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
             break;
         case 'product_type':
-            $stmt = $pdo->prepare("SELECT product_type_id, product_name FROM product_type WHERE material_id=?");
+            $stmt = $pdo->prepare("SELECT product_type_id, product_name FROM product_type WHERE material_id = ? ORDER BY product_name ASC");
             $stmt->execute([$parent_id]);
             $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
             break;
@@ -113,6 +113,8 @@ if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
                 size_1 = ?,
                 size_2 = ?,
                 size_3 = ?,
+                material_id = ?,
+                product_type_id = ?,
                 updated_at = NOW(),
                 updated_by = ?
             WHERE product_id = ? AND xero_relation = ?
@@ -125,6 +127,8 @@ if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
             $size1,
             $size2,
             $size3,
+            $_POST['material_id'] ?: null,
+            $_POST['product_type_id'] ?: null,
             $_SESSION['user_id'] ?? 1,
             $product_id,
             $_POST['xero_relation'],
