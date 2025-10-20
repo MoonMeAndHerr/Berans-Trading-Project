@@ -33,6 +33,9 @@ if ($invoice_id) {
             $commissionPayments = floatval($existingOrder['commission_paid_amount'] ?? 0);
             $existingOrder['has_any_payments'] = ($supplierPayments > 0 || $shippingPayments > 0 || $commissionPayments > 0);
             
+            // Debug: Log payment check
+            error_log("PAYMENT CHECK - Invoice ID: {$invoice_id}, Supplier: {$supplierPayments}, Shipping: {$shippingPayments}, Commission: {$commissionPayments}, Has Payments: " . ($existingOrder['has_any_payments'] ? 'YES' : 'NO'));
+            
             // Get invoice items
             $stmt = $pdo->prepare("
                 SELECT ii.*, p.section_id, p.category_id, p.subcategory_id,

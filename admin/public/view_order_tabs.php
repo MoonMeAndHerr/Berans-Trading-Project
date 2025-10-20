@@ -6,33 +6,7 @@
         ?>
         <!-- Minimal CSS for Order Tabs -->
         <link href="assets/css/order-tabs-minimal.css" rel="stylesheet" type="text/css" />
-        
-        <!-- Custom Scrollbar Styling -->
-        <style>
-            /* Clean minimal scrollbar for payment history */
-            .payment-history-scroll::-webkit-scrollbar {
-                width: 6px;
-            }
-            
-            .payment-history-scroll::-webkit-scrollbar-track {
-                background: transparent;
-            }
-            
-            .payment-history-scroll::-webkit-scrollbar-thumb {
-                background: rgba(0, 0, 0, 0.2);
-                border-radius: 10px;
-            }
-            
-            .payment-history-scroll::-webkit-scrollbar-thumb:hover {
-                background: rgba(0, 0, 0, 0.3);
-            }
-            
-            /* For Firefox */
-            .payment-history-scroll {
-                scrollbar-width: thin;
-                scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
-            }
-        </style>
+
 
         <!-- ============================================================== -->
         <!-- Start right Content here -->
@@ -200,6 +174,14 @@
                                             <div class="detail-label">Quick Actions</div>
                                             <div class="detail-value">
                                                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                                    <button class="btn-compact btn-outline" onclick='confirmEditOrder(<?= $order['invoice_id'] ?>, {
+                                                        customerPayment: <?= isset($order['total_paid']) && $order['total_paid'] > 0 ? $order['total_paid'] : 0 ?>,
+                                                        supplierPayment: <?= isset($order['supplier_payments_total']) && $order['supplier_payments_total'] > 0 ? $order['supplier_payments_total'] : 0 ?>,
+                                                        shippingPayment: <?= isset($order['shipping_payments_total']) && $order['shipping_payments_total'] > 0 ? $order['shipping_payments_total'] : 0 ?>,
+                                                        commissionPayment: <?= isset($order['commission_paid_amount']) && $order['commission_paid_amount'] > 0 ? $order['commission_paid_amount'] : 0 ?>
+                                                    })'>
+                                                        <i class="ri-edit-line"></i> Edit Order
+                                                    </button>
                                                     <button class="btn-compact btn-outline" onclick="loadCartonDetails(<?= $order['invoice_id'] ?>)" data-bs-toggle="modal" data-bs-target="#cartonDetailModal">
                                                         <i class="ri-archive-line"></i> Carton Details
                                                     </button>
@@ -1208,5 +1190,117 @@
                 minimumFractionDigits: 3,
                 maximumFractionDigits: 3
             });
+        }
+
+        // Confirm Edit Order with Payment Warning
+        function confirmEditOrder(invoiceId, payments) {
+            const hasCustomerPayment = payments.customerPayment > 0;
+            const hasSupplierPayment = payments.supplierPayment > 0;
+            const hasShippingPayment = payments.shippingPayment > 0;
+            const hasCommissionPayment = payments.commissionPayment > 0;
+            const hasAnyPayment = hasCustomerPayment || hasSupplierPayment || hasShippingPayment || hasCommissionPayment;
+            
+            if (hasAnyPayment) {
+                // Build payment details list
+                let paymentDetails = [];
+                
+                if (hasCustomerPayment) {
+                    paymentDetails.push(`
+                        <li style="margin-bottom: 8px;">
+                            <strong class="text-success">💰 Customer Payments:</strong> 
+                            <span class="text-success">RM ${payments.customerPayment.toLocaleString('en-MY', {minimumFractionDigits: 2})}</span>
+                            <br><small class="text-muted" style="margin-left: 20px;">Recorded in Order Management</small>
+                        </li>
+                    `);
+                }
+                
+                if (hasSupplierPayment) {
+                    paymentDetails.push(`
+                        <li style="margin-bottom: 8px;">
+                            <strong class="text-warning">🏭 Supplier Payments:</strong> 
+                            <span class="text-warning">¥ ${payments.supplierPayment.toLocaleString('en-MY', {minimumFractionDigits: 2})}</span>
+                            <br><small class="text-muted" style="margin-left: 20px;">Recorded in Profit & Loss</small>
+                        </li>
+                    `);
+                }
+                
+                if (hasShippingPayment) {
+                    paymentDetails.push(`
+                        <li style="margin-bottom: 8px;">
+                            <strong class="text-info">🚢 Shipping Payments:</strong> 
+                            <span class="text-info">RM ${payments.shippingPayment.toLocaleString('en-MY', {minimumFractionDigits: 2})}</span>
+                            <br><small class="text-muted" style="margin-left: 20px;">Recorded in Profit & Loss</small>
+                        </li>
+                    `);
+                }
+                
+                if (hasCommissionPayment) {
+                    paymentDetails.push(`
+                        <li style="margin-bottom: 8px;">
+                            <strong style="color: #8b5cf6;">👤 Commission Payments:</strong> 
+                            <span style="color: #7c3aed;">RM ${payments.commissionPayment.toLocaleString('en-MY', {minimumFractionDigits: 2})}</span>
+                            <br><small class="text-muted" style="margin-left: 20px;">Recorded in Profit & Loss</small>
+                        </li>
+                    `);
+                }
+                
+                // Show warning with specific payment details
+                Swal.fire({
+                    title: '⚠️ Payment Warning',
+                    html: `
+                        <div style="text-align: left; padding: 10px;">
+                            <p style="margin-bottom: 15px;">
+                                <strong class="text-danger">This order has existing payments recorded!</strong>
+                            </p>
+                            
+                            <div style="background: var(--vz-input-bg, rgba(243, 244, 246, 0.5)); padding: 12px; border-radius: 6px; margin-bottom: 15px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
+                                <p style="margin: 0 0 10px 0; font-weight: 600;">
+                                    <i class="ri-money-dollar-circle-line"></i> Payment Summary:
+                                </p>
+                                <ul style="margin: 0; padding-left: 20px; list-style: none;">
+                                    ${paymentDetails.join('')}
+                                </ul>
+                            </div>
+                            
+                            <p style="margin-bottom: 10px;" class="text-warning">
+                                <i class="ri-alert-line"></i> <strong>Editing this order will affect:</strong>
+                            </p>
+                            <ul style="margin: 10px 0; padding-left: 20px;" class="text-muted">
+                                <li>Cost calculations (supplier & shipping)</li>
+                                <li>Profit/loss margins</li>
+                                <li>Payment balances & reconciliation</li>
+                                ${hasCommissionPayment ? '<li>Staff commission amounts</li>' : ''}
+                            </ul>
+                            
+                            <div style="background: rgba(254, 243, 199, 0.2); border-left: 3px solid #f59e0b; padding: 10px; margin-top: 15px; border-radius: 4px;">
+                                <p style="margin: 0; font-size: 0.9em;" class="text-warning">
+                                    <i class="ri-information-line"></i> 
+                                    <strong>Important:</strong> After saving changes, you'll be prompted to adjust payment records automatically to maintain accurate financial records.
+                                </p>
+                            </div>
+                        </div>
+                    `,
+                    icon: 'warning',
+                    width: '600px',
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="ri-edit-line"></i> Yes, Continue Editing',
+                    cancelButtonText: '<i class="ri-close-line"></i> Cancel',
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#6c757d',
+                    customClass: {
+                        popup: 'payment-warning-popup',
+                        confirmButton: 'btn-confirm-edit',
+                        cancelButton: 'btn-cancel-edit'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Navigate to edit page
+                        window.location.href = `forms-update-order.php?invoice_id=${invoiceId}`;
+                    }
+                });
+            } else {
+                // No payments - directly navigate to edit page
+                window.location.href = `forms-update-order.php?invoice_id=${invoiceId}`;
+            }
         }
     </script>

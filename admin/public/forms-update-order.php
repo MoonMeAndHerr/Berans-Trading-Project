@@ -122,6 +122,14 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <?php else: ?>
+                                    <!-- Debug: No payments detected -->
+                                    <script>
+                                        console.log('Payment Warning NOT shown - has_any_payments:', '<?= $existingOrder['has_any_payments'] ?? 'undefined' ?>');
+                                        console.log('Supplier Payments:', '<?= $existingOrder['supplier_payments_total'] ?? '0' ?>');
+                                        console.log('Shipping Payments:', '<?= $existingOrder['shipping_payments_total'] ?? '0' ?>');
+                                        console.log('Commission Payments:', '<?= $existingOrder['commission_paid_amount'] ?? '0' ?>');
+                                    </script>
                                     <?php endif; ?>
 
                                     <!-- Form Body -->
@@ -1107,14 +1115,14 @@
                 
                 let breakdownHtml = `
                     <div style="text-align: left; margin: 20px 0;">
-                        <h5 style="color: #f59e0b; margin-bottom: 15px;">⚠️ Cost Changes Detected</h5>`;
+                        <h5 class="text-warning" style="margin-bottom: 15px;">⚠️ Cost Changes Detected</h5>`;
                 
                 // Add overpayment warning if detected
                 if (hasOverpayment) {
                     breakdownHtml += `
-                        <div style="background: #fee2e2; border: 2px solid #dc2626; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                            <h6 style="color: #dc2626; margin-bottom: 10px;">⚠️ OVERPAYMENT DETECTED</h6>
-                            <p style="margin: 0; color: #991b1b;">
+                        <div style="background: var(--vz-input-bg, rgba(254, 226, 226, 0.5)); border: 2px solid var(--vz-danger, #dc2626); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h6 class="text-danger" style="margin-bottom: 10px;">⚠️ OVERPAYMENT DETECTED</h6>
+                            <p style="margin: 0;">
                                 The new costs are LOWER than what you've already paid. 
                                 Automatic adjustment cannot reverse payments. 
                                 <strong>Manual action will be required</strong> to handle refunds or credits.
@@ -1123,7 +1131,7 @@
                 }
                 
                 breakdownHtml += `
-                        <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <div style="background: var(--vz-input-bg, rgba(254, 243, 199, 0.3)); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
                             <h6 style="margin-bottom: 10px;">Supplier Costs:</h6>
                             <table style="width: 100%; margin-bottom: 10px;">
                                 <tr>
@@ -1134,23 +1142,23 @@
                                     <td>New Cost:</td>
                                     <td style="text-align: right;"><strong>${formatRM(adj.new_costs.supplier_rm)}</strong></td>
                                 </tr>
-                                <tr style="border-top: 2px solid #f59e0b;">
+                                <tr style="border-top: 2px solid var(--vz-warning, #f59e0b);">
                                     <td><strong>Difference:</strong></td>
-                                    <td style="text-align: right; color: ${adj.differences.supplier_rm >= 0 ? '#dc2626' : '#16a34a'};">
+                                    <td style="text-align: right;" class="${adj.differences.supplier_rm >= 0 ? 'text-danger' : 'text-success'}">
                                         <strong>${adj.differences.supplier_rm >= 0 ? '+' : ''}${formatRM(adj.differences.supplier_rm)}</strong>
                                     </td>
                                 </tr>
                             </table>
-                            <div style="background: white; padding: 10px; border-radius: 4px;">
+                            <div style="background: var(--vz-input-bg, rgba(255, 255, 255, 0.5)); padding: 10px; border-radius: 4px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
                                 <div>💰 Payments Made: ${formatRM(adj.payments_made.supplier_rm)}</div>
-                                <div style="color: ${adj.new_balances.supplier_rm >= 0 ? '#dc2626' : '#16a34a'};">
+                                <div class="${adj.new_balances.supplier_rm >= 0 ? 'text-danger' : 'text-success'}">
                                     📊 New Balance: <strong>${formatRM(adj.new_balances.supplier_rm)}</strong>
                                     ${adj.new_balances.supplier_rm > 0.01 ? ' (Underpaid)' : adj.new_balances.supplier_rm < -0.01 ? ' (⚠️ OVERPAID - Refund Needed)' : ' (Balanced)'}
                                 </div>
                             </div>
                         </div>
                         
-                        <div style="background: #dbeafe; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <div style="background: var(--vz-input-bg, rgba(219, 234, 254, 0.3)); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
                             <h6 style="margin-bottom: 10px;">Shipping Costs:</h6>
                             <table style="width: 100%; margin-bottom: 10px;">
                                 <tr>
@@ -1161,16 +1169,16 @@
                                     <td>New Cost:</td>
                                     <td style="text-align: right;"><strong>${formatRM(adj.new_costs.shipping_rm)}</strong></td>
                                 </tr>
-                                <tr style="border-top: 2px solid #3b82f6;">
+                                <tr style="border-top: 2px solid var(--vz-info, #3b82f6);">
                                     <td><strong>Difference:</strong></td>
-                                    <td style="text-align: right; color: ${adj.differences.shipping_rm >= 0 ? '#dc2626' : '#16a34a'};">
+                                    <td style="text-align: right;" class="${adj.differences.shipping_rm >= 0 ? 'text-danger' : 'text-success'}">
                                         <strong>${adj.differences.shipping_rm >= 0 ? '+' : ''}${formatRM(adj.differences.shipping_rm)}</strong>
                                     </td>
                                 </tr>
                             </table>
-                            <div style="background: white; padding: 10px; border-radius: 4px;">
+                            <div style="background: var(--vz-input-bg, rgba(255, 255, 255, 0.5)); padding: 10px; border-radius: 4px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
                                 <div>💰 Payments Made: ${formatRM(adj.payments_made.shipping_rm)}</div>
-                                <div style="color: ${adj.new_balances.shipping_rm >= 0 ? '#dc2626' : '#16a34a'};">
+                                <div class="${adj.new_balances.shipping_rm >= 0 ? 'text-danger' : 'text-success'}">
                                     📊 New Balance: <strong>${formatRM(adj.new_balances.shipping_rm)}</strong>
                                     ${adj.new_balances.shipping_rm > 0.01 ? ' (Underpaid)' : adj.new_balances.shipping_rm < -0.01 ? ' (⚠️ OVERPAID - Refund Needed)' : ' (Balanced)'}
                                 </div>
@@ -1180,7 +1188,7 @@
                 // Add commission section if commission changes detected
                 if (adj.old_costs.commission_rm > 0 || adj.new_costs.commission_rm > 0) {
                     breakdownHtml += `
-                        <div style="background: #e0e7ff; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <div style="background: var(--vz-input-bg, rgba(224, 231, 255, 0.3)); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
                             <h6 style="margin-bottom: 10px;">Staff Commission:</h6>
                             <table style="width: 100%; margin-bottom: 10px;">
                                 <tr>
@@ -1191,16 +1199,16 @@
                                     <td>New Commission:</td>
                                     <td style="text-align: right;"><strong>${formatRM(adj.new_costs.commission_rm)}</strong></td>
                                 </tr>
-                                <tr style="border-top: 2px solid #6366f1;">
+                                <tr style="border-top: 2px solid var(--vz-primary, #6366f1);">
                                     <td><strong>Difference:</strong></td>
-                                    <td style="text-align: right; color: ${adj.differences.commission_rm >= 0 ? '#dc2626' : '#16a34a'};">
+                                    <td style="text-align: right;" class="${adj.differences.commission_rm >= 0 ? 'text-danger' : 'text-success'}">
                                         <strong>${adj.differences.commission_rm >= 0 ? '+' : ''}${formatRM(adj.differences.commission_rm)}</strong>
                                     </td>
                                 </tr>
                             </table>
-                            <div style="background: white; padding: 10px; border-radius: 4px;">
+                            <div style="background: var(--vz-input-bg, rgba(255, 255, 255, 0.5)); padding: 10px; border-radius: 4px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
                                 <div>💰 Commission Paid: ${formatRM(adj.payments_made.commission_rm || 0)}</div>
-                                <div style="color: ${adj.new_balances.commission_rm >= 0 ? '#dc2626' : '#16a34a'};">
+                                <div class="${adj.new_balances.commission_rm >= 0 ? 'text-danger' : 'text-success'}">
                                     📊 New Balance: <strong>${formatRM(adj.new_balances.commission_rm)}</strong>
                                     ${adj.new_balances.commission_rm > 0.01 ? ' (Unpaid)' : adj.new_balances.commission_rm < -0.01 ? ' (⚠️ OVERPAID - Manual Adjustment Needed)' : ' (Fully Paid)'}
                                 </div>
@@ -1209,13 +1217,13 @@
                 }
                 
                 breakdownHtml += `
-                        <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center;">
-                            <h5 style="margin: 0; color: ${adj.new_balances.total_rm >= 0 ? '#dc2626' : '#16a34a'};">
+                        <div style="background: var(--vz-input-bg, rgba(243, 244, 246, 0.5)); padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
+                            <h5 style="margin: 0;" class="${adj.new_balances.total_rm >= 0 ? 'text-danger' : 'text-success'}">
                                 Total Balance: ${formatRM(adj.new_balances.total_rm)}
                             </h5>
                         </div>
                         
-                        <p style="margin-top: 15px; font-size: 14px; color: #6b7280; text-align: center;">
+                        <p class="text-muted" style="margin-top: 15px; font-size: 14px; text-align: center;">
                             ${hasOverpayment ? 
                                 '⚠️ <strong>Manual action required</strong> to handle overpayments. Proceed with caution.' : 
                                 'You\'ll be able to adjust payments automatically after updating.'}
@@ -1399,14 +1407,14 @@
                 // Build detailed breakdown HTML
                 let breakdownHtml = `
                     <div style="text-align: left; margin: 20px 0;">
-                        <h5 style="color: #f59e0b; margin-bottom: 15px;">⚠️ Cost Changes Detected</h5>`;
+                        <h5 class="text-warning" style="margin-bottom: 15px;">⚠️ Cost Changes Detected</h5>`;
                 
                 // Add overpayment warning if detected
                 if (hasOverpayment) {
                     breakdownHtml += `
-                        <div style="background: #fee2e2; border: 2px solid #dc2626; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                            <h6 style="color: #dc2626; margin-bottom: 10px;">⚠️ OVERPAYMENT DETECTED</h6>
-                            <p style="margin: 0; color: #991b1b;">
+                        <div style="background: var(--vz-input-bg, rgba(254, 226, 226, 0.5)); border: 2px solid var(--vz-danger, #dc2626); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h6 class="text-danger" style="margin-bottom: 10px;">⚠️ OVERPAYMENT DETECTED</h6>
+                            <p style="margin: 0;">
                                 The new costs are LOWER than what you've already paid. 
                                 Automatic adjustment cannot reverse payments. 
                                 <strong>You must manually handle refunds or credits in the Profit/Loss page.</strong>
@@ -1415,7 +1423,7 @@
                 }
                 
                 breakdownHtml += `
-                        <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <div style="background: var(--vz-input-bg, rgba(254, 243, 199, 0.3)); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
                             <h6 style="margin-bottom: 10px;">Supplier Costs:</h6>
                             <table style="width: 100%; margin-bottom: 10px;">
                                 <tr>
@@ -1426,23 +1434,23 @@
                                     <td>New Cost:</td>
                                     <td style="text-align: right;"><strong>${formatRM(adj.new_costs.supplier_rm)}</strong></td>
                                 </tr>
-                                <tr style="border-top: 2px solid #f59e0b;">
+                                <tr style="border-top: 2px solid var(--vz-warning, #f59e0b);">
                                     <td><strong>Difference:</strong></td>
-                                    <td style="text-align: right; color: ${adj.differences.supplier_rm >= 0 ? '#dc2626' : '#16a34a'};">
+                                    <td style="text-align: right;" class="${adj.differences.supplier_rm >= 0 ? 'text-danger' : 'text-success'}">
                                         <strong>${adj.differences.supplier_rm >= 0 ? '+' : ''}${formatRM(adj.differences.supplier_rm)}</strong>
                                     </td>
                                 </tr>
                             </table>
-                            <div style="background: white; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                            <div style="background: var(--vz-input-bg, rgba(255, 255, 255, 0.5)); padding: 10px; border-radius: 4px; margin-top: 10px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
                                 <div>💰 Payments Made: ${formatRM(adj.payments_made.supplier_rm)}</div>
-                                <div style="color: ${adj.new_balances.supplier_rm >= 0 ? '#dc2626' : '#16a34a'};">
+                                <div class="${adj.new_balances.supplier_rm >= 0 ? 'text-danger' : 'text-success'}">
                                     📊 New Balance: <strong>${formatRM(adj.new_balances.supplier_rm)}</strong>
                                     ${adj.new_balances.supplier_rm > 0.01 ? ' (Underpaid)' : adj.new_balances.supplier_rm < -0.01 ? ' (⚠️ OVERPAID - Refund Needed)' : ' (Fully Paid)'}
                                 </div>
                             </div>
                         </div>
                         
-                        <div style="background: #dbeafe; padding: 15px; border-radius: 8px;">
+                        <div style="background: var(--vz-input-bg, rgba(219, 234, 254, 0.3)); padding: 15px; border-radius: 8px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
                             <h6 style="margin-bottom: 10px;">Shipping Costs:</h6>
                             <table style="width: 100%; margin-bottom: 10px;">
                                 <tr>
@@ -1453,16 +1461,16 @@
                                     <td>New Cost:</td>
                                     <td style="text-align: right;"><strong>${formatRM(adj.new_costs.shipping_rm)}</strong></td>
                                 </tr>
-                                <tr style="border-top: 2px solid #3b82f6;">
+                                <tr style="border-top: 2px solid var(--vz-info, #3b82f6);">
                                     <td><strong>Difference:</strong></td>
-                                    <td style="text-align: right; color: ${adj.differences.shipping_rm >= 0 ? '#dc2626' : '#16a34a'};">
+                                    <td style="text-align: right;" class="${adj.differences.shipping_rm >= 0 ? 'text-danger' : 'text-success'}">
                                         <strong>${adj.differences.shipping_rm >= 0 ? '+' : ''}${formatRM(adj.differences.shipping_rm)}</strong>
                                     </td>
                                 </tr>
                             </table>
-                            <div style="background: white; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                            <div style="background: var(--vz-input-bg, rgba(255, 255, 255, 0.5)); padding: 10px; border-radius: 4px; margin-top: 10px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
                                 <div>💰 Payments Made: ${formatRM(adj.payments_made.shipping_rm)}</div>
-                                <div style="color: ${adj.new_balances.shipping_rm >= 0 ? '#dc2626' : '#16a34a'};">
+                                <div class="${adj.new_balances.shipping_rm >= 0 ? 'text-danger' : 'text-success'}">
                                     📊 New Balance: <strong>${formatRM(adj.new_balances.shipping_rm)}</strong>
                                     ${adj.new_balances.shipping_rm > 0.01 ? ' (Underpaid)' : adj.new_balances.shipping_rm < -0.01 ? ' (⚠️ OVERPAID - Refund Needed)' : ' (Fully Paid)'}
                                 </div>
@@ -1472,7 +1480,7 @@
                 // Add commission section if commission changes detected
                 if (adj.old_costs.commission_rm > 0 || adj.new_costs.commission_rm > 0) {
                     breakdownHtml += `
-                        <div style="background: #e0e7ff; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                        <div style="background: var(--vz-input-bg, rgba(224, 231, 255, 0.3)); padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
                             <h6 style="margin-bottom: 10px;">Staff Commission:</h6>
                             <table style="width: 100%; margin-bottom: 10px;">
                                 <tr>
@@ -1483,16 +1491,16 @@
                                     <td>New Commission:</td>
                                     <td style="text-align: right;"><strong>${formatRM(adj.new_costs.commission_rm)}</strong></td>
                                 </tr>
-                                <tr style="border-top: 2px solid #6366f1;">
+                                <tr style="border-top: 2px solid var(--vz-primary, #6366f1);">
                                     <td><strong>Difference:</strong></td>
-                                    <td style="text-align: right; color: ${adj.differences.commission_rm >= 0 ? '#dc2626' : '#16a34a'};">
+                                    <td style="text-align: right;" class="${adj.differences.commission_rm >= 0 ? 'text-danger' : 'text-success'}">
                                         <strong>${adj.differences.commission_rm >= 0 ? '+' : ''}${formatRM(adj.differences.commission_rm)}</strong>
                                     </td>
                                 </tr>
                             </table>
-                            <div style="background: white; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                            <div style="background: var(--vz-input-bg, rgba(255, 255, 255, 0.5)); padding: 10px; border-radius: 4px; margin-top: 10px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
                                 <div>💰 Commission Paid: ${formatRM(adj.payments_made.commission_rm || 0)}</div>
-                                <div style="color: ${adj.new_balances.commission_rm >= 0 ? '#dc2626' : '#16a34a'};">
+                                <div class="${adj.new_balances.commission_rm >= 0 ? 'text-danger' : 'text-success'}">
                                     📊 New Balance: <strong>${formatRM(adj.new_balances.commission_rm)}</strong>
                                     ${adj.new_balances.commission_rm > 0.01 ? ' (Unpaid)' : adj.new_balances.commission_rm < -0.01 ? ' (⚠️ OVERPAID - Manual Adjustment Needed)' : ' (Fully Paid)'}
                                 </div>
@@ -1501,8 +1509,8 @@
                 }
                 
                 breakdownHtml += `
-                        <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center;">
-                            <h5 style="margin: 0; color: ${adj.new_balances.total_rm >= 0 ? '#dc2626' : '#16a34a'};">
+                        <div style="background: var(--vz-input-bg, rgba(243, 244, 246, 0.5)); padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
+                            <h5 style="margin: 0;" class="${adj.new_balances.total_rm >= 0 ? 'text-danger' : 'text-success'}">
                                 Total Balance: ${formatRM(adj.new_balances.total_rm)}
                             </h5>
                         </div>
@@ -1512,7 +1520,7 @@
                 Swal.fire({
                     title: '⚖️ Payment Adjustment Required',
                     html: breakdownHtml + `
-                        <p style="margin-top: 15px; font-size: 14px; color: #6b7280;">
+                        <p class="text-muted" style="margin-top: 15px; font-size: 14px;">
                             ${hasOverpayment ? 
                                 '⚠️ <strong>Overpayments cannot be automatically reversed.</strong> You can view and manually adjust in Profit/Loss.' : 
                                 'Would you like to automatically create adjustment payments to match the new costs?'}

@@ -32,6 +32,9 @@ function getOrderTabs() {
             c.customer_company_name,
             c.customer_phone,
             (SELECT SUM(amount_paid) FROM payment_history WHERE invoice_id = i.invoice_id) as total_paid,
+            COALESCE(i.supplier_payments_total, 0) as supplier_payments_total,
+            COALESCE(i.shipping_payments_total, 0) as shipping_payments_total,
+            COALESCE(i.commission_paid_amount, 0) as commission_paid_amount,
             CASE 
                 WHEN EXISTS (
                     SELECT 1 FROM payment_history 
