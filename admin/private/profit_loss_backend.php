@@ -15,6 +15,14 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
     $pdo = openDB();
     $action = $_GET['action'] ?? $_POST['action'];
     
+    // Debug logging
+    error_log("=== PROFIT LOSS BACKEND ===");
+    error_log("Action received: " . $action);
+    error_log("GET action: " . ($_GET['action'] ?? 'not set'));
+    error_log("POST action: " . ($_POST['action'] ?? 'not set'));
+    error_log("Request method: " . $_SERVER['REQUEST_METHOD']);
+    error_log("POST data: " . print_r($_POST, true));
+    
     switch($action) {
         case 'get_orders':
             echo json_encode(getProfitLossOrders($pdo));
@@ -113,6 +121,26 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
                 echo json_encode($result);
             } else {
                 echo json_encode(['success' => false, 'error' => 'Date range required']);
+            }
+            break;
+            
+        case 'add_payment_adjustment':
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $invoiceId = $_POST['invoice_id'] ?? null;
+                $adjustmentType = $_POST['adjustment_type'] ?? null; // 'supplier' or 'shipping'
+                $amount = $_POST['amount'] ?? null;
+                $description = $_POST['description'] ?? null;
+                
+                error_log("Payment Adjustment Request - Invoice: $invoiceId, Type: $adjustmentType, Amount: $amount");
+                
+                if($invoiceId && $adjustmentType && $amount !== null) {
+                    $result = addPaymentAdjustment($pdo, $invoiceId, $adjustmentType, $amount, $description);
+                    echo json_encode($result);
+                } else {
+                    echo json_encode(['success' => false, 'error' => 'Missing required fields']);
+                }
+            } else {
+                echo json_encode(['success' => false, 'error' => 'POST method required']);
             }
             break;
             
@@ -383,7 +411,10 @@ function getOrderProfitDetails($pdo, $invoiceId) {
         }
         
         // Calculate totals
-        $totalRevenue = array_sum(array_column($items, 'item_revenue'));
+        // For commission: use pre-discount revenue (sum of items)
+        // For profit/revenue display: use post-discount total_amount
+        $totalRevenueBeforeDiscount = array_sum(array_column($items, 'item_revenue')); // Pre-discount for commission
+        $totalRevenueAfterDiscount = floatval($order['total_amount']); // Post-discount for profit calculation
         $totalSupplierCostYen = array_sum(array_column($items, 'total_supplier_cost_yen'));
         $totalShippingCostRm = array_sum(array_column($items, 'total_shipping_cost_rm'));
         $totalProfit = array_sum(array_column($items, 'item_profit'));
@@ -402,7 +433,7 @@ function getOrderProfitDetails($pdo, $invoiceId) {
             }
         }
         
-        $actualProfitLoss = $totalRevenue - ($supplierPaymentsMade / $avgConversionRate + $shippingPaymentsMade);
+        $actualProfitLoss = $totalRevenueAfterDiscount - ($supplierPaymentsMade / $avgConversionRate + $shippingPaymentsMade);
         
         return [
             'success' => true,
@@ -410,7 +441,8 @@ function getOrderProfitDetails($pdo, $invoiceId) {
             'items' => $items,
             'payments' => $payments,
             'summary' => [
-                'total_revenue' => $totalRevenue,
+                'total_revenue' => $totalRevenueAfterDiscount, // Discounted total (what customer pays)
+                'total_revenue_before_discount' => $totalRevenueBeforeDiscount, // Sum of items (before discount)
                 'total_supplier_cost_yen' => $totalSupplierCostYen,
                 'total_shipping_cost_rm' => $totalShippingCostRm, // Correctly named as RM
                 'total_profit' => $totalProfit,
@@ -706,13 +738,21 @@ function getStaffCommissionSummary($pdo, $dateFrom, $dateTo, $staffId = null) {
                 ) as total_profit,
                 SUM(
                     CASE WHEN i.commission_percentage > 0 
-                    THEN i.total_amount * (i.commission_percentage / 100)
+                    THEN COALESCE((
+                        SELECT SUM(ii.quantity * ii.unit_price) 
+                        FROM invoice_item ii 
+                        WHERE ii.invoice_id = i.invoice_id
+                    ), i.total_amount) * (i.commission_percentage / 100)
                     ELSE 0 END
                 ) as total_commission_due,
                 SUM(COALESCE(i.commission_paid_amount, 0)) as total_commission_paid,
                 SUM(
                     CASE WHEN i.commission_percentage > 0 
-                    THEN (i.total_amount * (i.commission_percentage / 100)) - COALESCE(i.commission_paid_amount, 0)
+                    THEN (COALESCE((
+                        SELECT SUM(ii.quantity * ii.unit_price) 
+                        FROM invoice_item ii 
+                        WHERE ii.invoice_id = i.invoice_id
+                    ), i.total_amount) * (i.commission_percentage / 100)) - COALESCE(i.commission_paid_amount, 0)
                     ELSE 0 END
                 ) as total_commission_remaining
             FROM invoice i
@@ -743,7 +783,11 @@ function getStaffCommissionSummary($pdo, $dateFrom, $dateTo, $staffId = null) {
                 ) as total_profit,
                 SUM(
                     CASE WHEN i.commission_percentage > 0 
-                    THEN i.total_amount * (i.commission_percentage / 100)
+                    THEN COALESCE((
+                        SELECT SUM(ii.quantity * ii.unit_price) 
+                        FROM invoice_item ii 
+                        WHERE ii.invoice_id = i.invoice_id
+                    ), i.total_amount) * (i.commission_percentage / 100)
                     ELSE 0 END
                 ) as total_commission_due,
                 SUM(COALESCE(i.commission_paid_amount, 0)) as total_commission_paid
@@ -980,6 +1024,111 @@ function getPaymentSummaries($pdo, $monthFilter = '', $searchFilter = '', $dateF
         
     } catch(PDOException $e) {
         error_log("Error fetching payment summaries: " . $e->getMessage());
+        return ['success' => false, 'error' => 'Database error: ' . $e->getMessage()];
+    }
+}
+
+/**
+ * Add payment adjustment (positive or negative) after order update
+ */
+function addPaymentAdjustment($pdo, $invoiceId, $adjustmentType, $amount, $description = null) {
+    try {
+        // Get invoice items to calculate average conversion rate
+        $stmt = $pdo->prepare("
+            SELECT COALESCE(p.new_conversion_rate, 0.032) as conversion_rate
+            FROM invoice_item ii 
+            LEFT JOIN price p ON p.product_id = ii.product_id 
+            WHERE ii.invoice_id = ? AND p.new_conversion_rate > 0
+        ");
+        $stmt->execute([$invoiceId]);
+        $rates = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        
+        // Calculate average conversion rate
+        $avgConversionRate = 0.032; // Default rate
+        if (!empty($rates)) {
+            $avgConversionRate = array_sum($rates) / count($rates);
+        }
+        
+        // Get current payment history and totals
+        if ($adjustmentType === 'supplier') {
+            $stmt = $pdo->prepare("SELECT payment_history_json, supplier_payments_total FROM invoice WHERE invoice_id = ?");
+        } else {
+            $stmt = $pdo->prepare("SELECT payment_history_json, shipping_payments_total FROM invoice WHERE invoice_id = ?");
+        }
+        $stmt->execute([$invoiceId]);
+        $current = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$current) {
+            return ['success' => false, 'error' => 'Invoice not found'];
+        }
+        
+        // Parse existing payment history
+        $paymentHistory = [];
+        if (!empty($current['payment_history_json'])) {
+            $paymentHistory = json_decode($current['payment_history_json'], true) ?: [];
+        }
+        
+        // Prepare adjustment payment
+        if ($adjustmentType === 'supplier') {
+            // Convert RM to Yen for storage (RM × rate = Yen, where rate is Yen per 1 RM)
+            $amountYen = $amount * $avgConversionRate;
+            
+            $newPayment = [
+                'type' => 'supplier',
+                'amount' => $amountYen, // Store as Yen
+                'amount_rm' => $amount, // Also store original RM amount
+                'conversion_rate' => $avgConversionRate,
+                'description' => '⚖️ ADJUSTMENT: ' . ($description ?: 'Cost changed after order update'),
+                'is_adjustment' => true,
+                'date' => date('Y-m-d H:i:s'),
+                'timestamp' => time()
+            ];
+            
+            $newTotal = ($current['supplier_payments_total'] ?: 0) + $amountYen;
+            $field = 'supplier_payments_total';
+            $noteField = 'supplier_payment_notes';
+            $note = date('Y-m-d H:i:s') . " - ⚖️ PAYMENT ADJUSTMENT: RM " . number_format($amount, 2) . 
+                    " (¥" . number_format($amountYen, 2) . " @ rate " . number_format($avgConversionRate, 4) . ")" .
+                    ($description ? " - " . $description : " - Cost adjustment after order update");
+        } else {
+            $newPayment = [
+                'type' => 'shipping',
+                'amount' => $amount, // Shipping is in RM
+                'description' => '⚖️ ADJUSTMENT: ' . ($description ?: 'Cost changed after order update'),
+                'is_adjustment' => true,
+                'date' => date('Y-m-d H:i:s'),
+                'timestamp' => time()
+            ];
+            
+            $newTotal = ($current['shipping_payments_total'] ?: 0) + $amount;
+            $field = 'shipping_payments_total';
+            $noteField = 'shipping_payment_notes';
+            $note = date('Y-m-d H:i:s') . " - ⚖️ PAYMENT ADJUSTMENT: RM " . number_format($amount, 2) .
+                    ($description ? " - " . $description : " - Cost adjustment after order update");
+        }
+        
+        $paymentHistory[] = $newPayment;
+        
+        // Update database
+        $query = "
+            UPDATE invoice 
+            SET $field = ?, 
+                payment_history_json = ?,
+                $noteField = CONCAT(COALESCE($noteField, ''), ?, '\n')
+            WHERE invoice_id = ?
+        ";
+        
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$newTotal, json_encode($paymentHistory), $note, $invoiceId]);
+        
+        $adjustmentLabel = $amount >= 0 ? 'increase' : 'reduction';
+        return [
+            'success' => true, 
+            'message' => ucfirst($adjustmentType) . " payment adjustment recorded successfully (RM " . number_format(abs($amount), 2) . " " . $adjustmentLabel . ")"
+        ];
+        
+    } catch(PDOException $e) {
+        error_log("Error adding payment adjustment: " . $e->getMessage());
         return ['success' => false, 'error' => 'Database error: ' . $e->getMessage()];
     }
 }

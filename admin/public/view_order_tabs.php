@@ -178,7 +178,8 @@
                                                         customerPayment: <?= isset($order['total_paid']) && $order['total_paid'] > 0 ? $order['total_paid'] : 0 ?>,
                                                         supplierPayment: <?= isset($order['supplier_payments_total']) && $order['supplier_payments_total'] > 0 ? $order['supplier_payments_total'] : 0 ?>,
                                                         shippingPayment: <?= isset($order['shipping_payments_total']) && $order['shipping_payments_total'] > 0 ? $order['shipping_payments_total'] : 0 ?>,
-                                                        commissionPayment: <?= isset($order['commission_paid_amount']) && $order['commission_paid_amount'] > 0 ? $order['commission_paid_amount'] : 0 ?>
+                                                        commissionPayment: <?= isset($order['commission_paid_amount']) && $order['commission_paid_amount'] > 0 ? $order['commission_paid_amount'] : 0 ?>,
+                                                        conversionRate: <?= isset($order['conversion_rate']) && $order['conversion_rate'] > 0 ? $order['conversion_rate'] : 0.032 ?>
                                                     })'>
                                                         <i class="ri-edit-line"></i> Edit Order
                                                     </button>
@@ -1200,6 +1201,10 @@
             const hasCommissionPayment = payments.commissionPayment > 0;
             const hasAnyPayment = hasCustomerPayment || hasSupplierPayment || hasShippingPayment || hasCommissionPayment;
             
+            // Convert supplier payment from YEN to RM for display
+            const conversionRate = payments.conversionRate || 0.032;
+            const supplierPaymentRM = payments.supplierPayment / conversionRate;
+            
             if (hasAnyPayment) {
                 // Build payment details list
                 let paymentDetails = [];
@@ -1218,7 +1223,7 @@
                     paymentDetails.push(`
                         <li style="margin-bottom: 8px;">
                             <strong class="text-warning">🏭 Supplier Payments:</strong> 
-                            <span class="text-warning">¥ ${payments.supplierPayment.toLocaleString('en-MY', {minimumFractionDigits: 2})}</span>
+                            <span class="text-warning">RM ${supplierPaymentRM.toLocaleString('en-MY', {minimumFractionDigits: 2})}</span>
                             <br><small class="text-muted" style="margin-left: 20px;">Recorded in Profit & Loss</small>
                         </li>
                     `);

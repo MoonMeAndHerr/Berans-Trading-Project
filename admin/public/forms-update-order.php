@@ -122,14 +122,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <?php else: ?>
-                                    <!-- Debug: No payments detected -->
-                                    <script>
-                                        console.log('Payment Warning NOT shown - has_any_payments:', '<?= $existingOrder['has_any_payments'] ?? 'undefined' ?>');
-                                        console.log('Supplier Payments:', '<?= $existingOrder['supplier_payments_total'] ?? '0' ?>');
-                                        console.log('Shipping Payments:', '<?= $existingOrder['shipping_payments_total'] ?? '0' ?>');
-                                        console.log('Commission Payments:', '<?= $existingOrder['commission_paid_amount'] ?? '0' ?>');
-                                    </script>
                                     <?php endif; ?>
 
                                     <!-- Form Body -->
@@ -1115,24 +1107,24 @@
                 
                 let breakdownHtml = `
                     <div style="text-align: left; margin: 20px 0;">
-                        <h5 class="text-warning" style="margin-bottom: 15px;">⚠️ Cost Changes Detected</h5>`;
+                        <h5 style="color: #fbbf24; margin-bottom: 15px;">⚠️ Cost Changes Detected</h5>`;
                 
                 // Add overpayment warning if detected
                 if (hasOverpayment) {
                     breakdownHtml += `
-                        <div style="background: var(--vz-input-bg, rgba(254, 226, 226, 0.5)); border: 2px solid var(--vz-danger, #dc2626); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                            <h6 class="text-danger" style="margin-bottom: 10px;">⚠️ OVERPAYMENT DETECTED</h6>
-                            <p style="margin: 0;">
+                        <div style="background: rgba(220, 38, 38, 0.15); border: 2px solid #ef4444; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h6 style="color: #fca5a5; margin-bottom: 10px;">⚠️ OVERPAYMENT DETECTED</h6>
+                            <p style="margin: 0; color: #fecaca; font-weight: 500;">
                                 The new costs are LOWER than what you've already paid. 
                                 Automatic adjustment cannot reverse payments. 
-                                <strong>Manual action will be required</strong> to handle refunds or credits.
+                                <strong style="color: #fee2e2;">Manual action will be required</strong> to handle refunds or credits.
                             </p>
                         </div>`;
                 }
                 
                 breakdownHtml += `
-                        <div style="background: var(--vz-input-bg, rgba(254, 243, 199, 0.3)); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
-                            <h6 style="margin-bottom: 10px;">Supplier Costs:</h6>
+                        <div style="background: rgba(251, 191, 36, 0.15); border: 1px solid #fbbf24; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h6 style="margin-bottom: 10px; color: #fcd34d;">Supplier Costs:</h6>
                             <table style="width: 100%; margin-bottom: 10px;">
                                 <tr>
                                     <td>Current Cost:</td>
@@ -1142,24 +1134,24 @@
                                     <td>New Cost:</td>
                                     <td style="text-align: right;"><strong>${formatRM(adj.new_costs.supplier_rm)}</strong></td>
                                 </tr>
-                                <tr style="border-top: 2px solid var(--vz-warning, #f59e0b);">
+                                <tr style="border-top: 2px solid #f59e0b;">
                                     <td><strong>Difference:</strong></td>
-                                    <td style="text-align: right;" class="${adj.differences.supplier_rm >= 0 ? 'text-danger' : 'text-success'}">
+                                    <td style="text-align: right; color: ${adj.differences.supplier_rm >= 0 ? '#dc2626' : '#16a34a'};">
                                         <strong>${adj.differences.supplier_rm >= 0 ? '+' : ''}${formatRM(adj.differences.supplier_rm)}</strong>
                                     </td>
                                 </tr>
                             </table>
-                            <div style="background: var(--vz-input-bg, rgba(255, 255, 255, 0.5)); padding: 10px; border-radius: 4px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
-                                <div>💰 Payments Made: ${formatRM(adj.payments_made.supplier_rm)}</div>
-                                <div class="${adj.new_balances.supplier_rm >= 0 ? 'text-danger' : 'text-success'}">
+                            <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px; border: 1px solid rgba(251, 191, 36, 0.3);">
+                                <div style="color: #fcd34d;">💰 Payments Made: ${formatRM(adj.payments_made.supplier_rm)}</div>
+                                <div style="color: ${adj.new_balances.supplier_rm >= 0 ? '#fca5a5' : '#86efac'}; font-weight: 500;">
                                     📊 New Balance: <strong>${formatRM(adj.new_balances.supplier_rm)}</strong>
                                     ${adj.new_balances.supplier_rm > 0.01 ? ' (Underpaid)' : adj.new_balances.supplier_rm < -0.01 ? ' (⚠️ OVERPAID - Refund Needed)' : ' (Balanced)'}
                                 </div>
                             </div>
                         </div>
                         
-                        <div style="background: var(--vz-input-bg, rgba(219, 234, 254, 0.3)); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
-                            <h6 style="margin-bottom: 10px;">Shipping Costs:</h6>
+                        <div style="background: rgba(59, 130, 246, 0.15); border: 1px solid #60a5fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h6 style="margin-bottom: 10px; color: #93c5fd;">Shipping Costs:</h6>
                             <table style="width: 100%; margin-bottom: 10px;">
                                 <tr>
                                     <td>Current Cost:</td>
@@ -1169,16 +1161,16 @@
                                     <td>New Cost:</td>
                                     <td style="text-align: right;"><strong>${formatRM(adj.new_costs.shipping_rm)}</strong></td>
                                 </tr>
-                                <tr style="border-top: 2px solid var(--vz-info, #3b82f6);">
+                                <tr style="border-top: 2px solid #3b82f6;">
                                     <td><strong>Difference:</strong></td>
-                                    <td style="text-align: right;" class="${adj.differences.shipping_rm >= 0 ? 'text-danger' : 'text-success'}">
+                                    <td style="text-align: right; color: ${adj.differences.shipping_rm >= 0 ? '#dc2626' : '#16a34a'};">
                                         <strong>${adj.differences.shipping_rm >= 0 ? '+' : ''}${formatRM(adj.differences.shipping_rm)}</strong>
                                     </td>
                                 </tr>
                             </table>
-                            <div style="background: var(--vz-input-bg, rgba(255, 255, 255, 0.5)); padding: 10px; border-radius: 4px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
-                                <div>💰 Payments Made: ${formatRM(adj.payments_made.shipping_rm)}</div>
-                                <div class="${adj.new_balances.shipping_rm >= 0 ? 'text-danger' : 'text-success'}">
+                            <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px; border: 1px solid rgba(96, 165, 250, 0.3);">
+                                <div style="color: #93c5fd;">💰 Payments Made: ${formatRM(adj.payments_made.shipping_rm)}</div>
+                                <div style="color: ${adj.new_balances.shipping_rm >= 0 ? '#fca5a5' : '#86efac'}; font-weight: 500;">
                                     📊 New Balance: <strong>${formatRM(adj.new_balances.shipping_rm)}</strong>
                                     ${adj.new_balances.shipping_rm > 0.01 ? ' (Underpaid)' : adj.new_balances.shipping_rm < -0.01 ? ' (⚠️ OVERPAID - Refund Needed)' : ' (Balanced)'}
                                 </div>
@@ -1188,8 +1180,8 @@
                 // Add commission section if commission changes detected
                 if (adj.old_costs.commission_rm > 0 || adj.new_costs.commission_rm > 0) {
                     breakdownHtml += `
-                        <div style="background: var(--vz-input-bg, rgba(224, 231, 255, 0.3)); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
-                            <h6 style="margin-bottom: 10px;">Staff Commission:</h6>
+                        <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid #a78bfa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h6 style="margin-bottom: 10px; color: #c4b5fd;">Staff Commission:</h6>
                             <table style="width: 100%; margin-bottom: 10px;">
                                 <tr>
                                     <td>Current Commission:</td>
@@ -1199,16 +1191,16 @@
                                     <td>New Commission:</td>
                                     <td style="text-align: right;"><strong>${formatRM(adj.new_costs.commission_rm)}</strong></td>
                                 </tr>
-                                <tr style="border-top: 2px solid var(--vz-primary, #6366f1);">
+                                <tr style="border-top: 2px solid #6366f1;">
                                     <td><strong>Difference:</strong></td>
-                                    <td style="text-align: right;" class="${adj.differences.commission_rm >= 0 ? 'text-danger' : 'text-success'}">
+                                    <td style="text-align: right; color: ${adj.differences.commission_rm >= 0 ? '#dc2626' : '#16a34a'};">
                                         <strong>${adj.differences.commission_rm >= 0 ? '+' : ''}${formatRM(adj.differences.commission_rm)}</strong>
                                     </td>
                                 </tr>
                             </table>
-                            <div style="background: var(--vz-input-bg, rgba(255, 255, 255, 0.5)); padding: 10px; border-radius: 4px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
-                                <div>💰 Commission Paid: ${formatRM(adj.payments_made.commission_rm || 0)}</div>
-                                <div class="${adj.new_balances.commission_rm >= 0 ? 'text-danger' : 'text-success'}">
+                            <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px; border: 1px solid rgba(167, 139, 250, 0.3);">
+                                <div style="color: #c4b5fd;">💰 Commission Paid: ${formatRM(adj.payments_made.commission_rm || 0)}</div>
+                                <div style="color: ${adj.new_balances.commission_rm >= 0 ? '#fca5a5' : '#86efac'}; font-weight: 500;">
                                     📊 New Balance: <strong>${formatRM(adj.new_balances.commission_rm)}</strong>
                                     ${adj.new_balances.commission_rm > 0.01 ? ' (Unpaid)' : adj.new_balances.commission_rm < -0.01 ? ' (⚠️ OVERPAID - Manual Adjustment Needed)' : ' (Fully Paid)'}
                                 </div>
@@ -1217,13 +1209,13 @@
                 }
                 
                 breakdownHtml += `
-                        <div style="background: var(--vz-input-bg, rgba(243, 244, 246, 0.5)); padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
-                            <h5 style="margin: 0;" class="${adj.new_balances.total_rm >= 0 ? 'text-danger' : 'text-success'}">
+                        <div style="background: rgba(75, 85, 99, 0.3); border: 1px solid #9ca3af; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center;">
+                            <h5 style="margin: 0; color: ${adj.new_balances.total_rm >= 0 ? '#fca5a5' : '#86efac'}; font-weight: 600;">
                                 Total Balance: ${formatRM(adj.new_balances.total_rm)}
                             </h5>
                         </div>
                         
-                        <p class="text-muted" style="margin-top: 15px; font-size: 14px; text-align: center;">
+                        <p style="margin-top: 15px; font-size: 14px; color: #6b7280; text-align: center;">
                             ${hasOverpayment ? 
                                 '⚠️ <strong>Manual action required</strong> to handle overpayments. Proceed with caution.' : 
                                 'You\'ll be able to adjust payments automatically after updating.'}
@@ -1407,24 +1399,24 @@
                 // Build detailed breakdown HTML
                 let breakdownHtml = `
                     <div style="text-align: left; margin: 20px 0;">
-                        <h5 class="text-warning" style="margin-bottom: 15px;">⚠️ Cost Changes Detected</h5>`;
+                        <h5 style="color: #fbbf24; margin-bottom: 15px;">⚠️ Cost Changes Detected</h5>`;
                 
                 // Add overpayment warning if detected
                 if (hasOverpayment) {
                     breakdownHtml += `
-                        <div style="background: var(--vz-input-bg, rgba(254, 226, 226, 0.5)); border: 2px solid var(--vz-danger, #dc2626); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                            <h6 class="text-danger" style="margin-bottom: 10px;">⚠️ OVERPAYMENT DETECTED</h6>
-                            <p style="margin: 0;">
+                        <div style="background: rgba(220, 38, 38, 0.15); border: 2px solid #ef4444; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h6 style="color: #fca5a5; margin-bottom: 10px;">⚠️ OVERPAYMENT DETECTED</h6>
+                            <p style="margin: 0; color: #fecaca; font-weight: 500;">
                                 The new costs are LOWER than what you've already paid. 
                                 Automatic adjustment cannot reverse payments. 
-                                <strong>You must manually handle refunds or credits in the Profit/Loss page.</strong>
+                                <strong style="color: #fee2e2;">You must manually handle refunds or credits in the Profit/Loss page.</strong>
                             </p>
                         </div>`;
                 }
                 
                 breakdownHtml += `
-                        <div style="background: var(--vz-input-bg, rgba(254, 243, 199, 0.3)); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
-                            <h6 style="margin-bottom: 10px;">Supplier Costs:</h6>
+                        <div style="background: rgba(251, 191, 36, 0.15); border: 1px solid #fbbf24; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h6 style="margin-bottom: 10px; color: #fcd34d;">Supplier Costs:</h6>
                             <table style="width: 100%; margin-bottom: 10px;">
                                 <tr>
                                     <td>Previous Cost:</td>
@@ -1434,24 +1426,24 @@
                                     <td>New Cost:</td>
                                     <td style="text-align: right;"><strong>${formatRM(adj.new_costs.supplier_rm)}</strong></td>
                                 </tr>
-                                <tr style="border-top: 2px solid var(--vz-warning, #f59e0b);">
+                                <tr style="border-top: 2px solid #f59e0b;">
                                     <td><strong>Difference:</strong></td>
-                                    <td style="text-align: right;" class="${adj.differences.supplier_rm >= 0 ? 'text-danger' : 'text-success'}">
+                                    <td style="text-align: right; color: ${adj.differences.supplier_rm >= 0 ? '#dc2626' : '#16a34a'};">
                                         <strong>${adj.differences.supplier_rm >= 0 ? '+' : ''}${formatRM(adj.differences.supplier_rm)}</strong>
                                     </td>
                                 </tr>
                             </table>
-                            <div style="background: var(--vz-input-bg, rgba(255, 255, 255, 0.5)); padding: 10px; border-radius: 4px; margin-top: 10px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
-                                <div>💰 Payments Made: ${formatRM(adj.payments_made.supplier_rm)}</div>
-                                <div class="${adj.new_balances.supplier_rm >= 0 ? 'text-danger' : 'text-success'}">
+                            <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px; margin-top: 10px; border: 1px solid rgba(251, 191, 36, 0.3);">
+                                <div style="color: #fcd34d;">💰 Payments Made: ${formatRM(adj.payments_made.supplier_rm)}</div>
+                                <div style="color: ${adj.new_balances.supplier_rm >= 0 ? '#fca5a5' : '#86efac'}; font-weight: 500;">
                                     📊 New Balance: <strong>${formatRM(adj.new_balances.supplier_rm)}</strong>
                                     ${adj.new_balances.supplier_rm > 0.01 ? ' (Underpaid)' : adj.new_balances.supplier_rm < -0.01 ? ' (⚠️ OVERPAID - Refund Needed)' : ' (Fully Paid)'}
                                 </div>
                             </div>
                         </div>
                         
-                        <div style="background: var(--vz-input-bg, rgba(219, 234, 254, 0.3)); padding: 15px; border-radius: 8px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
-                            <h6 style="margin-bottom: 10px;">Shipping Costs:</h6>
+                        <div style="background: rgba(59, 130, 246, 0.15); border: 1px solid #60a5fa; padding: 15px; border-radius: 8px;">
+                            <h6 style="margin-bottom: 10px; color: #93c5fd;">Shipping Costs:</h6>
                             <table style="width: 100%; margin-bottom: 10px;">
                                 <tr>
                                     <td>Previous Cost:</td>
@@ -1461,16 +1453,16 @@
                                     <td>New Cost:</td>
                                     <td style="text-align: right;"><strong>${formatRM(adj.new_costs.shipping_rm)}</strong></td>
                                 </tr>
-                                <tr style="border-top: 2px solid var(--vz-info, #3b82f6);">
+                                <tr style="border-top: 2px solid #3b82f6;">
                                     <td><strong>Difference:</strong></td>
-                                    <td style="text-align: right;" class="${adj.differences.shipping_rm >= 0 ? 'text-danger' : 'text-success'}">
+                                    <td style="text-align: right; color: ${adj.differences.shipping_rm >= 0 ? '#dc2626' : '#16a34a'};">
                                         <strong>${adj.differences.shipping_rm >= 0 ? '+' : ''}${formatRM(adj.differences.shipping_rm)}</strong>
                                     </td>
                                 </tr>
                             </table>
-                            <div style="background: var(--vz-input-bg, rgba(255, 255, 255, 0.5)); padding: 10px; border-radius: 4px; margin-top: 10px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
-                                <div>💰 Payments Made: ${formatRM(adj.payments_made.shipping_rm)}</div>
-                                <div class="${adj.new_balances.shipping_rm >= 0 ? 'text-danger' : 'text-success'}">
+                            <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px; margin-top: 10px; border: 1px solid rgba(96, 165, 250, 0.3);">
+                                <div style="color: #93c5fd;">💰 Payments Made: ${formatRM(adj.payments_made.shipping_rm)}</div>
+                                <div style="color: ${adj.new_balances.shipping_rm >= 0 ? '#fca5a5' : '#86efac'}; font-weight: 500;">
                                     📊 New Balance: <strong>${formatRM(adj.new_balances.shipping_rm)}</strong>
                                     ${adj.new_balances.shipping_rm > 0.01 ? ' (Underpaid)' : adj.new_balances.shipping_rm < -0.01 ? ' (⚠️ OVERPAID - Refund Needed)' : ' (Fully Paid)'}
                                 </div>
@@ -1480,8 +1472,8 @@
                 // Add commission section if commission changes detected
                 if (adj.old_costs.commission_rm > 0 || adj.new_costs.commission_rm > 0) {
                     breakdownHtml += `
-                        <div style="background: var(--vz-input-bg, rgba(224, 231, 255, 0.3)); padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
-                            <h6 style="margin-bottom: 10px;">Staff Commission:</h6>
+                        <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid #a78bfa; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                            <h6 style="margin-bottom: 10px; color: #c4b5fd;">Staff Commission:</h6>
                             <table style="width: 100%; margin-bottom: 10px;">
                                 <tr>
                                     <td>Previous Commission:</td>
@@ -1491,16 +1483,16 @@
                                     <td>New Commission:</td>
                                     <td style="text-align: right;"><strong>${formatRM(adj.new_costs.commission_rm)}</strong></td>
                                 </tr>
-                                <tr style="border-top: 2px solid var(--vz-primary, #6366f1);">
+                                <tr style="border-top: 2px solid #6366f1;">
                                     <td><strong>Difference:</strong></td>
-                                    <td style="text-align: right;" class="${adj.differences.commission_rm >= 0 ? 'text-danger' : 'text-success'}">
+                                    <td style="text-align: right; color: ${adj.differences.commission_rm >= 0 ? '#dc2626' : '#16a34a'};">
                                         <strong>${adj.differences.commission_rm >= 0 ? '+' : ''}${formatRM(adj.differences.commission_rm)}</strong>
                                     </td>
                                 </tr>
                             </table>
-                            <div style="background: var(--vz-input-bg, rgba(255, 255, 255, 0.5)); padding: 10px; border-radius: 4px; margin-top: 10px; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
-                                <div>💰 Commission Paid: ${formatRM(adj.payments_made.commission_rm || 0)}</div>
-                                <div class="${adj.new_balances.commission_rm >= 0 ? 'text-danger' : 'text-success'}">
+                            <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px; margin-top: 10px; border: 1px solid rgba(167, 139, 250, 0.3);">
+                                <div style="color: #c4b5fd;">💰 Commission Paid: ${formatRM(adj.payments_made.commission_rm || 0)}</div>
+                                <div style="color: ${adj.new_balances.commission_rm >= 0 ? '#fca5a5' : '#86efac'}; font-weight: 500;">
                                     📊 New Balance: <strong>${formatRM(adj.new_balances.commission_rm)}</strong>
                                     ${adj.new_balances.commission_rm > 0.01 ? ' (Unpaid)' : adj.new_balances.commission_rm < -0.01 ? ' (⚠️ OVERPAID - Manual Adjustment Needed)' : ' (Fully Paid)'}
                                 </div>
@@ -1509,8 +1501,8 @@
                 }
                 
                 breakdownHtml += `
-                        <div style="background: var(--vz-input-bg, rgba(243, 244, 246, 0.5)); padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; border: 1px solid var(--vz-border-color, rgba(209, 213, 219, 0.3));">
-                            <h5 style="margin: 0;" class="${adj.new_balances.total_rm >= 0 ? 'text-danger' : 'text-success'}">
+                        <div style="background: rgba(75, 85, 99, 0.3); border: 1px solid #9ca3af; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center;">
+                            <h5 style="margin: 0; color: ${adj.new_balances.total_rm >= 0 ? '#fca5a5' : '#86efac'}; font-weight: 600;">
                                 Total Balance: ${formatRM(adj.new_balances.total_rm)}
                             </h5>
                         </div>
@@ -1520,7 +1512,7 @@
                 Swal.fire({
                     title: '⚖️ Payment Adjustment Required',
                     html: breakdownHtml + `
-                        <p class="text-muted" style="margin-top: 15px; font-size: 14px;">
+                        <p style="margin-top: 15px; font-size: 14px; color: #6b7280;">
                             ${hasOverpayment ? 
                                 '⚠️ <strong>Overpayments cannot be automatically reversed.</strong> You can view and manually adjust in Profit/Loss.' : 
                                 'Would you like to automatically create adjustment payments to match the new costs?'}
@@ -1625,6 +1617,8 @@
 
                 // Process adjustments sequentially
                 let promise = Promise.resolve();
+                const results = [];
+                
                 adjustments.forEach(adjustment => {
                     promise = promise.then(() => {
                         console.log('Processing adjustment:', adjustment);
@@ -1638,15 +1632,44 @@
                             formData.append('description', 'Automatic adjustment after order update');
                             
                             console.log('Calling add_payment_adjustment for:', adjustment.type, 'Amount:', adjustment.amount);
+                            console.log('FormData contents:', {
+                                invoice_id: formData.get('invoice_id'),
+                                adjustment_type: formData.get('adjustment_type'),
+                                amount: formData.get('amount'),
+                                description: formData.get('description')
+                            });
                             
                             return fetch('../private/profit_loss_backend.php?action=add_payment_adjustment', {
                                 method: 'POST',
                                 body: formData
                             })
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log('Payment adjustment response:', data);
-                                return data;
+                            .then(response => {
+                                console.log('Response status:', response.status);
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                                return response.text();
+                            })
+                            .then(text => {
+                                console.log('Raw response text:', text);
+                                try {
+                                    const data = JSON.parse(text);
+                                    console.log('Payment adjustment response for', adjustment.type + ':', data);
+                                    results.push({ type: adjustment.type, success: data.success, data: data, error: data.error });
+                                    if (!data.success) {
+                                        console.error('Adjustment failed for', adjustment.type + ':', data.error);
+                                    }
+                                    return data;
+                                } catch (e) {
+                                    console.error('JSON parse error for', adjustment.type + ':', e, 'Text:', text);
+                                    results.push({ type: adjustment.type, success: false, error: 'Invalid JSON response: ' + text });
+                                    return { success: false, error: 'Invalid JSON response' };
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error in payment adjustment for', adjustment.type + ':', error);
+                                results.push({ type: adjustment.type, success: false, error: error.message });
+                                return { success: false, error: error.message }; // Return instead of throw to continue chain
                             });
                         } else if (adjustment.endpoint === 'pay_staff_commission') {
                             // Commission adjustment - only if amount is positive (additional commission due)
@@ -1660,14 +1683,30 @@
                                     method: 'POST',
                                     body: formData
                                 })
-                                .then(response => response.json())
+                                .then(response => {
+                                    console.log('Commission response status:', response.status);
+                                    if (!response.ok) {
+                                        throw new Error(`HTTP error! status: ${response.status}`);
+                                    }
+                                    return response.json();
+                                })
                                 .then(data => {
                                     console.log('Commission payment response:', data);
+                                    results.push({ type: 'commission', success: data.success, data: data, error: data.error });
+                                    if (!data.success) {
+                                        console.error('Commission adjustment failed:', data.error);
+                                    }
                                     return data;
+                                })
+                                .catch(error => {
+                                    console.error('Error in commission payment:', error);
+                                    results.push({ type: 'commission', success: false, error: error.message });
+                                    return { success: false, error: error.message }; // Return instead of throw to continue chain
                                 });
                             } else {
                                 // For negative or zero commission adjustments, skip
                                 console.log('Commission adjustment skipped - amount not positive:', adjustment.amount);
+                                results.push({ type: 'commission', success: true, skipped: true });
                                 return Promise.resolve({ success: true, skipped: true });
                             }
                         }
@@ -1675,27 +1714,66 @@
                 });
 
                 promise.then(() => {
-                    Swal.fire({
-                        title: 'Success!',
-                        html: `
-                            <p>Invoice updated and payment adjustments created successfully!</p>
-                            <p style="color: #16a34a; margin-top: 10px;">
-                                ✅ All payment balances have been adjusted automatically.
-                            </p>
-                        `,
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        window.location.href = 'view_order_tabs.php';
-                    });
+                    console.log('All adjustments processed. Results:', results);
+                    
+                    // Check if all adjustments succeeded
+                    const failed = results.filter(r => !r.success && !r.skipped);
+                    const succeeded = results.filter(r => r.success);
+                    
+                    if (failed.length > 0) {
+                        console.error('Some adjustments failed:', failed);
+                        Swal.fire({
+                            title: 'Partial Success',
+                            html: `
+                                <p>Invoice updated successfully, but some payment adjustments failed:</p>
+                                <ul class="text-start mt-3">
+                                    ${succeeded.map(r => `<li class="text-success">✓ ${r.type} adjustment successful</li>`).join('')}
+                                    ${failed.map(r => `<li class="text-danger">✗ ${r.type} adjustment failed: ${r.error || 'Unknown error'}</li>`).join('')}
+                                </ul>
+                                <p class="mt-3">Please adjust payments manually in the Profit & Loss page.</p>
+                            `,
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.href = 'view_order_tabs.php';
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Success!',
+                            html: `
+                                <p>Invoice updated and payment adjustments created successfully!</p>
+                                <p style="color: #16a34a; margin-top: 10px;">
+                                    ✅ All payment balances have been adjusted automatically.
+                                </p>
+                                <ul class="text-start mt-3">
+                                    ${succeeded.map(r => `<li class="text-success">${r.type}: ${r.skipped ? 'No adjustment needed' : 'Adjusted successfully'}</li>`).join('')}
+                                </ul>
+                            `,
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.href = 'view_order_tabs.php';
+                        });
+                    }
                 }).catch(error => {
                     console.error('Adjustment error:', error);
+                    console.log('Partial results before error:', results);
+                    
+                    const succeeded = results.filter(r => r.success);
+                    
                     Swal.fire({
                         title: 'Partial Success',
                         html: `
-                            <p>Invoice updated but there was an error creating automatic adjustments.</p>
+                            <p>Invoice updated but there was an error creating automatic adjustments:</p>
+                            ${succeeded.length > 0 ? `
+                                <p class="mt-2"><strong>Successful adjustments:</strong></p>
+                                <ul class="text-start">
+                                    ${succeeded.map(r => `<li class="text-success">✓ ${r.type}</li>`).join('')}
+                                </ul>
+                            ` : ''}
+                            <p class="text-danger mt-2">${error.message}</p>
                             <p style="color: #f59e0b; margin-top: 10px;">
-                                ⚠️ Please adjust payments manually in the Profit/Loss page.
+                                ⚠️ Please adjust remaining payments manually in the Profit/Loss page.
                             </p>
                         `,
                         icon: 'warning',
