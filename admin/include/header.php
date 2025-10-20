@@ -28,7 +28,7 @@ require_once __DIR__ . '/../private/auth_check.php';
     <meta content="<?php echo WEB_TAGLINE; ?>" name="description" />
     <meta content="Berans" name="author" />
     <!-- App favicon -->
-    <link rel="shortcut icon" href="../../media/<?php echo $favicon; ?>">
+    <link rel="shortcut icon" href="../media/<?php echo $favicon; ?>">
 
     <!-- Layout config Js -->
     <script src="assets/js/layout.js"></script>

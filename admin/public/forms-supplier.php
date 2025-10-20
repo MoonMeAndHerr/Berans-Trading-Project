@@ -30,8 +30,72 @@
             <!-- ============================================================== -->
 
                         <div class="row">
+                            <!-- Supplier List Card -->
+                            <div class="col-12 mb-4">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">Supplier List</h5>
+                                        <button class="btn btn-success" onclick="$('a[href=\'#animation-home\']').tab('show')">
+                                            <i class="ri-add-line align-middle me-1"></i> Add New Supplier
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table id="supplierTable" class="table table-striped table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Supplier Name</th>
+                                                        <th>Contact Person</th>
+                                                        <th>Phone</th>
+                                                        <th>Email</th>
+                                                        <th>City</th>
+                                                        <th>Country</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach($allSuppliers as $supplier): ?>
+                                                        <tr>
+                                                            <td><?= htmlspecialchars($supplier['supplier_name']) ?></td>
+                                                            <td><?= htmlspecialchars($supplier['supplier_contact_person'] ?? 'N/A') ?></td>
+                                                            <td><?= htmlspecialchars($supplier['phone'] ?? 'N/A') ?></td>
+                                                            <td><?= htmlspecialchars($supplier['email'] ?? 'N/A') ?></td>
+                                                            <td><?= htmlspecialchars($supplier['city'] ?? 'N/A') ?></td>
+                                                            <td><?= htmlspecialchars($supplier['country'] ?? 'N/A') ?></td>
+                                                            <td>
+                                                                <div class="d-flex gap-2">
+                                                                    <button type="button" class="btn btn-sm btn-info" 
+                                                                            onclick="viewSupplierDetails(<?= htmlspecialchars(json_encode($supplier)) ?>)"
+                                                                            title="View Details">
+                                                                        <i class="ri-eye-line"></i>
+                                                                    </button>
+                                                                    <button type="button" class="btn btn-sm btn-primary" 
+                                                                            onclick="editSupplier(<?= $supplier['supplier_id'] ?>)"
+                                                                            title="Edit Supplier">
+                                                                        <i class="ri-edit-line"></i>
+                                                                    </button>
+                                                                    <button type="button" class="btn btn-sm btn-danger" 
+                                                                            onclick="deleteSupplier(<?= $supplier['supplier_id'] ?>, '<?= htmlspecialchars($supplier['supplier_name']) ?>')"
+                                                                            title="Delete Supplier">
+                                                                        <i class="ri-delete-bin-line"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Supplier Actions Card -->
                             <div class="col-xxl-6">
                                 <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">Manage Supplier</h5>
+                                    </div>
                                     <div class="card-body">
                                         <ul class="nav nav-pills animation-nav nav-justified gap-2 mb-3" role="tablist">
                                             <li class="nav-item waves-effect waves-light">
@@ -42,11 +106,6 @@
                                             <li class="nav-item waves-effect waves-light">
                                                 <a class="nav-link" data-bs-toggle="tab" href="#animation-profile" role="tab">
                                                     Update 
-                                                </a>
-                                            </li>
-                                            <li class="nav-item waves-effect waves-light">
-                                                <a class="nav-link" data-bs-toggle="tab" href="#animation-messages" role="tab">
-                                                    Delete   
                                                 </a>
                                             </li>
                                         </ul>
@@ -84,7 +143,7 @@
                                                 <!-- end success message -->
 
                                                 <div class="live-preview">
-                                                    <form action="" method="POST">
+                                                    <form action="" method="POST" id="addSupplierForm">
                                                         <div class="row">
                                                             <!-- Supplier Name -->
                                                             <div class="col-md-12">
@@ -253,7 +312,7 @@
                                                 </div><!-- end supplier dropdown -->
 
                                                 <!-- ✅ Update Form -->
-                                                <form id="updateForm" action="" method="POST">
+                                                <form id="updateForm" action="" method="POST" onsubmit="return handleFormSubmit(this, 'update')">
                                                     <div class="row">
                                                         <input type="hidden" name="supplier_id" id="update_supplier_id">
                                                         <input type="hidden" name="xero_relation" id="update_supplier_xero_relation">
@@ -344,150 +403,51 @@
                                             </div>
 
 
-                                            <!------------- DELETE PANE -------------->
 
 
-                                            <div class="tab-pane" id="animation-messages" role="tabpanel">
-                                                
-                                            <!-- ✅ Show errors -->
-                                            <?php if (!empty($errors)): ?>
-                                                <div class="alert alert-danger">
-                                                    <ul class="mb-0">
-                                                        <?php foreach ($errors as $error): ?>
-                                                            <li><?= htmlspecialchars($error) ?></li>
-                                                        <?php endforeach; ?>
-                                                    </ul>
-                                                </div>
-                                            <?php endif; ?>
-
-                                            <?php if (!empty($errors)): ?>
-                                                    <div class="alert alert-danger">
-                                                        <ul class="mb-0">
-                                                            <?php foreach ($errors as $e): ?>
-                                                                <li><?= htmlspecialchars($e) ?></li>
+                                            <!-- Supplier List Tab -->
+                                            <div class="tab-pane" id="supplier-list" role="tabpanel">
+                                                <div class="table-responsive">
+                                                    <table id="supplierTable" class="table table-striped table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Supplier Name</th>
+                                                                <th>Contact Person</th>
+                                                                <th>Phone</th>
+                                                                <th>Email</th>
+                                                                <th>City</th>
+                                                                <th>Country</th>
+                                                                <th>Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <?php foreach($allSuppliers as $supplier): ?>
+                                                                <tr>
+                                                                    <td><?= htmlspecialchars($supplier['supplier_name']) ?></td>
+                                                                    <td><?= htmlspecialchars($supplier['supplier_contact_person'] ?? 'N/A') ?></td>
+                                                                    <td><?= htmlspecialchars($supplier['phone'] ?? 'N/A') ?></td>
+                                                                    <td><?= htmlspecialchars($supplier['email'] ?? 'N/A') ?></td>
+                                                                    <td><?= htmlspecialchars($supplier['city'] ?? 'N/A') ?></td>
+                                                                    <td><?= htmlspecialchars($supplier['country'] ?? 'N/A') ?></td>
+                                                                    <td>
+                                                                        <div class="d-flex gap-2">
+                                                                            <button type="button" class="btn btn-sm btn-info" 
+                                                                                    onclick="viewSupplierDetails(<?= htmlspecialchars(json_encode($supplier)) ?>)"
+                                                                                    title="View Details">
+                                                                                <i class="ri-eye-line"></i>
+                                                                            </button>
+                                                                            <button type="button" class="btn btn-sm btn-primary" 
+                                                                                    onclick="editSupplier(<?= $supplier['supplier_id'] ?>)"
+                                                                                    title="Edit Supplier">
+                                                                                <i class="ri-edit-line"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
                                                             <?php endforeach; ?>
-                                                        </ul>
-                                                    </div>s
-                                                <?php endif; ?><!-- end error messages -->
-
-                                                <!-- ✅ Show Add success message -->
-                                                <?php if ($success_add): ?>
-                                                    <div class="alert alert-success"><?= htmlspecialchars($success_add) ?></div>
-                                                <?php endif; ?>
-
-                                                <!-- ✅ Show Update success message -->
-                                                <?php if ($success_update): ?>
-                                                    <div class="alert alert-success"><?= htmlspecialchars($success_update) ?></div>
-                                                <?php endif; ?>
-                                                <!-- end success message -->
-
-                                                <!-- ✅ Show Delete Success -->
-                                                <?php if ($success_delete): ?>
-                                                    <div class="alert alert-danger"><?= htmlspecialchars($success_delete) ?></div>
-                                                <?php endif; ?>
-                                                <!-- end success message -->
-
-                                            <!-- ✅ Supplier dropdown -->
-                                            <div class="mb-3">
-                                                <label for="deleteSupplierSelect" class="form-label">Choose Supplier to Delete</label>
-                                                <select id="deleteSupplierSelect" class="form-select">
-                                                    <option value="">-- Select a supplier --</option>
-                                                    <?php foreach ($allSuppliers as $sup): ?>
-                                                        <option 
-                                                            value="<?= $sup['supplier_id'] ?>"
-                                                            data-name="<?= htmlspecialchars($sup['supplier_name'], ENT_QUOTES) ?>"
-                                                            data-contact="<?= htmlspecialchars($sup['supplier_contact_person'], ENT_QUOTES) ?>"
-                                                            data-phone="<?= htmlspecialchars($sup['phone'], ENT_QUOTES) ?>"
-                                                            data-email="<?= htmlspecialchars($sup['email'], ENT_QUOTES) ?>"
-                                                            data-address="<?= htmlspecialchars($sup['address'], ENT_QUOTES) ?>"
-                                                            data-city="<?= htmlspecialchars($sup['city'], ENT_QUOTES) ?>"
-                                                            data-region="<?= htmlspecialchars($sup['region'], ENT_QUOTES) ?>"
-                                                            data-postcode="<?= htmlspecialchars($sup['postcode'], ENT_QUOTES) ?>"
-                                                            data-country="<?= htmlspecialchars($sup['country'], ENT_QUOTES) ?>"
-                                                            data-notes="<?= htmlspecialchars($sup['notes'], ENT_QUOTES) ?>"
-                                                        >
-                                                            <?= htmlspecialchars($sup['supplier_name']) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-
-                                            <!-- ✅ Delete Form -->
-                                                <form action="" method="POST" onsubmit="return confirm('⚠️ Are you sure you want to delete this supplier?');">
-                                                    <div class="row">
-                                                        <input type="hidden" name="delete_supplier_id" id="delete_supplier_id">
-
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Supplier Name</label>
-                                                            <input type="text" id="delete_supplier_name" class="form-control" readonly>
-                                                        </div>
-
-                                                        <div class="col-md-6">
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Contact Person</label>
-                                                                <input type="text" id="delete_supplier_contact" class="form-control" readonly>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="col-md-6">
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Phone</label>
-                                                                <input type="text" id="delete_supplier_phone" class="form-control" readonly>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Email</label>
-                                                            <input type="text" id="delete_supplier_email" class="form-control" readonly>
-                                                        </div>
-
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Address</label>
-                                                            <textarea id="delete_supplier_address" class="form-control" rows="2" readonly></textarea>
-                                                        </div>
-
-                                                        <!-- City -->
-                                                        <div class="col-md-6">
-                                                            <div class="mb-3">
-                                                                <label class="form-label">City</label>
-                                                                <input type="text" id="delete_supplier_city" class="form-control" readonly>
-                                                            </div>
-                                                        </div><!-- end phone -->
-
-                                                        <!-- Region -->
-                                                        <div class="col-md-6">
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Region</label>
-                                                                <input type="text" id="delete_supplier_region" class="form-control" readonly>
-                                                            </div>
-                                                        </div><!-- end phone -->
-
-                                                        <!-- Postcode -->
-                                                        <div class="col-md-6">
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Postcode</label>
-                                                                <input type="text" id="delete_supplier_postcode" class="form-control" readonly>
-                                                            </div>
-                                                        </div><!-- end phone -->
-
-                                                        <!-- Country -->
-                                                        <div class="col-md-6">
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Country</label>
-                                                                <input type="text" id="delete_supplier_country" class="form-control" readonly>
-                                                            </div>
-                                                        </div><!-- end phone -->
-
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Notes</label>
-                                                            <textarea id="delete_supplier_notes" class="form-control" rows="2" readonly></textarea>
-                                                        </div>
-
-                                                        <div class="text-end">
-                                                            <button type="submit" class="btn btn-danger">Delete Supplier</button>
-                                                        </div>
-                                                    </div>
-                                                </form>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -574,15 +534,79 @@
             <?php include __DIR__ . '/../include/footer.php';?>
         </div><!-- end main content-->
     </div><!-- END layout-wrapper -->
-    
+
+    <!-- View Supplier Details Modal -->
+    <div class="modal fade" id="viewSupplierModal" tabindex="-1" aria-labelledby="viewSupplierModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewSupplierModalLabel">Supplier Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Supplier Name</label>
+                            <div class="fw-bold" id="view_supplier_name"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Contact Person</label>
+                            <div id="view_contact_person"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Phone</label>
+                            <div id="view_phone"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Email</label>
+                            <div id="view_email"></div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-muted">Address</label>
+                            <div id="view_address"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">City</label>
+                            <div id="view_city"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Region</label>
+                            <div id="view_region"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Postal Code</label>
+                            <div id="view_postcode"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Country</label>
+                            <div id="view_country"></div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-muted">Notes</label>
+                            <div id="view_notes" class="bg-light p-2 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="editSupplier(currentSupplier.supplier_id)">Edit Supplier</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <?php include __DIR__ . '/../include/themesetting.php';?>
 
     <!-- jQuery FIRST -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    
     <!-- Select2 for searchable dropdowns -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <!-- Custom Select2 Bootstrap styling -->
@@ -658,15 +682,106 @@
     <script src="assets/libs/feather-icons/feather.min.js"></script>
     <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="assets/js/plugins.js"></script>
-    <script src="../private/js/forms-supplier.js"></script>
+    <script src="../public/assets/js/forms-supplier.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Custom Supplier JS -->
+
 
     <!-- prismjs plugin -->
     <script src="assets/libs/prismjs/prism.js"></script>
 
     <script src="assets/js/app.js"></script>
 
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
     <script>
+        // Store current supplier for modal operations
+        let currentSupplier = null;
+
+        function viewSupplierDetails(supplier) {
+            currentSupplier = supplier;
+            
+            // Populate modal fields
+            $('#view_supplier_name').text(supplier.supplier_name || 'N/A');
+            $('#view_contact_person').text(supplier.supplier_contact_person || 'N/A');
+            $('#view_phone').text(supplier.phone || 'N/A');
+            $('#view_email').text(supplier.email || 'N/A');
+            $('#view_address').text(supplier.address || 'N/A');
+            $('#view_city').text(supplier.city || 'N/A');
+            $('#view_region').text(supplier.region || 'N/A');
+            $('#view_postcode').text(supplier.postcode || 'N/A');
+            $('#view_country').text(supplier.country || 'N/A');
+            $('#view_notes').text(supplier.notes || 'N/A');
+            
+            // Show the modal
+            $('#viewSupplierModal').modal('show');
+        }
+
+        // deleteSupplier is defined in forms-supplier.js
+
+        function editSupplier(supplierId) {
+            // Switch to update tab
+            $('a[href="#animation-profile"]').tab('show');
+            
+            // Set the supplier in the dropdown and trigger change
+            $('#supplierSelectUpdate').val(supplierId).trigger('change');
+            
+            // Close the view modal if it's open
+            $('#viewSupplierModal').modal('hide');
+        }
+
+        function handleFormSubmit(form, action) {
+            event.preventDefault();
+            const formData = new FormData(form);
+            const isUpdate = action === 'update';
+            
+            Swal.fire({
+                title: 'Confirm ' + (isUpdate ? 'Update' : 'Save'),
+                text: isUpdate ? 'Are you sure you want to update this supplier?' : 'Are you sure you want to add this supplier?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2ab57d',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: isUpdate ? 'Yes, update it!' : 'Yes, save it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+            return false;
+        }
+
         $(document).ready(function() {
+            // Add form submission handler
+            $('#addSupplierForm').on('submit', function(e) {
+                return handleFormSubmit(this, 'add');
+            });
+
+            // Update form submission handler
+            $('#updateForm').on('submit', function(e) {
+                return handleFormSubmit(this, 'update');
+            });
+
+            // Initialize DataTable
+            $('#supplierTable').DataTable({
+                pageLength: 5,
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                responsive: true,
+                dom: '<"top"lf>rt<"bottom"ip><"clear">',
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search suppliers..."
+                }
+            });
+
             // Initialize Select2 for Update dropdown
             $('#supplierSelectUpdate').select2({
                 placeholder: "-- Select a supplier (optional) --",
@@ -779,16 +894,6 @@
                     setTimeout(() => {
                         $('#supplierSelectUpdate').select2('destroy').select2({
                             placeholder: "-- Select a supplier (optional) --",
-                            allowClear: true,
-                            width: '100%',
-                            theme: 'default'
-                        });
-                    }, 100);
-                } else if (target === '#animation-messages') {
-                    // Delete tab - reinitialize
-                    setTimeout(() => {
-                        $('#deleteSupplierSelect').select2('destroy').select2({
-                            placeholder: "-- Select a supplier to delete --",
                             allowClear: true,
                             width: '100%',
                             theme: 'default'

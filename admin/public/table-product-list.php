@@ -6,6 +6,29 @@ include __DIR__ . '/../include/header.php';
 
         <!-- Custom CSS for Product List -->
         <link href="assets/css/table-product-list-minimal.css" rel="stylesheet" type="text/css" />
+        <style>
+            /* Custom styling for disabled selects to maintain readability in both modes */
+            select:disabled {
+                opacity: 1 !important;
+                cursor: default !important;
+                -webkit-appearance: none !important;
+                -moz-appearance: none !important;
+                appearance: none !important;
+                background-image: none !important;
+                padding-right: 0.75rem !important;
+            }
+            /* Light mode */
+            [data-bs-theme="light"] select:disabled {
+                background-color: #f8f9fa !important;
+                color: #212529 !important;
+            }
+            /* Dark mode */
+            [data-bs-theme="dark"] select:disabled {
+                background-color: #2b3035 !important;
+                color: #e9ecef !important;
+                border-color: #424850 !important;
+            }
+        </style>
 
         <!-- ============================================================== -->
         <!-- Start right Content here -->
@@ -49,6 +72,7 @@ include __DIR__ . '/../include/header.php';
                                                     <th>Product Type</th>
                                                     <th>Variant</th>
                                                     <th>Description</th>
+                                                    <th>Dimension</th>
                                                     <th>Selling Price</th>
                                                     <th>Profit</th>
                                                     <th>Visibility</th>
@@ -70,6 +94,17 @@ include __DIR__ . '/../include/header.php';
                                                         <div class="description-cell" title="<?= htmlspecialchars($product['description']) ?>">
                                                             <?= htmlspecialchars($product['description'] ?: 'N/A') ?>
                                                         </div>
+                                                    </td>
+                                                    <td>
+                                                        <?php
+                                                        $dimensions = array();
+                                                        for ($i = 1; $i <= 3; $i++) {
+                                                            if (!empty($product["size_$i"])) {
+                                                                $dimensions[] = htmlspecialchars($product["size_$i"]);
+                                                            }
+                                                        }
+                                                        echo !empty($dimensions) ? implode(" × ", $dimensions) : 'N/A';
+                                                        ?>
                                                     </td>
                                                     <td>
                                                         <?= $product['new_selling_price'] ? 'RM ' . number_format($product['new_selling_price'], 3) : 'N/A' ?>
@@ -166,27 +201,37 @@ include __DIR__ . '/../include/header.php';
                             <div class="row g-3">
                                 <div class="col-sm-6">
                                     <label class="form-label">Section</label>
-                                    <input type="text" class="form-control" id="update_section_display" readonly style="background-color: #f8f9fa;">
+                                    <select class="form-select" id="update_section_display" disabled>
+                                        <option value="" selected></option>
+                                    </select>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <label class="form-label">Category</label>
-                                    <input type="text" class="form-control" id="update_category_display" readonly style="background-color: #f8f9fa;">
+                                    <select class="form-select" id="update_category_display" disabled>
+                                        <option value="" selected></option>
+                                    </select>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <label class="form-label">Subcategory</label>
-                                    <input type="text" class="form-control" id="update_subcategory_display" readonly style="background-color: #f8f9fa;">
+                                    <select class="form-select" id="update_subcategory_display" disabled>
+                                        <option value="" selected></option>
+                                    </select>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <label class="form-label">Material</label>
-                                    <input type="text" class="form-control" id="update_material_display"  readonly style="background-color: #f8f9fa;">
+                                    <select class="form-select" name="material_id" id="update_material">
+                                        <option value="">Select Material...</option>
+                                    </select>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <label class="form-label">Product Type</label>
-                                    <input type="text" class="form-control" id="update_product_type_display" readonly style="background-color: #f8f9fa;">
+                                    <select class="form-select" name="product_type_id" id="update_product_type">
+                                        <option value="">Select Product Type...</option>
+                                    </select>
                                 </div>
 
                                 <div class="col-sm-6">
@@ -314,8 +359,6 @@ include __DIR__ . '/../include/header.php';
                     <input type="hidden" name="product_id" id="update_product_id">
                     <input type="hidden" name="xero_relation" id="update_xero_relation">
                     <input type="hidden" name="product_code" id="update_product_code">
-                    <input type="hidden" name="material_name" id="update_material_name">
-                    <input type="hidden" name="product_type_name" id="update_product_type_name">
                     <input type="hidden" name="update_product" value="1">
                 </form>
             </div>
@@ -543,9 +586,9 @@ include __DIR__ . '/../include/header.php';
             $('#productTable').DataTable({
                 responsive: true,
                 pageLength: 25,
-                order: [[10, 'desc']], // Order by created date (now column 10)
+                order: [[11, 'desc']], // Order by created date (now column 11)
                 columnDefs: [
-                    { orderable: false, targets: [11] } // Disable sorting on Actions column (now column 11)
+                    { orderable: false, targets: [12] } // Disable sorting on Actions column (now column 12)
                 ]
             });
 
@@ -725,12 +768,10 @@ include __DIR__ . '/../include/header.php';
             $('#update_description').val(product.description || '');
             $('#update_production_lead_time').val(product.production_lead_time || '');
 
-            // Populate readonly display fields
-            $('#update_section_display').val(product.section_name || '');
-            $('#update_category_display').val(product.category_name || '');
-            $('#update_subcategory_display').val(product.subcategory_name || '');
-            $('#update_material_display').val(product.material_name || '');
-            $('#update_product_type_display').val(product.product_type_name || '');
+            // Populate hierarchy display fields
+            $('#update_section_display').html(`<option value="${product.section_id}">${product.section_name || ''}</option>`);
+            $('#update_category_display').html(`<option value="${product.category_id}">${product.category_name || ''}</option>`);
+            $('#update_subcategory_display').html(`<option value="${product.subcategory_id}">${product.subcategory_name || ''}</option>`);
             
             // Set supplier value on native select
             $('#update_supplier').val(product.supplier_id || '');
@@ -784,9 +825,81 @@ include __DIR__ . '/../include/header.php';
                 }
             });
 
+            // Load initial material options based on subcategory
+            loadMaterialOptions(product.subcategory_id, product.material_id, product.product_type_id);
+
             // Show the modal
             $('#updateProductModal').modal('show');
         }
+
+        function loadMaterialOptions(subcategoryId, selectedMaterialId = '', selectedProductTypeId = '') {
+            if (!subcategoryId) return;
+            
+            $.ajax({
+                url: '',
+                type: 'GET',
+                data: {
+                    ajax: 1,
+                    type: 'material',
+                    parent_id: subcategoryId
+                },
+                success: function(materials) {
+                    let options = '<option value="">Select Material...</option>';
+                    materials.forEach(function(material) {
+                        const selected = material.material_id == selectedMaterialId ? 'selected' : '';
+                        options += `<option value="${material.material_id}" ${selected}>${material.material_name}</option>`;
+                    });
+                    $('#update_material').html(options);
+                    
+                    // If we have a selected material, load product types
+                    if (selectedMaterialId) {
+                        loadProductTypes(selectedMaterialId, selectedProductTypeId);
+                    }
+                }
+            });
+        }
+
+        function loadProductTypes(materialId, selectedProductTypeId = '') {
+            if (!materialId) return;
+            
+            console.log('Loading product types for material:', materialId, 'Selected:', selectedProductTypeId); // Debug log
+            
+            $.ajax({
+                url: '',
+                type: 'GET',
+                data: {
+                    ajax: 1,
+                    type: 'product_type',
+                    parent_id: materialId
+                },
+                success: function(productTypes) {
+                    console.log('Received product types:', productTypes); // Debug log
+                    let options = '<option value="">Select Product Type...</option>';
+                    productTypes.forEach(function(type) {
+                        const selected = type.product_type_id == selectedProductTypeId ? 'selected' : '';
+                        options += `<option value="${type.product_type_id}" ${selected}>${type.product_name}</option>`;
+                    });
+                    $('#update_product_type').html(options);
+                    
+                    // Force select the value after options are loaded
+                    if (selectedProductTypeId) {
+                        $('#update_product_type').val(selectedProductTypeId);
+                    }
+                }
+            });
+        }
+
+        // Add change event handlers for material selection
+        $(document).ready(function() {
+            $('#update_material').on('change', function() {
+                const materialId = $(this).val();
+                if (materialId) {
+                    loadProductTypes(materialId);
+                } else {
+                    $('#update_product_type').html('<option value="">Select Product Type...</option>');
+                }
+            });
+        });
 
         function addUpdateAdditionalCarton(index = null, product = null) {
             if (updateAdditionalCount >= updateMaxAdditional) return;
