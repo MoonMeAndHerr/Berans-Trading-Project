@@ -1759,3 +1759,72 @@
 [2025-10-20 20:57:11] Last login updated - {
     "staff_id": "1"
 }
+[2025-10-20 23:45:58] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-10-20 23:45:59] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-10-20 23:46:04] Login attempt started - {
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/141.0.0.0 Safari\/537.36"
+}
+[2025-10-20 23:46:04] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-10-20 23:46:04] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-10-20 23:46:04] Password verification successful - {
+    "staff_id": 1
+}
+[2025-10-20 23:46:04] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-10-20 23:46:04] Session token created in database - {
+    "staff_id": "1",
+    "token": "6ff04245fa5eb32696cc8ebe25408092"
+}
+[2025-10-20 23:46:04] Last login updated - {
+    "staff_id": "1"
+}
+[2025-10-21 18:35:17] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-10-21 18:35:55] Login attempt started - {
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/141.0.0.0 Safari\/537.36"
+}
+[2025-10-21 18:35:55] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-10-21 18:35:55] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-10-21 18:35:55] Password verification successful - {
+    "staff_id": 1
+}
+[2025-10-21 18:35:55] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-10-21 18:35:55] Session token created in database - {
+    "staff_id": "1",
+    "token": "a37f93d571c920c453a6e7ef04f4eb45"
+}
+[2025-10-21 18:35:55] Last login updated - {
+    "staff_id": "1"
+}
