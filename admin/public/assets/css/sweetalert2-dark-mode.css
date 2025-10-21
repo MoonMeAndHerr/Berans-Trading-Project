@@ -1,0 +1,176 @@
+/* SweetAlert2 Dark Mode Styles */
+/* Apply dark mode styles when data-layout-mode="dark" */
+
+[data-layout-mode="dark"] .swal2-popup {
+    background: #2b3035 !important;
+    color: #e9ecef !important;
+    border: 1px solid #424850 !important;
+}
+
+[data-layout-mode="dark"] .swal2-title {
+    color: #e9ecef !important;
+}
+
+[data-layout-mode="dark"] .swal2-html-container {
+    color: #ced4da !important;
+}
+
+[data-layout-mode="dark"] .swal2-html-container strong {
+    color: #f8f9fa !important;
+}
+
+[data-layout-mode="dark"] .swal2-input,
+[data-layout-mode="dark"] .swal2-textarea,
+[data-layout-mode="dark"] .swal2-select {
+    background-color: #1a1d21 !important;
+    color: #e9ecef !important;
+    border: 1px solid #424850 !important;
+}
+
+[data-layout-mode="dark"] .swal2-input::placeholder,
+[data-layout-mode="dark"] .swal2-textarea::placeholder {
+    color: #6c757d !important;
+}
+
+[data-layout-mode="dark"] .swal2-input:focus,
+[data-layout-mode="dark"] .swal2-textarea:focus,
+[data-layout-mode="dark"] .swal2-select:focus {
+    border-color: #5969ff !important;
+    box-shadow: 0 0 0 0.2rem rgba(89, 105, 255, 0.25) !important;
+}
+
+[data-layout-mode="dark"] .swal2-close {
+    color: #e9ecef !important;
+}
+
+[data-layout-mode="dark"] .swal2-close:hover {
+    color: #ffffff !important;
+}
+
+/* Buttons */
+[data-layout-mode="dark"] .swal2-confirm {
+    background-color: #5969ff !important;
+    color: #ffffff !important;
+}
+
+[data-layout-mode="dark"] .swal2-deny {
+    background-color: #dc3545 !important;
+    color: #ffffff !important;
+}
+
+[data-layout-mode="dark"] .swal2-cancel {
+    background-color: #6c757d !important;
+    color: #ffffff !important;
+}
+
+/* Footer */
+[data-layout-mode="dark"] .swal2-footer {
+    border-top-color: #424850 !important;
+    color: #adb5bd !important;
+}
+
+/* Loading spinner */
+[data-layout-mode="dark"] .swal2-loader {
+    border-color: #5969ff transparent #5969ff transparent !important;
+}
+
+/* Timer progress bar */
+[data-layout-mode="dark"] .swal2-timer-progress-bar {
+    background: rgba(89, 105, 255, 0.5) !important;
+}
+
+/* Validation message */
+[data-layout-mode="dark"] .swal2-validation-message {
+    background: #dc3545 !important;
+    color: #ffffff !important;
+}
+
+/* Icons colors for dark mode */
+[data-layout-mode="dark"] .swal2-icon.swal2-success [class^='swal2-success-line'] {
+    background-color: #28a745 !important;
+}
+
+[data-layout-mode="dark"] .swal2-icon.swal2-success .swal2-success-ring {
+    border-color: rgba(40, 167, 69, 0.3) !important;
+}
+
+[data-layout-mode="dark"] .swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+    background-color: #dc3545 !important;
+}
+
+[data-layout-mode="dark"] .swal2-icon.swal2-warning {
+    border-color: #ffc107 !important;
+    color: #ffc107 !important;
+}
+
+[data-layout-mode="dark"] .swal2-icon.swal2-info {
+    border-color: #17a2b8 !important;
+    color: #17a2b8 !important;
+}
+
+[data-layout-mode="dark"] .swal2-icon.swal2-question {
+    border-color: #6c757d !important;
+    color: #6c757d !important;
+}
+
+/* Custom HTML content styling */
+[data-layout-mode="dark"] .swal2-html-container .text-muted {
+    color: #adb5bd !important;
+}
+
+[data-layout-mode="dark"] .swal2-html-container .text-danger {
+    color: #ff6b6b !important;
+}
+
+[data-layout-mode="dark"] .swal2-html-container .text-success {
+    color: #51cf66 !important;
+}
+
+[data-layout-mode="dark"] .swal2-html-container .text-warning {
+    color: #ffd43b !important;
+}
+
+[data-layout-mode="dark"] .swal2-html-container .text-info {
+    color: #74c0fc !important;
+}
+
+/* Background overlays */
+[data-layout-mode="dark"] .swal2-html-container .bg-light {
+    background-color: #1a1d21 !important;
+}
+
+[data-layout-mode="dark"] .swal2-html-container hr {
+    border-top-color: #424850 !important;
+}
+
+/* Tables inside SweetAlert2 */
+[data-layout-mode="dark"] .swal2-html-container table {
+    color: #e9ecef !important;
+}
+
+[data-layout-mode="dark"] .swal2-html-container table td,
+[data-layout-mode="dark"] .swal2-html-container table th {
+    border-color: #424850 !important;
+}
+
+/* Lists inside SweetAlert2 */
+[data-layout-mode="dark"] .swal2-html-container ul,
+[data-layout-mode="dark"] .swal2-html-container ol {
+    color: #ced4da !important;
+}
+
+/* Backdrop */
+[data-layout-mode="dark"] .swal2-container.swal2-backdrop-show {
+    background: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Custom styled divs inside alerts (like our payment warnings) */
+[data-layout-mode="dark"] .swal2-html-container div[style*="background"] {
+    border-color: #424850 !important;
+}
+
+/* Loading state text */
+[data-layout-mode="dark"] .swal2-popup.swal2-loading .swal2-actions,
+[data-layout-mode="dark"] .swal2-popup.swal2-loading .swal2-title {
+    color: #e9ecef !important;
+}

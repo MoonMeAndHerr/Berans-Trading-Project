@@ -143,7 +143,7 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
                     
                     $result = deleteOrder($pdo, $invoiceId);
 
-                    // echo json_encode($result);
+                    echo json_encode($result);
                 } else {
                     echo json_encode(['success' => false, 'error' => 'Invoice ID required']);
                 }
