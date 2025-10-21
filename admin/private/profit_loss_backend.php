@@ -2,7 +2,8 @@
 
 if(session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/../../global/main_configuration.php';
-
+use League\OAuth2\Client\Provider\GenericProvider;
+use GuzzleHttp\Client;
 /**
  * Profit & Loss Management Backend API
  * Handles profit/loss calculations, payment tracking, and order completion
@@ -101,8 +102,48 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
                 $invoiceId = $_POST['invoice_id'] ?? null;
                 
                 if($invoiceId) {
+                $stmt = $pdo->prepare("SELECT * FROM invoice WHERE invoice_id = ?");
+                $stmt->execute([$invoiceId]);
+                $invoice = $stmt->fetch(PDO::FETCH_ASSOC);
+                $xero_relation = $invoice['xero_relation'] ?? null;
+
+                    try {
+                        $tokenData = refreshXeroToken();
+                        $accessToken = $tokenData['access_token'];
+                        $tenantId = $tokenData['tenant_id'];
+
+                        $client = new Client();
+
+                        // ✅ Simpler payload for single invoice
+                        $voidPayload = [
+                            'Status' => 'VOIDED'
+                        ];
+
+                        $response = $client->request('POST', "https://api.xero.com/api.xro/2.0/Invoices/{$xero_relation}", [
+                            'headers' => [
+                                'Authorization'  => 'Bearer ' . $accessToken,
+                                'Xero-tenant-id' => $tenantId,
+                                'Content-Type'   => 'application/json',
+                                'Accept'         => 'application/json'
+                            ],
+                            'json' => $voidPayload
+                        ]);
+
+                        $responseBody = json_decode($response->getBody()->getContents(), true);
+                        error_log("XERO_SUCCESS: Voided Xero invoice $xero_relation");
+                        error_log(print_r($responseBody, true));
+
+                    } catch (\GuzzleHttp\Exception\ClientException $e) {
+                        $response = $e->getResponse();
+                        $body = $response ? $response->getBody()->getContents() : 'No response body';
+                        error_log("XERO_ERROR: Failed to void invoice. " . $body);
+                    } catch (Exception $e) {
+                        error_log("XERO_EXCEPTION: " . $e->getMessage());
+                    }
+                    
                     $result = deleteOrder($pdo, $invoiceId);
-                    echo json_encode($result);
+
+                    // echo json_encode($result);
                 } else {
                     echo json_encode(['success' => false, 'error' => 'Invoice ID required']);
                 }
@@ -690,7 +731,7 @@ function deleteOrder($pdo, $invoiceId) {
         $deleteInvoiceStmt->execute([$invoiceId]);
         
         $pdo->commit();
-        
+
         return [
             'success' => true, 
             'message' => 'Order deleted successfully',

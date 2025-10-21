@@ -693,62 +693,89 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $customer = $stmt->fetch(PDO::FETCH_ASSOC);
             $xero_relation_customer = $customer['xero_relation'];
 
-            // Create Xero invoice
+            $stmt = $pdo->prepare("SELECT * FROM invoice WHERE invoice_id = ?");
+            $stmt->execute([$_POST['invoice_id']]);
+            $invoice = $stmt->fetch(PDO::FETCH_ASSOC);
+            $xero_relation = $invoice['xero_relation'];
+
             try {
-                // Always refresh Xero tokens to ensure they're current
-                try {
-                    $tokenData = refreshXeroToken();
-                    $accessToken = $tokenData['access_token'];
-                    $tenantId = $tokenData['tenant_id'];
-                    error_log("XERO_INFO: Successfully refreshed Xero tokens for invoice creation");
-                } catch (Exception $refreshError) {
-                    error_log("XERO_WARNING: Failed to refresh Xero tokens: " . $refreshError->getMessage());
-                    // Skip Xero integration if refresh fails
-                    throw new Exception("Xero tokens unavailable: " . $refreshError->getMessage());
-                }
-                $xeroInvoiceData = [
-                        'Type' => 'ACCREC',
-                        'Contact' => [
-                            'ContactID' => $xero_relation_customer
-                        ],
-                        'Date' => date('Y-m-d'),
-                        'DueDate' => date('Y-m-d', strtotime('+30 days')),
-                        'Reference' => $invoice_number,
-                        'LineItems' => $lineItems,
-                        'Status' => 'AUTHORISED'
-                    ];
+                // Always refresh tokens before API calls
+                $tokenData = refreshXeroToken();
+                $accessToken = $tokenData['access_token'];
+                $tenantId = $tokenData['tenant_id'];
 
-                    $client = new Client();
-                    $response = $client->request('POST', 'https://api.xero.com/api.xro/2.0/Invoices', [
-                        'headers' => [
-                            'Authorization' => 'Bearer ' . $accessToken,
-                            'Xero-tenant-id' => $tenantId,
-                            'Content-Type' => 'application/json',
-                            'Accept' => 'application/json'
-                        ],
-                        'json' => $xeroInvoiceData
-                    ]);
+                $client = new Client();
 
-                    $responseBody = $response->getBody()->getContents();
-                    $xeroResponse = json_decode($responseBody, true);
-                    
-                    if (isset($xeroResponse['Invoices'][0]['InvoiceID'])) {
-                        $xero_invoice_id = $xeroResponse['Invoices'][0]['InvoiceID'];
-                        
-                        // Update the invoice with Xero ID
-                        $updateStmt = $pdo->prepare("UPDATE invoice SET xero_relation = ? WHERE invoice_id = ?");
-                        $updateStmt->execute([$xero_invoice_id, $invoice_id]);
-                        
-                        error_log("XERO_SUCCESS: Xero invoice created successfully: " . $xero_invoice_id);
-                    } else {
-                        error_log("XERO_ERROR: Xero invoice creation failed: " . print_r($xeroResponse, true));
+                // Step 1: Void existing invoice (if any)
+                if (!empty($xero_relation)) {
+                    try {
+                        $voidPayload = [
+                            'Invoices' => [
+                                [
+                                    'InvoiceID' => $xero_relation,
+                                    'Status'    => 'VOIDED'
+                                ]
+                            ]
+                        ];
+
+                        $client->request('POST', 'https://api.xero.com/api.xro/2.0/Invoices', [
+                            'headers' => [
+                                'Authorization' => 'Bearer ' . $accessToken,
+                                'Xero-tenant-id' => $tenantId,
+                                'Content-Type' => 'application/json',
+                                'Accept' => 'application/json'
+                            ],
+                            'json' => $voidPayload
+                        ]);
+
+                        error_log("XERO_SUCCESS: Voided old invoice $xero_relation");
+                    } catch (Exception $e) {
+                        error_log("XERO_WARNING: Could not void old invoice: " . $e->getMessage());
                     }
+                }
+
+                // Step 2: Build new invoice payload
+                $xeroInvoiceData = [
+                    'Type' => 'ACCREC',
+                    'Contact' => [
+                        'ContactID' => $xero_relation_customer
+                    ],
+                    'Date' => date('Y-m-d'),
+                    'DueDate' => date('Y-m-d', strtotime('+30 days')),
+                    'Reference' => $invoice_number, // same reference number
+                    'LineItems' => $lineItems,
+                    'Status' => 'AUTHORISED'
+                ];
+
+                // Step 3: Create new invoice
+                $response = $client->request('POST', 'https://api.xero.com/api.xro/2.0/Invoices', [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $accessToken,
+                        'Xero-tenant-id' => $tenantId,
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json'
+                    ],
+                    'json' => $xeroInvoiceData
+                ]);
+
+                $responseBody = $response->getBody()->getContents();
+                $xeroResponse = json_decode($responseBody, true);
+
+                // Step 4: Save new invoice ID
+                if (isset($xeroResponse['Invoices'][0]['InvoiceID'])) {
+                    $newInvoiceId = $xeroResponse['Invoices'][0]['InvoiceID'];
+                    $updateStmt = $pdo->prepare("UPDATE invoice SET xero_relation = ? WHERE invoice_id = ?");
+                    $updateStmt->execute([$newInvoiceId, $invoice_id]);
+
+                    error_log("XERO_SUCCESS: New invoice created successfully: " . $newInvoiceId);
+                } else {
+                    error_log("XERO_ERROR: Invoice creation failed: " . print_r($xeroResponse, true));
+                }
+
             } catch (Exception $e) {
-                // Log error but continue - don't let Xero issues block invoice creation
                 error_log("XERO_ERROR: Exception caught: " . $e->getMessage());
-                error_log("XERO_ERROR: Exception trace: " . $e->getTraceAsString());
-                // Don't throw the exception - just log it and continue
             }
+
 
         // $_SESSION['success'] = "Invoice #$invoice_number updated successfully!";
         error_log("Transaction committed successfully");

@@ -59,6 +59,10 @@
 
 						foreach ($results as $row) {
 
+							$images = $row['image_url']; // e.g. from your query
+							$imageArray = explode(',', $images);
+							$coverImage = trim($imageArray[0]); // Get first image and trim any spaces
+
 					?>
 
 					<div class="col-12 col-sm-6 col-lg-3">
@@ -72,7 +76,7 @@
 
 								<a href="product?id=<?php echo $row['product_id']; ?>">
 									<div class="product-thumb-info-image">
-										<img alt="" class="img-fluid product-image" src="../../media/<?php echo $row['image_url']; ?>">
+										<img alt="" class="img-fluid product-image" src="../../media/<?php echo $coverImage; ?>">
 									</div>
 								</a>
 							</div>

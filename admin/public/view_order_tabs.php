@@ -183,6 +183,11 @@
                                                     })'>
                                                         <i class="ri-edit-line"></i> Edit Order
                                                     </button>
+                                                    <button class="btn-compact btn-outline">
+                                                        <a href="../private/export-order-pdf.php?id=<?php echo $order['invoice_id']; ?>">
+                                                            <i class="ri-attachment-line"></i> View PDF
+                                                        </a>
+                                                    </button>
                                                     <button class="btn-compact btn-outline" onclick="loadCartonDetails(<?= $order['invoice_id'] ?>)" data-bs-toggle="modal" data-bs-target="#cartonDetailModal">
                                                         <i class="ri-archive-line"></i> Carton Details
                                                     </button>
