@@ -466,14 +466,34 @@ foreach ($itemsOnPage as $item) {
     $firstImage = trim($images[0]);
     $imagePath = __DIR__ . '/../../media/' . $firstImage;
 
-    if (file_exists($imagePath)) {
+    if (file_exists($imagePath) && is_readable($imagePath)) {
+        $imageMime = null;
+    
+        if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $imageMime = finfo_file($finfo, $imagePath);
+            finfo_close($finfo);
+        }
+    
+        if (!$imageMime) {
+            $ext = strtolower(pathinfo($imagePath, PATHINFO_EXTENSION));
+            $mimeTypes = [
+                'jpg' => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
+                'png' => 'image/png',
+                'gif' => 'image/gif',
+                'webp' => 'image/webp'
+            ];
+            $imageMime = $mimeTypes[$ext] ?? 'application/octet-stream';
+        }
+    
         $imageBase64 = base64_encode(file_get_contents($imagePath));
-        $imageMime = mime_content_type($imagePath);
         $imgSrc = 'data:' . $imageMime . ';base64,' . $imageBase64;
         $imageTag = '<img src="' . $imgSrc . '" class="product-image">';
     } else {
         $imageTag = '<div style="width:60px;height:60px;background:#f1f5f9;border-radius:4px;"></div>';
     }
+
 
     $html .= '
             <tr>
