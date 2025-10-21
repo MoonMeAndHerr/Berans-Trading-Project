@@ -130,8 +130,13 @@
                                                             </div>
                                                                                                    
                                                             <div class="col-lg-12">
-                                                                <label>Product Image</label>
+                                                                <label>Cover Image</label>
                                                                     <input type="file" accept="image/*" class="form-control" name="image" required>
+                                                            </div>
+
+                                                            <div class="col-lg-12">
+                                                                <label>Product Image/s</label>
+                                                                    <input type="file" accept="image/*" class="form-control" name="listimg[]" multiple>
                                                             </div>
                                                         </div>
                                                     </div>

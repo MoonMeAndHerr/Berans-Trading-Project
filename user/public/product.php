@@ -18,6 +18,9 @@
 	$stmt = $pdo->prepare($sql);
 	$stmt->execute(['id' => $id]);
 	$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+	$images = $row['image_url']; // e.g. from your query
+	$imageArray = explode(',', $images);
 ?>
 
 <style>
@@ -47,15 +50,44 @@
 
 							<div class="thumb-gallery-wrapper lightbox" data-plugin-options="{'delegate': 'a.shop-gallery', 'type': 'image', 'gallery': {'enabled': true}, 'mainClass': 'mfp-with-zoom', 'zoom': {'enabled': true, 'duration': 300}}">
 								<div class="thumb-gallery-detail owl-carousel owl-theme manual nav-inside nav-style-1 nav-dark mb-3">
+
+								<?php
+
+									for ($i = 0; $i < count($imageArray); $i++) {
+
+								?>
+
 									<div>
-										<a href="../../media/<?php echo $row['image_url']; ?>" class="shop-gallery" title=""><img alt="" class="img-fluid" src="../../media/<?php echo $row['image_url']; ?>"></a>
+										<a href="../../media/<?php echo trim($imageArray[$i]); ?>" class="shop-gallery" title=""><img alt="" class="img-fluid" src="../../media/<?php echo trim($imageArray[$i]); ?>"></a>
 									</div>
+
+								<?php
+
+									}
+
+								?>
+
 								</div>
 								<div class="thumb-gallery-thumbs owl-carousel owl-theme manual thumb-gallery-thumbs">
+
+								<?php
+
+									for ($i = 0; $i < count($imageArray); $i++) {
+
+								?>
+
 									<div class="cur-pointer">
-										<img alt="" class="img-fluid" src="../../media/<?php echo $row['image_url']; ?>">
+										<img alt="" class="img-fluid" src="../../media/<?php echo trim($imageArray[$i]); ?>">
 									</div>
+
+								<?php
+
+									}
+
+								?>
+
 								</div>
+								
 							</div>
 
 						</div>
@@ -152,6 +184,10 @@
 
 											while ($row = $stmt->fetch()) {
 
+												$images = $row['image_url']; // e.g. from your query
+												$imageArray = explode(',', $images);
+												$coverImage = trim($imageArray[0]); // Get first image and trim any spaces
+
 										?>
 
 
@@ -165,7 +201,7 @@
 
 												<a href="product?id=<?php echo $row['product_id']; ?>">
 													<div class="product-thumb-info-image">
-														<img alt="" class="img-fluid product-image" src="../../media/<?php echo $row['image_url']; ?>">
+														<img alt="" class="img-fluid product-image" src="../../media/<?php echo $coverImage; ?>">
 
 													</div>
 												</a>

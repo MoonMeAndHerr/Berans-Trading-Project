@@ -9,14 +9,14 @@ session_start();
 $provider = new GenericProvider([
     'clientId'                => '401AA121B0D7485193B11FA9CCA0546B',
     'clientSecret'            => 'Frpko_qPMO1nY2kMbHsnW5dqLssheS_oeNFrxvxh6k7vIpTu',
-    'redirectUri'             => 'http://localhost/Work-Related/Berans-Trading-Project/admin/public/callback.php',
+    'redirectUri'             => 'http://localhost/Berans-Trading-Project-main/admin/public/callback.php',
     'urlAuthorize'            => 'https://login.xero.com/identity/connect/authorize',
     'urlAccessToken'          => 'https://identity.xero.com/connect/token',
     'urlResourceOwnerDetails' => 'https://api.xero.com/api.xro/2.0/Organisation'
 ]);
 
 $authorizationUrl = $provider->getAuthorizationUrl([
-    'scope' => 'openid profile email accounting.transactions accounting.contacts accounting.settings offline_access'
+    'scope' => 'openid profile email accounting.transactions accounting.attachments.read accounting.attachments accounting.contacts accounting.settings offline_access'
 ]);
 
 $_SESSION['oauth2state'] = $provider->getState();

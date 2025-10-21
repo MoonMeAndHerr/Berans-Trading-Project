@@ -52,6 +52,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         $pdo->beginTransaction();
 
         $uploadDir = '../../media/';
+        $all_images = [];
 
         // --- Generate Product Code ---
         $sectionName = $pdo->query("SELECT section_name FROM section WHERE section_id = ".$_POST['section'])->fetchColumn();
@@ -82,12 +83,24 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         } 
 
         if (!empty($_FILES['image']['name'])) {
-
             $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-            $logo_name = 'product_' . time() . '.' . $ext;
+            $logo_name = 'product_cover_' . time() . '.' . $ext;
             move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $logo_name);
-
+            $all_images[] = $logo_name; // add to array
         }
+
+        if (!empty($_FILES['listimg']['name'][0])) {
+            foreach ($_FILES['listimg']['name'] as $key => $filename) {
+                if (!empty($filename)) {
+                    $ext = pathinfo($filename, PATHINFO_EXTENSION);
+                    $img_name = 'product_' . time() . '_' . $key . '.' . $ext;
+                    move_uploaded_file($_FILES['listimg']['tmp_name'][$key], $uploadDir . $img_name);
+                    $all_images[] = $img_name; // add each image to array
+                }
+            }
+        }
+
+        $images_string = implode(',', $all_images);
 
         // --- Insert Product ---
         $stmt = $pdo->prepare("INSERT INTO product 
@@ -104,7 +117,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $_POST['variant'] ?? null,
             $_POST['description'] ?? null,
             $_POST['production_lead_time'] ?? null,
-            $logo_name ?? null,
+            $images_string ?? null,
             $size1,
             $size2,
             $size3,

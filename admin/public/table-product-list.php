@@ -195,7 +195,7 @@ include __DIR__ . '/../include/header.php';
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form method="POST" id="updateProductForm" enctype="multipart/form-data">
-                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    <div class="modal-body">
                         <div class="row g-3">
                             <!-- Product Hierarchy Selection - READONLY -->
                             <div class="row g-3">
@@ -246,7 +246,7 @@ include __DIR__ . '/../include/header.php';
                             </div>
 
                             <!-- Variant, Description, Lead Time -->
-                            <div class="row g-3 mt-3">
+                            <div class="row g-3">
                                 <div class="col-lg-4">
                                     <div class="form-floating">
                                         <input type="text" class="form-control" name="variant" id="update_variant" placeholder="Enter Variant" required>
@@ -259,16 +259,28 @@ include __DIR__ . '/../include/header.php';
                                         <label>Description</label>
                                     </div>
                                 </div>
+
                                 <div class="col-lg-4">
                                     <div class="form-floating">
                                         <input type="number" class="form-control" name="production_lead_time" id="update_production_lead_time" placeholder="Enter Lead Time (Days)" required>
                                         <label>Production Lead Time (Days)</label>
                                     </div>
                                 </div>
-                                <div class="col-lg-12">
-                                        <label>Product Image</label>
-                                        <input type="file" accept="image/*" class="form-control" name="product_image" id="product_image" >
+
+                                <div class="col-lg-4">
+                                        <label>Cover Image</label>
+                                        <input type="file" accept="image/*" class="form-control" name="image" >
                                     </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                        <label>Product Image/s</label>
+                                        <input type="file" accept="image/*" class="form-control" name="listimg[]" multiple>
+                                    </div>
+                                </div><br>
+
+                                <div class="col-lg-4">
+                                    <label><input type="checkbox" name="replace_all_products" value="1">  Replace all product images</label>
                                 </div>
 
                             <!-- Size 1,2,3 with metrics -->
@@ -350,12 +362,13 @@ include __DIR__ . '/../include/header.php';
                                     <button type="button" id="updateAddCartonButton" class="btn btn-secondary btn-sm">Add Additional Carton</button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Update Product</button>
                     </div>
+                        </div>
+                    </div>
+
                     <input type="hidden" name="product_id" id="update_product_id">
                     <input type="hidden" name="xero_relation" id="update_xero_relation">
                     <input type="hidden" name="product_code" id="update_product_code">

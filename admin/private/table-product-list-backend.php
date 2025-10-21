@@ -50,24 +50,87 @@ if (isset($_POST['update_product']) && isset($_POST['product_id'])) {
         $pdo->beginTransaction();
         
         $product_id = $_POST['product_id'];
-        
+
+        $uploadDir = '../../media/';
+        $all_images = [];
+
+        $replace_all_products = $_POST['replace_all_products'] ?? false; // optional checkbox or flag
+
+        $stmt = $pdo->prepare("SELECT image_url FROM product WHERE product_id = ?");
+        $stmt->execute([$product_id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $existing_images = $row['image_url'];
+        $existing_array = explode(',', $existing_images);
+
+        // Split existing image array
+        $existing_cover = $existing_array[0] ?? '';
+        $existing_products = array_slice($existing_array, 1);
+
+        /* -------------------- 2️⃣ Handle Cover Image -------------------- */
+        if (!empty($_FILES['image']['name'])) {
+            // New cover uploaded
+            $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $cover_name = 'product_cover_' . time() . '.' . $ext;
+            move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $cover_name);
+        } else {
+            // Keep existing cover
+            $cover_name = $existing_cover;
+        }
+
+        /* -------------------- 3️⃣ Handle Product Images -------------------- */
+        $new_product_images = [];
+        if (!empty($_FILES['listimg']['name'][0])) {
+            foreach ($_FILES['listimg']['name'] as $key => $filename) {
+                if (!empty($filename)) {
+                    $ext = pathinfo($filename, PATHINFO_EXTENSION);
+                    $img_name = 'product_' . time() . '_' . $key . '.' . $ext;
+                    move_uploaded_file($_FILES['listimg']['tmp_name'][$key], $uploadDir . $img_name);
+                    $new_product_images[] = $img_name;
+                }
+            }
+        }
+
+        /* -------------------- 4️⃣ Combine Logic for 4 Cases -------------------- */
+
+        // Case 1: Only cover updated (no new product images)
+        if (empty($new_product_images) && !empty($_FILES['image']['name'])) {
+            $final_product_images = $existing_products;
+        }
+
+        // Case 2: Only product images updated (no new cover)
+        elseif (!empty($new_product_images) && empty($_FILES['image']['name']) && !$replace_all_products) {
+            $final_product_images = array_merge($existing_products, $new_product_images);
+        }
+
+        // Case 3: Both cover and product images updated (append mode)
+        elseif (!empty($new_product_images) && !empty($_FILES['image']['name']) && !$replace_all_products) {
+            $final_product_images = array_merge($existing_products, $new_product_images);
+        }
+
+        // Case 4: Both cover and product images updated (replace mode)
+        elseif (!empty($new_product_images) && $replace_all_products) {
+            $final_product_images = $new_product_images;
+        }
+
+        // Default fallback — no changes
+        else {
+            $final_product_images = $existing_products;
+        }
+
+        /* -------------------- 5️⃣ Merge and Update -------------------- */
+        $all_images = array_merge([$cover_name], $final_product_images);
+        $images_string = implode(',', $all_images);
+
+        $stmt = $pdo->prepare("UPDATE product SET image_url = ? WHERE product_id = ?");
+        $stmt->execute([$images_string, $product_id]);
+   
         // --- Handle sizes (same as forms-product-add-new.php) ---
         $size1 = !empty($_POST['size_1']) && !empty($_POST['metric_1']) ? $_POST['size_1'].''.$_POST['metric_1'] : null;
         $size2 = !empty($_POST['size_2']) && !empty($_POST['metric_2']) ? $_POST['size_2'].''.$_POST['metric_2'] : null;
         $size3 = !empty($_POST['size_3']) && !empty($_POST['metric_3']) ? $_POST['size_3'].''.$_POST['metric_3'] : null;
 
-        if (!empty($_FILES['product_image']['name'])) {
-            $ext = pathinfo($_FILES['product_image']['name'], PATHINFO_EXTENSION);
-            $product_image = 'product_' . time() . '.' . $ext;
-            $uploadDir = __DIR__ . '/../../media/';
-            if (!is_dir($uploadDir)) { @mkdir($uploadDir, 0775, true); }
-            @move_uploaded_file($_FILES['product_image']['tmp_name'], $uploadDir . $product_image);
 
-            $stmt = $pdo->prepare("UPDATE product SET image_url = :product_image WHERE product_id = :product_id");
-            $stmt->bindParam(':product_image', $product_image);
-            $stmt->bindParam(':product_id', $product_id);
-            $stmt->execute();
-        }
 
             $productName = $_POST['material_name'].' '.$_POST['product_type_name'].' '.$size1.'*'.$size2.' '.$_POST['variant'];
             

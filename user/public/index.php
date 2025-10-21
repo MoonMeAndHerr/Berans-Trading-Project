@@ -130,12 +130,18 @@
 
 										while ($row = $stmt->fetch()) {
 
+											$images = $row['image_url']; // e.g. from your query
+											$imageArray = explode(',', $images);
+											$coverImage = trim($imageArray[0]); // Get first image and trim any spaces
+
 									?>
+
+									
 
 									<div class="portfolio-item">
 										<span class="thumb-info thumb-info-lighten thumb-info-no-borders thumb-info-bottom-info thumb-info-centered-icons border-radius-0">
 											<span class="thumb-info-wrapper border-radius-0">
-												<img src="../../media/<?php echo $row['image_url']; ?>" class="img-fluid product-image border-radius-0" alt="">
+												<img src="../../media/<?php echo $coverImage; ?>" class="img-fluid product-image border-radius-0" alt="">
 												<span class="thumb-info-title">
 													<span class="thumb-info-inner line-height-1 font-weight-bold text-dark position-relative top-3"><?php echo $row['product_code'].' | '.$row['material_name'].' '.$row['product_name'].' '.$row['size_1'].'*'.$row['size_2'].'*'.$row['size_3'].' '.$row['variant']; ?></span>
 													<span class="thumb-info-type"><?php echo $row['section_name']; ?></span>
@@ -144,7 +150,7 @@
 													<a href="product?id=<?php echo $row['product_id']; ?>">
 														<span class="thumb-info-action-icon thumb-info-action-icon-primary"><i class="fas fa-link"></i></span>
 													</a>
-													<a href="../../media/<?php echo $row['image_url']; ?>" class="lightbox-portfolio">
+													<a href="../../media/<?php echo $coverImage; ?>" class="lightbox-portfolio">
 														<span class="thumb-info-action-icon thumb-info-action-icon-light"><i class="fas fa-search text-dark"></i></span>
 													</a>
 												</span>
