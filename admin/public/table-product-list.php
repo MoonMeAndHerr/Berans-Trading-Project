@@ -126,6 +126,12 @@ include __DIR__ . '/../include/header.php';
                                                                     title="Edit Product">
                                                                 <i class="ri-edit-line"></i>
                                                             </button>
+                                                            <a href="forms-update-image.php?product_id=<?php echo $product['product_id'];?>">
+                                                            <button type="button" class="btn btn-sm btn-primary" 
+                                                                    title="Edit Images">
+                                                                <i class="ri-image-line"></i>
+                                                            </button>
+                                                            </a>
                                                             <a href="forms-price-add-new.php?product_id=<?= $product['product_id'] ?>" 
                                                                class="btn btn-sm btn-warning" title="Update Pricing">
                                                                 <i class="ri-price-tag-3-line"></i>
@@ -266,23 +272,7 @@ include __DIR__ . '/../include/header.php';
                                         <label>Production Lead Time (Days)</label>
                                     </div>
                                 </div>
-
-                                <div class="col-lg-4">
-                                        <label>Cover Image</label>
-                                        <input type="file" accept="image/*" class="form-control" name="image" >
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4">
-                                        <label>Product Image/s</label>
-                                        <input type="file" accept="image/*" class="form-control" name="listimg[]" multiple>
-                                    </div>
-                                </div><br>
-
-                                <div class="col-lg-4">
-                                    <label><input type="checkbox" name="replace_all_products" value="1">  Replace all product images</label>
-                                </div>
-
+                                
                             <!-- Size 1,2,3 with metrics -->
                             <?php for($i=1;$i<=3;$i++): ?>
                                 <div class="row g-2 mt-2">
@@ -377,7 +367,7 @@ include __DIR__ . '/../include/header.php';
             </div>
         </div>
     </div>
-    
+
     <!-- View Product Details Modal -->
     <div class="modal fade" id="viewProductModal" tabindex="-1" aria-labelledby="viewProductModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
@@ -555,6 +545,7 @@ include __DIR__ . '/../include/header.php';
     <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="assets/js/plugins.js"></script>
     <script src="assets/libs/prismjs/prism.js"></script>
+
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
