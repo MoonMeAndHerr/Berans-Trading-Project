@@ -42,7 +42,7 @@ require_once __DIR__ . '/../private/auth_check.php';
     <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
     <!-- SweetAlert2 Css -->
     <link rel="stylesheet" href="assets/libs/sweetalert2/sweetalert2.min.css">
-    <!-- SweetAlert2 Dark Mode Theme (Global) -->
+    <!-- SweetAlert2 Dark Mode Css -->
     <link rel="stylesheet" href="assets/css/sweetalert2-dark-mode.css">
     <!-- NPM Css -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
