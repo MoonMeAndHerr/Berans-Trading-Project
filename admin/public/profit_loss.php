@@ -7,6 +7,99 @@ include __DIR__ . '/../include/header.php';
 
     <!-- Custom Profit & Loss Styles -->
     <link href="assets/css/profit-loss.css" rel="stylesheet" type="text/css" />
+    
+    <style>
+        /* Normal green for completed on time */
+        #profitLossTable tbody tr.completed-on-time td {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #065f46;
+            transition: all 0.2s ease;
+        }
+        
+        #profitLossTable tbody tr.completed-on-time {
+            border-left: 5px solid #10b981;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        #profitLossTable tbody tr.completed-on-time:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+        }
+        
+        /* Teal/Emerald for completed late (after overdue) */
+        #profitLossTable tbody tr.completed-late td {
+            background-color: rgba(20, 184, 166, 0.15) !important;
+            color: #0f766e !important;
+            transition: all 0.2s ease;
+        }
+        
+        #profitLossTable tbody tr.completed-late {
+            border-left: 5px solid #14b8a6 !important;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        #profitLossTable tbody tr.completed-late:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(20, 184, 166, 0.2);
+        }
+        
+        /* Yellow styling for started/pending orders */
+        #profitLossTable tbody tr.started-row td {
+            background-color: rgba(251, 191, 36, 0.15);
+            color: #78350f;
+            transition: all 0.2s ease;
+        }
+        
+        #profitLossTable tbody tr.started-row {
+            border-left: 5px solid #f59e0b;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        #profitLossTable tbody tr.started-row:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(251, 191, 36, 0.2);
+        }
+        
+        /* Orange styling for overdue orders (past ETA) */
+        #profitLossTable tbody tr.overdue-row td {
+            background-color: rgba(249, 115, 22, 0.15) !important;
+            color: #c2410c !important;
+            transition: all 0.2s ease;
+        }
+        
+        #profitLossTable tbody tr.overdue-row {
+            border-left: 5px solid #ea580c !important;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        #profitLossTable tbody tr.overdue-row:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(249, 115, 22, 0.2);
+        }
+        
+        /* Status Modal Button Styling */
+        .status-option {
+            text-align: left;
+            font-weight: 500;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .status-option:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .status-option.active {
+            border-width: 2px !important;
+            font-weight: 600;
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+        }
+    </style>
 
 
 
@@ -76,9 +169,10 @@ include __DIR__ . '/../include/header.php';
                                                 <div class="flex-grow-1">
                                                     <h6 class="mb-0">
                                                         <span id="totalCommissionPayments">RM 0.00</span> / 
-                                                        <span id="totalCommissionRemaining" class="text-danger">RM 0.00</span>
+                                                        <span id="totalCommissionRemaining" class="text-danger">RM 0.00</span> / 
+                                                        <span id="excludedCommissionRemaining" class="text-muted">(RM 0.00)</span>
                                                     </h6>
-                                                    <small class="text-muted">Commission Paid / Remaining</small>
+                                                    <small class="text-muted">Commission Paid / Remaining / (No Status)</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -92,9 +186,10 @@ include __DIR__ . '/../include/header.php';
                                                 <div class="flex-grow-1">
                                                     <h6 class="mb-0">
                                                         <span id="totalShippingPayments">RM 0.00</span> / 
-                                                        <span id="totalShippingRemaining" class="text-danger">RM 0.00</span>
+                                                        <span id="totalShippingRemaining" class="text-danger">RM 0.00</span> / 
+                                                        <span id="excludedShippingRemaining" class="text-muted">(RM 0.00)</span>
                                                     </h6>
-                                                    <small class="text-muted">Shipping Paid / Remaining</small>
+                                                    <small class="text-muted">Shipping Paid / Remaining / (No Status)</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -108,20 +203,66 @@ include __DIR__ . '/../include/header.php';
                                                 <div class="flex-grow-1">
                                                     <h6 class="mb-0">
                                                         <span id="totalSupplierPayments">RM 0.00</span> / 
-                                                        <span id="totalSupplierRemaining" class="text-danger">RM 0.00</span>
+                                                        <span id="totalSupplierRemaining" class="text-danger">RM 0.00</span> / 
+                                                        <span id="excludedSupplierRemaining" class="text-muted">(RM 0.00)</span>
                                                     </h6>
-                                                    <small class="text-muted">Supplier Paid / Remaining</small>
+                                                    <small class="text-muted">Supplier Paid / Remaining / (No Status)</small>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     
+                                    <!-- Zakat Summary Row -->
+                                    <div class="row g-3 mt-2 border-bottom pb-3">
+                                        <div class="col-md-4">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <div class="rounded bg-light p-2">
+                                                        <i class="ri-funds-line text-info" style="font-size: 18px;"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-0">
+                                                        <span id="totalZakat" class="text-info">RM 0.00</span> / 
+                                                        <span id="excludedZakat" class="text-muted">(RM 0.00)</span>
+                                                    </h6>
+                                                    <small class="text-muted">Zakat (With Status) / (No Status)</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Order Count Display -->
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="alert alert-info mb-0 py-2" style="background-color: rgba(13, 110, 253, 0.1); border: 1px solid rgba(13, 110, 253, 0.2);">
+                                                <small class="text-muted">
+                                                    <i class="ri-information-line me-1"></i>
+                                                    Summary above: <strong id="includedOrderCount">0</strong> orders with status (Paid/Remaining) + 
+                                                    <strong id="excludedOrderCount">0</strong> orders without status (shown in parentheses)
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="row g-3 align-items-end">
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
                                             <label class="form-label fw-medium text-muted">Filter by Month</label>
                                             <input type="month" id="monthFilter" class="form-control" placeholder="Select month">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-medium text-muted">Filter by Status</label>
+                                            <select id="statusFilter" class="form-select">
+                                                <option value="">All Status</option>
+                                                <option value="not_started">Not Started</option>
+                                                <option value="pending">Pending</option>
+                                                <option value="started">Started</option>
+                                                <option value="overdue">Overdue</option>
+                                                <option value="completed_on_time">Completed On Time</option>
+                                                <option value="completed_late">Completed Late</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
                                             <label class="form-label fw-medium text-muted">Search Orders</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-light border-end-0">
@@ -700,6 +841,46 @@ include __DIR__ . '/../include/header.php';
                     </div>
                 </div>
 
+                <!-- Change P&L Status Modal -->
+                <div class="modal fade" id="statusModal" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-light">
+                                <h5 class="modal-title">
+                                    <i class="ri-edit-line me-2 text-warning"></i>Change P&L Status
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-info border-0 mb-3">
+                                    <i class="ri-information-line me-2"></i>
+                                    <small><strong>Note:</strong> This will only update the Profit & Loss tracking status and will NOT affect the main order status on the View Order page.</small>
+                                </div>
+                                
+                                <input type="hidden" id="statusChangeInvoiceId">
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Select New Status</label>
+                                    <div class="d-grid gap-2">
+                                        <button type="button" class="btn btn-outline-warning status-option" data-status="pending">
+                                            <i class="ri-time-line me-2"></i>Pending
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger status-option" data-status="overdue">
+                                            <i class="ri-alarm-warning-line me-2"></i>Overdue
+                                        </button>
+                                        <button type="button" class="btn btn-outline-success status-option" data-status="completed">
+                                            <i class="ri-check-line me-2"></i>Completed
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer bg-light">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 
             <?php include __DIR__ . '/../include/footer.php';?>
         </div><!-- end main content-->
@@ -729,7 +910,13 @@ include __DIR__ . '/../include/header.php';
     <!-- Profit Loss Management JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM Content Loaded - Starting initialization');
+            // Check for overdue orders on page load (sync from View Order)
+            fetch('../private/view-order-tabs-backend.php?action=check_overdue')
+                .then(response => response.json())
+                .then(data => {
+                })
+                .catch(error => {
+                });
             
             // DOM Elements
             const accessKeyInput = document.getElementById('accessKey');
@@ -739,44 +926,17 @@ include __DIR__ . '/../include/header.php';
             const securitySection = document.getElementById('securitySection');
             const lockAccessBtn = document.getElementById('lockAccess');
 
-            console.log('Elements found:', {
-                accessKeyInput: !!accessKeyInput,
-                verifyAccessKeyBtn: !!verifyAccessKeyBtn,
-                toggleKeyVisibilityBtn: !!toggleKeyVisibilityBtn,
-                keyIcon: !!keyIcon
-            });
-
             // Toggle password visibility
             if (toggleKeyVisibilityBtn && accessKeyInput && keyIcon) {
-                console.log('Setting up toggle button listener');
                 toggleKeyVisibilityBtn.addEventListener('click', function() {
-                    console.log('Toggle button clicked');
-                    console.log('Current input type:', accessKeyInput.type);
-                    
                     if (accessKeyInput.type === 'password') {
                         accessKeyInput.type = 'text';
                         keyIcon.className = 'ri-eye-off-line';
-                        console.log('Changed to text - showing password');
                     } else {
                         accessKeyInput.type = 'password';
                         keyIcon.className = 'ri-eye-line';
-                        console.log('Changed to password - hiding text');
                     }
                 });
-            } else {
-                console.log('Toggle elements not found!', {
-                    toggleBtn: !!toggleKeyVisibilityBtn,
-                    input: !!accessKeyInput,
-                    icon: !!keyIcon
-                });
-            }
-
-            // Verify access key - Using onclick attribute instead of event listener
-            // (Button has onclick="verifyAccess()" in HTML)
-            if (verifyAccessKeyBtn) {
-                console.log('Verify button found - using onclick handler');
-            } else {
-                console.log('Verify button not found!');
             }
 
             // Lock access
@@ -822,7 +982,6 @@ include __DIR__ . '/../include/header.php';
                     }
                 })
                 .catch(error => {
-                    console.error('Error loading data:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -961,7 +1120,6 @@ include __DIR__ . '/../include/header.php';
                 }
             })
             .catch(error => {
-                console.error('Error loading staff list:', error);
             });
         }
         
@@ -1002,7 +1160,6 @@ include __DIR__ . '/../include/header.php';
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Network Error',
@@ -1118,18 +1275,13 @@ include __DIR__ . '/../include/header.php';
             const accessKeyInput = document.getElementById('accessKey');
             const keyIcon = document.getElementById('keyIcon');
             
-            console.log('togglePasswordVisibility called');
-            console.log('Current type:', accessKeyInput ? accessKeyInput.type : 'input not found');
-            
             if (accessKeyInput && keyIcon) {
                 if (accessKeyInput.type === 'password') {
                     accessKeyInput.type = 'text';
                     keyIcon.className = 'ri-eye-off-line';
-                    console.log('Password revealed');
                 } else {
                     accessKeyInput.type = 'password';
                     keyIcon.className = 'ri-eye-line';
-                    console.log('Password hidden');
                 }
             }
         }
@@ -1278,18 +1430,28 @@ include __DIR__ . '/../include/header.php';
                     })
                     .then(response => response.json())
                     .then(data => {
+                        
                         if (data.success) {
+                            // Close modal first
+                            const modalElement = document.getElementById('markCompleteModal');
+                            if (modalElement) {
+                                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                                if (modalInstance) {
+                                    modalInstance.hide();
+                                }
+                            }
+                            
+                            // Show success message with green styling info
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Order Completed!',
-                                text: 'The order has been marked as completed.',
+                                text: 'The order has been marked as completed and will now appear in green.',
                                 timer: 2000,
                                 showConfirmButton: false
+                            }).then(() => {
+                                // Refresh the table after success message
+                                loadProfitLossData(currentPage);
                             });
-                            
-                            // Close modal and refresh data
-                            bootstrap.Modal.getInstance(document.getElementById('markCompleteModal')).hide();
-                            loadProfitLossData(currentPage); // Refresh main list
                         } else {
                             Swal.fire({
                                 icon: 'error',
@@ -1299,7 +1461,6 @@ include __DIR__ . '/../include/header.php';
                         }
                     })
                     .catch(error => {
-                        console.error('Error:', error);
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
@@ -1412,31 +1573,19 @@ include __DIR__ . '/../include/header.php';
             // Add action to form data
             formData.append('action', type === 'supplier' ? 'add_supplier_payment' : 'add_shipping_payment');
             
-            console.log('Submitting payment:', {
-                type: type,
-                action: formData.get('action'),
-                invoice_id: formData.get('invoice_id'),
-                amount: formData.get('amount'),
-                description: formData.get('description')
-            });
-            
             fetch('../private/profit_loss_backend.php', {
                 method: 'POST',
                 body: formData
             })
             .then(response => {
-                console.log('Response status:', response.status);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.text();
             })
             .then(text => {
-                console.log('Raw response:', text);
                 try {
                     const data = JSON.parse(text);
-                    console.log('Parsed response:', data);
-                    
                     if (data.success) {
                         const paymentAmount = parseFloat(formData.get('amount'));
                         const isDeduction = paymentAmount < 0;
@@ -1463,7 +1612,6 @@ include __DIR__ . '/../include/header.php';
                         // Refresh the main table
                         loadProfitLossData();
                     } else {
-                        console.error('Payment failed:', data);
                         Swal.fire({
                             icon: 'error',
                             title: 'Payment Failed',
@@ -1472,8 +1620,6 @@ include __DIR__ . '/../include/header.php';
                         });
                     }
                 } catch (parseError) {
-                    console.error('JSON parse error:', parseError);
-                    console.error('Response was:', text);
                     Swal.fire({
                         icon: 'error',
                         title: 'Server Error',
@@ -1483,7 +1629,6 @@ include __DIR__ . '/../include/header.php';
                 }
             })
             .catch(error => {
-                console.error('Fetch error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Network Error',
@@ -1550,7 +1695,6 @@ include __DIR__ . '/../include/header.php';
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Network Error',
@@ -1653,11 +1797,10 @@ include __DIR__ . '/../include/header.php';
 
                 // Handle payment summaries data
                 if (summariesData.success) {
-                    updatePaymentSummaryCards(summariesData.summaries);
+                    updatePaymentSummaryCards(summariesData.summaries, summariesData.order_counts, summariesData.excluded_summaries);
                 }
             })
             .catch(error => {
-                console.error('Error loading profit/loss data:', error);
                 tableBody.innerHTML = `
                     <tr>
                         <td colspan="8" class="text-center py-4">
@@ -1671,6 +1814,7 @@ include __DIR__ . '/../include/header.php';
 
         function applyFilters() {
             const monthFilter = document.getElementById('monthFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
             const searchFilter = document.getElementById('searchInput').value;
             const dateFromFilter = document.getElementById('dateFromFilter').value;
             const dateToFilter = document.getElementById('dateToFilter').value;
@@ -1678,6 +1822,7 @@ include __DIR__ . '/../include/header.php';
             // Update current filters
             currentFilters = {
                 month: monthFilter,
+                status: statusFilter,
                 search: searchFilter,
                 date_from: dateFromFilter,
                 date_to: dateToFilter
@@ -1691,6 +1836,7 @@ include __DIR__ . '/../include/header.php';
         function clearFilters() {
             // Clear all filter inputs
             document.getElementById('monthFilter').value = '';
+            document.getElementById('statusFilter').value = '';
             document.getElementById('searchInput').value = '';
             document.getElementById('dateFromFilter').value = '';
             document.getElementById('dateToFilter').value = '';
@@ -1703,9 +1849,7 @@ include __DIR__ . '/../include/header.php';
             loadProfitLossData(1);
         }
 
-        function updatePaymentSummaryCards(summaries) {
-            console.log('Updating payment summary cards:', summaries);
-            
+        function updatePaymentSummaryCards(summaries, orderCounts, excludedSummaries) {
             // Update commission payments and remaining
             document.getElementById('totalCommissionPayments').textContent = 
                 `RM ${formatNumber(summaries.total_commission_payments || 0)}`;
@@ -1723,6 +1867,32 @@ include __DIR__ . '/../include/header.php';
                 `RM ${formatNumber(summaries.total_supplier_payments || 0)}`;
             document.getElementById('totalSupplierRemaining').textContent = 
                 `RM ${formatNumber(summaries.total_supplier_remaining || 0)}`;
+            
+            // Update zakat total (10% of profit)
+            document.getElementById('totalZakat').textContent = 
+                `RM ${formatNumber(summaries.total_zakat || 0)}`;
+            
+            // Update excluded zakat
+            if (excludedSummaries) {
+                document.getElementById('excludedZakat').textContent = 
+                    `(RM ${formatNumber(excludedSummaries.total_zakat || 0)})`;
+            }
+            
+            // Update excluded order totals (orders without status)
+            if (excludedSummaries) {
+                document.getElementById('excludedCommissionRemaining').textContent = 
+                    `(RM ${formatNumber(excludedSummaries.total_commission_remaining || 0)})`;
+                document.getElementById('excludedShippingRemaining').textContent = 
+                    `(RM ${formatNumber(excludedSummaries.total_shipping_remaining || 0)})`;
+                document.getElementById('excludedSupplierRemaining').textContent = 
+                    `(RM ${formatNumber(excludedSummaries.total_supplier_remaining || 0)})`;
+            }
+            
+            // Update order counts if provided
+            if (orderCounts) {
+                document.getElementById('includedOrderCount').textContent = orderCounts.included || 0;
+                document.getElementById('excludedOrderCount').textContent = orderCounts.excluded || 0;
+            }
         }
 
         function displayPagination(pagination) {
@@ -1813,17 +1983,6 @@ include __DIR__ . '/../include/header.php';
             }
 
             const rows = orders.map(order => {
-                // DEBUG: Log commission calculation data
-                if (order.commission_staff_id) {
-                    console.log('DEBUG - Order:', order.order_number, {
-                        total_revenue: order.total_revenue,
-                        commission_percentage: order.commission_percentage,
-                        commission_paid_amount: order.commission_paid_amount,
-                        calculated_commission_due: order.total_revenue * (order.commission_percentage / 100),
-                        calculated_remaining: (order.total_revenue * (order.commission_percentage / 100)) - parseFloat(order.commission_paid_amount || 0)
-                    });
-                }
-                
                 // Use the backend calculated values - convert to RM like modal
                 const supplierCostYen = parseFloat(order.total_supplier_cost_yen || 0);
                 const shippingCostRm = parseFloat(order.total_shipping_cost_rm || 0);
@@ -1860,27 +2019,97 @@ include __DIR__ . '/../include/header.php';
                     statusText = 'Partially Paid';
                 }
                 
+                // Check order status for Profit Loss page
+                // Use profit_loss_status with priority, fall back to main order.status for one-way sync
+                const profitLossStatus = order.profit_loss_status ? order.profit_loss_status.toLowerCase() : null;
+                const mainStatus = order.status ? order.status.toLowerCase() : null;
+                const isStarted = order.production_status === 'started';
+                
+                // Determine completion status
+                // If profit_loss_status is explicitly set (pending/overdue/completed), use it
+                // Otherwise, use main order.status for one-way sync from View Order
+                let isCompleted = false;
+                let isOverdue = false;
+                
+                if (profitLossStatus === 'completed') {
+                    isCompleted = true;
+                } else if (profitLossStatus === 'overdue') {
+                    isOverdue = true;
+                } else if (profitLossStatus === 'pending') {
+                    // Explicitly pending in P&L
+                    isCompleted = false;
+                    isOverdue = false;
+                } else if (!profitLossStatus && mainStatus === 'completed') {
+                    // No explicit P&L status, inherit from View Order (one-way sync)
+                    isCompleted = true;
+                }
+                
+                // Check if completed late (completed after ETA or was overdue before completion)
+                let wasCompletedLate = false;
+                if (isCompleted) {
+                    if (order.completion_date && order.estimated_completion_date) {
+                        // Has completion date - check if completed after ETA
+                        const completionDate = new Date(order.completion_date);
+                        const etaDate = new Date(order.estimated_completion_date);
+                        wasCompletedLate = completionDate > etaDate;
+                    } else if (order.estimated_completion_date) {
+                        // No completion date but has ETA - check if current date is past ETA (was overdue when marked complete)
+                        const now = new Date();
+                        const etaDate = new Date(order.estimated_completion_date);
+                        wasCompletedLate = now > etaDate;
+                    }
+                }
+                let cellStyle = '';
+                let rowClass = '';
+                let statusBadge = '';
+                
+                if (isCompleted) {
+                    // Check if completed late or on time
+                    if (wasCompletedLate) {
+                        // Teal for completed late (after overdue)
+                        cellStyle = 'background-color: rgba(20, 184, 166, 0.15); color: #134e4a;';
+                        rowClass = 'completed-late';
+                        statusBadge = '<span class="badge" style="background-color: #14b8a6; color: #134e4a; font-size: 10px;">COMPLETED (OVERDUE)</span>';
+                    } else {
+                        // Green for completed on time
+                        cellStyle = 'background-color: rgba(16, 185, 129, 0.15); color: #065f46;';
+                        rowClass = 'completed-on-time';
+                        statusBadge = '<span class="badge bg-success" style="font-size: 10px;">COMPLETED</span>';
+                    }
+                } else if (isOverdue) {
+                    // Orange for overdue (past ETA, not completed)
+                    cellStyle = 'background-color: rgba(249, 115, 22, 0.15); color: #7c2d12;';
+                    rowClass = 'overdue-row';
+                    statusBadge = '<span class="badge" style="background-color: #ea580c; color: #7c2d12; font-size: 10px;">OVERDUE</span>';
+                } else if (isStarted) {
+                    // Yellow for started/pending (from View Order page)
+                    cellStyle = 'background-color: rgba(251, 191, 36, 0.15); color: #78350f;';
+                    rowClass = 'started-row';
+                    statusBadge = '<span class="badge bg-warning" style="font-size: 10px;">PENDING</span>';
+                }
+                
                 return `
-                    <tr>
-                        <td>
+                    <tr class="${rowClass}">
+                        <td style="${cellStyle}">
                             <div style="font-weight: 600;">${order.order_number || '#' + order.invoice_id}</div>
+                            ${statusBadge}
                         </td>
-                        <td>
+                        <td style="${cellStyle}">
                             <div style="font-weight: 500;">${order.customer_name || 'Unknown'}</div>
                             <div style="font-size: 12px; opacity: 0.7;">${order.customer_company_name || ''}</div>
                         </td>
-                        <td>
+                        <td style="${cellStyle}">
                             <div>${formatDate(order.order_date)}</div>
                         </td>
-                        <td>
-                            <div style="font-weight: 600; color: ${order.actual_profit_loss >= 0 ? '#059669' : '#dc2626'};">
-                                RM${formatNumber(order.actual_profit_loss)}
+                        <td style="${cellStyle}">
+                            <div style="font-weight: 600; color: ${order.profit_with_zakat >= 0 ? '#059669' : '#dc2626'};">
+                                RM${formatNumber(order.profit_with_zakat)}
                             </div>
                             <div style="font-size: 12px; color: #6b7280;">
-                                ${order.actual_profit_loss >= 0 ? 'Profit' : 'Loss'}
+                                ${order.profit_with_zakat >= 0 ? 'Profit (After Zakat)' : 'Loss'}
                             </div>
                         </td>
-                        <td>
+                        <td style="${cellStyle}">
                             <div style="font-weight: 500; color: #059669;">
                                 RM${formatNumber(supplierPaidRm + shippingPaidRm)}
                             </div>
@@ -1888,7 +2117,7 @@ include __DIR__ . '/../include/header.php';
                                 Total paid (RM${formatNumber(supplierPaidRm)} supplier + RM${formatNumber(shippingPaidRm)} shipping)
                             </div>
                         </td>
-                        <td>
+                        <td style="${cellStyle}">
                             <div style="font-weight: 600; color: ${totalRemainingRm <= 0.01 ? '#059669' : '#dc2626'};">
                                 RM${formatNumber(totalRemainingRm)}
                             </div>
@@ -1896,7 +2125,7 @@ include __DIR__ . '/../include/header.php';
                                 Total remaining (RM${formatNumber(supplierRemainingRm)} supplier + RM${formatNumber(shippingRemainingRm)} shipping)
                             </div>
                         </td>
-                        <td>
+                        <td style="${cellStyle}">
                             ${order.staff_name ? `
                                 <div style="font-weight: 500;">${order.staff_name}</div>
                                 <div style="font-size: 12px; color: ${(() => {
@@ -1920,23 +2149,25 @@ include __DIR__ . '/../include/header.php';
                                 <div style="font-style: italic; opacity: 0.7;">No commission</div>
                             `}
                         </td>
-                        <td>
+                        <td style="${cellStyle}">
                             <span class="status-badge status-${status}">${statusText}</span>
                         </td>
-                        <td>
-                            <div class="d-flex gap-1">
-                                <button class="btn btn-clean btn-clean-sm" onclick="openPaymentModal(${order.invoice_id})" title="Make Payment">
-                                    <i class="ri-money-dollar-circle-line"></i>
-                                </button>
-                                <button class="btn btn-clean-outline btn-clean-sm" onclick="viewProfitDetails(${order.invoice_id})" title="View Details">
-                                    <i class="ri-eye-line"></i>
-                                </button>
-                                <button class="btn btn-clean-outline btn-clean-sm" onclick="markAsComplete(${order.invoice_id})" title="Mark Complete">
-                                    <i class="ri-check-line"></i>
-                                </button>
-                                <button class="btn btn-danger btn-clean-sm" onclick="deleteOrder(${order.invoice_id})" title="Delete Order">
-                                    <i class="ri-delete-bin-line"></i>
-                                </button>
+                        <td style="${cellStyle}">
+                            <div class="d-flex flex-column gap-2">
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-clean btn-clean-sm" onclick="openPaymentModal(${order.invoice_id})" title="Make Payment">
+                                        <i class="ri-money-dollar-circle-line"></i>
+                                    </button>
+                                    <button class="btn btn-clean-outline btn-clean-sm" onclick="viewProfitDetails(${order.invoice_id})" title="View Details">
+                                        <i class="ri-eye-line"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-clean-sm" onclick="openStatusModal(${order.invoice_id}, '${order.profit_loss_status || 'pending'}')" title="Change P&L Status">
+                                        <i class="ri-edit-line"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-clean-sm" onclick="deleteOrder(${order.invoice_id})" title="Delete Order">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </button>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -2008,14 +2239,10 @@ include __DIR__ . '/../include/header.php';
             fetch(`../private/profit_loss_backend.php?action=get_order_details&invoice_id=${invoiceId}`)
             .then(response => response.json())
             .then(data => {
-                console.log('Raw profit details data:', data); // Debug log
                 
                 if (data.success) {
                     // Log individual items for debugging
                     if (data.items && data.items.length > 0) {
-                        console.log('First item details:', data.items[0]);
-                        console.log('Unit shipping cost from first item:', data.items[0].unit_shipping_cost_rm);
-                        console.log('Total cost from first item:', data.items[0].total_cost_rm);
                     }
                     displayProfitDetails(data);
                 } else {
@@ -2024,7 +2251,6 @@ include __DIR__ . '/../include/header.php';
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 document.getElementById('profitDetailsContent').innerHTML = 
                     '<div class="alert alert-danger">Failed to load data</div>';
             });
@@ -2065,13 +2291,13 @@ include __DIR__ . '/../include/header.php';
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Order Completed!',
-                                text: 'The order has been marked as completed.',
+                                text: 'The order has been marked as completed and will now appear in green.',
                                 timer: 2000,
                                 showConfirmButton: false
+                            }).then(() => {
+                                // Refresh the table after the success message
+                                loadProfitLossData(currentPage);
                             });
-                            
-                            // Refresh the table
-                            loadProfitLossData(currentPage);
                         } else {
                             Swal.fire({
                                 icon: 'error',
@@ -2081,7 +2307,6 @@ include __DIR__ . '/../include/header.php';
                         }
                     })
                     .catch(error => {
-                        console.error('Error:', error);
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
@@ -2143,7 +2368,6 @@ include __DIR__ . '/../include/header.php';
                         }
                     })
                     .catch(error => {
-                        console.error('Error:', error);
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
@@ -2183,7 +2407,8 @@ include __DIR__ . '/../include/header.php';
                 const totalShippingCost = unitShippingCost * quantity;
                 const totalCost = totalSupplierCost + totalShippingCost;
                 const itemProfit = itemRevenueTable - totalCost; // Use discounted revenue for profit calculation
-                const profitClass = itemProfit >= 0 ? 'text-success' : 'text-danger';
+                const itemProfitAfterZakat = itemProfit * 0.90; // Deduct 10% zakat
+                const profitClass = itemProfitAfterZakat >= 0 ? 'text-success' : 'text-danger';
                 
                 itemsHtml += `
                     <tr>
@@ -2194,7 +2419,7 @@ include __DIR__ . '/../include/header.php';
                         <td>RM ${formatNumber(totalSupplierCost)} | RM ${formatNumber(unitSupplierCostRm)}</td>
                         <td>RM ${formatNumber(totalShippingCost)} | RM ${formatNumber(unitShippingCost)}</td>
                         <td>RM ${formatNumber(totalCost)}</td>
-                        <td class="${profitClass}">RM ${formatNumber(Math.abs(itemProfit))}${itemProfit < 0 ? ' (Loss)' : ''}</td>
+                        <td class="${profitClass}">RM ${formatNumber(Math.abs(itemProfitAfterZakat))}${itemProfitAfterZakat < 0 ? ' (Loss)' : ''}</td>
                     </tr>
                 `;
             });
@@ -2211,6 +2436,11 @@ include __DIR__ . '/../include/header.php';
             const totalProfit = totalRevenue - totalCost;
             const totalProfitClass = totalProfit >= 0 ? 'text-success' : 'text-danger';
             
+            // Calculate zakat (10% of profit) and profit after zakat
+            const zakatAmount = parseFloat(summary?.zakat_amount || 0);
+            const profitAfterZakat = parseFloat(summary?.profit_after_zakat || 0);
+            const profitAfterZakatClass = profitAfterZakat >= 0 ? 'text-success' : 'text-danger';
+            
             const html = `
                 <div class="row mb-4">
                     <div class="col-md-6">
@@ -2226,7 +2456,10 @@ include __DIR__ . '/../include/header.php';
                         <p><strong>Price Deduction Discount:</strong> <span class="text-danger">- RM ${formatNumber(priceDeduction)}</span></p>
                         <p><strong>Supplier Cost:</strong> RM ${formatNumber(totalSupplierCostRm)}</p>
                         <p><strong>Shipping Cost:</strong> RM ${formatNumber(totalShippingCost)}</p>
-                        <p><strong>Total Profit:</strong> <span class="${totalProfitClass}">RM ${formatNumber(Math.abs(totalProfit))}</span></p>
+                        <hr class="my-2">
+                        <p><strong>Total Profit:</strong> <span class="${totalProfitClass} fw-bold">RM ${formatNumber(totalProfit)}</span></p>
+                        <p><strong>10% Zakat:</strong> <span class="text-danger">- RM ${formatNumber(zakatAmount)}</span></p>
+                        <p><strong>Profit With Zakat:</strong> <span class="${profitAfterZakatClass} fw-bold">RM ${formatNumber(profitAfterZakat)}</span></p>
                     </div>
                 </div>
                 
@@ -2242,7 +2475,7 @@ include __DIR__ . '/../include/header.php';
                                 <th>Total Supplier Cost | Per Unit</th>
                                 <th>Total Shipping Cost | Per Unit</th>
                                 <th>Total Cost</th>
-                                <th>Total Profit/Loss</th>
+                                <th>Profit/Loss (After Zakat)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -2356,7 +2589,6 @@ include __DIR__ . '/../include/header.php';
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 document.getElementById('supplierSummary').innerHTML = 
                     '<div class="alert alert-danger">Failed to load data</div>';
                 document.getElementById('shippingSummary').innerHTML = 
@@ -2788,7 +3020,6 @@ include __DIR__ . '/../include/header.php';
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -2796,6 +3027,95 @@ include __DIR__ . '/../include/header.php';
                 });
             });
         }
+
+        // Open Status Change Modal
+        function openStatusModal(invoiceId, currentStatus) {
+            if (!accessGranted) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Access Denied',
+                    text: 'Please verify your access key first'
+                });
+                return;
+            }
+
+            document.getElementById('statusChangeInvoiceId').value = invoiceId;
+            
+            // Highlight current status
+            document.querySelectorAll('.status-option').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.status === currentStatus) {
+                    btn.classList.add('active');
+                    btn.style.borderWidth = '2px';
+                }
+            });
+            
+            const modal = new bootstrap.Modal(document.getElementById('statusModal'));
+            modal.show();
+        }
+
+        // Change Profit Loss Status Function
+        function changeProfitLossStatus(newStatus) {
+            const invoiceId = document.getElementById('statusChangeInvoiceId').value;
+            
+            // Show loading
+            Swal.fire({
+                title: 'Updating Status...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Hide modal first
+            const modal = bootstrap.Modal.getInstance(document.getElementById('statusModal'));
+            modal.hide();
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('action', 'change_profit_loss_status');
+            formData.append('invoice_id', invoiceId);
+            formData.append('new_status', newStatus);
+
+            fetch('../private/profit_loss_backend.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Status Updated!',
+                        text: `Profit/Loss status changed to ${newStatus}`,
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        // Reload the data
+                        loadProfitLossData(currentPage);
+                    });
+                } else {
+                    throw new Error(data.error || 'Failed to update status');
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to update status'
+                });
+            });
+        }
+
+        // Add click handlers for status buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.status-option').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const newStatus = this.dataset.status;
+                    changeProfitLossStatus(newStatus);
+                });
+            });
+        });
 
         function formatCurrency(amount) {
             // Handle null, undefined, empty string, or NaN values
@@ -2838,6 +3158,14 @@ include __DIR__ . '/../include/header.php';
             const monthFilter = document.getElementById('monthFilter');
             if (monthFilter) {
                 monthFilter.addEventListener('change', function() {
+                    applyFilters();
+                });
+            }
+            
+            // Status filter auto-apply
+            const statusFilter = document.getElementById('statusFilter');
+            if (statusFilter) {
+                statusFilter.addEventListener('change', function() {
                     applyFilters();
                 });
             }

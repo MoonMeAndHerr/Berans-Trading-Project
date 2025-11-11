@@ -49,12 +49,10 @@ function getOrderTabs() {
                 ) THEN 1
                 ELSE 0
             END as has_payment,
+            i.production_status,
+            i.profit_loss_status,
             CASE 
-                WHEN EXISTS (
-                    SELECT 1 FROM payment_history 
-                    WHERE invoice_id = i.invoice_id 
-                    LIMIT 1
-                ) THEN (
+                WHEN i.production_status = 'started' THEN (
                     SELECT MAX(pr.production_lead_time + COALESCE(psh.delivery_days, 0)) 
                     FROM invoice_item ii 
                     JOIN product pr ON pr.product_id = ii.product_id 
@@ -65,11 +63,7 @@ function getOrderTabs() {
                 ELSE NULL
             END as max_lead_time,
             CASE 
-                WHEN EXISTS (
-                    SELECT 1 FROM payment_history 
-                    WHERE invoice_id = i.invoice_id 
-                    LIMIT 1
-                ) THEN (
+                WHEN i.production_status = 'started' THEN (
                     SELECT MAX(pr.production_lead_time) 
                     FROM invoice_item ii 
                     JOIN product pr ON pr.product_id = ii.product_id 
@@ -78,11 +72,7 @@ function getOrderTabs() {
                 ELSE NULL
             END as max_production_lead_time,
             CASE 
-                WHEN EXISTS (
-                    SELECT 1 FROM payment_history 
-                    WHERE invoice_id = i.invoice_id 
-                    LIMIT 1
-                ) THEN (
+                WHEN i.production_status = 'started' THEN (
                     SELECT psh.delivery_days
                     FROM invoice_item ii 
                     JOIN product pr ON pr.product_id = ii.product_id 
@@ -100,11 +90,7 @@ function getOrderTabs() {
                 ELSE NULL
             END as delivery_days,
             CASE 
-                WHEN EXISTS (
-                    SELECT 1 FROM payment_history 
-                    WHERE invoice_id = i.invoice_id 
-                    LIMIT 1
-                ) THEN (
+                WHEN i.production_status = 'started' THEN (
                     SELECT psh.shipping_name
                     FROM invoice_item ii 
                     JOIN product pr ON pr.product_id = ii.product_id 
@@ -122,11 +108,8 @@ function getOrderTabs() {
                 ELSE NULL
             END as shipping_method_name,
             CASE 
-                WHEN EXISTS (
-                    SELECT 1 FROM payment_history 
-                    WHERE invoice_id = i.invoice_id 
-                    LIMIT 1
-                ) THEN DATE_ADD(CURRENT_DATE(), 
+                WHEN i.production_status = 'started' THEN DATE_ADD(
+                    COALESCE(i.production_start_date, CURRENT_DATE()), 
                     INTERVAL (
                         SELECT MAX(pr.production_lead_time + COALESCE(psh.delivery_days, 0)) 
                         FROM invoice_item ii 
@@ -137,7 +120,8 @@ function getOrderTabs() {
                     ) DAY
                 )
                 ELSE NULL
-            END as estimated_completion_date
+            END as estimated_completion_date,
+            i.completion_date
         FROM invoice i
         LEFT JOIN customer c ON i.customer_id = c.customer_id
         WHERE c.deleted_at IS NULL
@@ -150,6 +134,44 @@ function getOrderTabs() {
     } catch(PDOException $e) {
         error_log("Error fetching orders: " . $e->getMessage());
         return [];
+    }
+}
+
+// Function to update overdue orders in profit_loss_status
+function updateOverdueOrders() {
+    global $pdo;
+    try {
+        // Update profit_loss_status to 'overdue' for orders that are:
+        // 1. Started (production_status = 'started')
+        // 2. Not completed in main order (status != 'completed')
+        // 3. Only if currently 'pending' (respect manual completion on Profit Loss page)
+        // 4. Past their ETA (estimated_completion_date < current date)
+        $query = "
+            UPDATE invoice i
+            SET i.profit_loss_status = 'overdue'
+            WHERE i.production_status = 'started'
+            AND i.status != 'completed'
+            AND (i.profit_loss_status = 'pending' OR i.profit_loss_status IS NULL OR i.profit_loss_status = 'overdue')
+            AND DATE_ADD(
+                COALESCE(i.production_start_date, CURRENT_DATE()), 
+                INTERVAL (
+                    SELECT MAX(pr.production_lead_time + COALESCE(psh.delivery_days, 0)) 
+                    FROM invoice_item ii 
+                    JOIN product pr ON pr.product_id = ii.product_id 
+                    LEFT JOIN price p ON p.product_id = pr.product_id
+                    LEFT JOIN price_shipping psh ON p.new_freight_method = psh.shipping_code
+                    WHERE ii.invoice_id = i.invoice_id
+                ) DAY
+            ) < CURRENT_DATE()
+        ";
+        
+        $stmt = $pdo->prepare($query);
+        $stmt->execute();
+        
+        return $stmt->rowCount(); // Return number of orders updated
+    } catch(PDOException $e) {
+        error_log("Error updating overdue orders: " . $e->getMessage());
+        return 0;
     }
 }
 
@@ -572,12 +594,48 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
                     throw new Exception('Invalid status value');
                 }
                 
-                $stmt = $pdo->prepare("
-                    UPDATE invoice 
-                    SET status = ?,
-                        updated_at = CURRENT_TIMESTAMP
-                    WHERE invoice_id = ?
-                ");
+                // Set completion_date when marking as completed, clear it when marking as pending
+                // Also sync profit_loss_status for one-way sync to Profit Loss page
+                if ($new_status === 'completed') {
+                    // Check if order already has a completion date
+                    $stmt = $pdo->prepare("
+                        SELECT completion_date 
+                        FROM invoice 
+                        WHERE invoice_id = ?
+                    ");
+                    $stmt->execute([$invoice_id]);
+                    $orderData = $stmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    if (!empty($orderData['completion_date'])) {
+                        // Already has completion date - don't overwrite it
+                        $stmt = $pdo->prepare("
+                            UPDATE invoice 
+                            SET status = ?,
+                                profit_loss_status = 'completed',
+                                updated_at = CURRENT_TIMESTAMP
+                            WHERE invoice_id = ?
+                        ");
+                    } else {
+                        // First time completing - set completion date
+                        $stmt = $pdo->prepare("
+                            UPDATE invoice 
+                            SET status = ?,
+                                profit_loss_status = 'completed',
+                                completion_date = CURRENT_TIMESTAMP,
+                                updated_at = CURRENT_TIMESTAMP
+                            WHERE invoice_id = ?
+                        ");
+                    }
+                } else {
+                    $stmt = $pdo->prepare("
+                        UPDATE invoice 
+                        SET status = ?,
+                            profit_loss_status = 'pending',
+                            completion_date = NULL,
+                            updated_at = CURRENT_TIMESTAMP
+                        WHERE invoice_id = ?
+                    ");
+                }
                 $stmt->execute([$new_status, $invoice_id]);
                 
                 if ($stmt->rowCount() === 0) {
@@ -590,6 +648,108 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
                 echo json_encode([
                     'success' => true,
                     'message' => 'Status updated successfully'
+                ]);
+                
+            } catch(Exception $e) {
+                // Clean any buffered output before sending JSON
+                if (ob_get_level() > 0) { ob_clean(); }
+                
+                echo json_encode([
+                    'success' => false,
+                    'error' => $e->getMessage()
+                ]);
+            }
+            exit;
+            break;
+        
+        case 'start_order':
+            try {
+                $invoice_id = $_POST['invoice_id'] ?? null;
+                
+                if (!$invoice_id) {
+                    throw new Exception('Missing required parameter: invoice_id');
+                }
+                
+                // Check if order has payment
+                $stmt = $pdo->prepare("
+                    SELECT COUNT(*) as payment_count 
+                    FROM payment_history 
+                    WHERE invoice_id = ?
+                ");
+                $stmt->execute([$invoice_id]);
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($result['payment_count'] == 0) {
+                    throw new Exception('Cannot start order without payment');
+                }
+                
+                // Check if order is already started
+                $stmt = $pdo->prepare("
+                    SELECT production_status, production_start_date 
+                    FROM invoice 
+                    WHERE invoice_id = ?
+                ");
+                $stmt->execute([$invoice_id]);
+                $orderData = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($orderData['production_status'] === 'started' && !empty($orderData['production_start_date'])) {
+                    // Order is already started - do not overwrite production_start_date
+                    $stmt = $pdo->prepare("
+                        UPDATE invoice 
+                        SET production_status = 'started',
+                            status = 'pending',
+                            updated_at = CURRENT_TIMESTAMP
+                        WHERE invoice_id = ?
+                    ");
+                } else {
+                    // First time starting - set production_start_date
+                    $stmt = $pdo->prepare("
+                        UPDATE invoice 
+                        SET production_status = 'started',
+                            status = 'pending',
+                            production_start_date = CURRENT_TIMESTAMP,
+                            updated_at = CURRENT_TIMESTAMP
+                        WHERE invoice_id = ?
+                    ");
+                }
+                $stmt->execute([$invoice_id]);
+                
+                if ($stmt->rowCount() === 0) {
+                    throw new Exception('Invoice not found or no changes made');
+                }
+                
+                // Clean any buffered output before sending JSON
+                if (ob_get_level() > 0) { ob_clean(); }
+                
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Order started successfully'
+                ]);
+                
+            } catch(Exception $e) {
+                // Clean any buffered output before sending JSON
+                if (ob_get_level() > 0) { ob_clean(); }
+                
+                echo json_encode([
+                    'success' => false,
+                    'error' => $e->getMessage()
+                ]);
+            }
+            exit;
+            break;
+            
+        case 'check_overdue':
+            try {
+                // Update all overdue orders in profit_loss_status
+                $updatedCount = updateOverdueOrders();
+                
+                // Clean any buffered output before sending JSON
+                if (ob_get_level() > 0) { ob_clean(); }
+                
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Overdue orders updated',
+                    'updated_count' => $updatedCount
                 ]);
                 
             } catch(Exception $e) {
