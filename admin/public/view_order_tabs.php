@@ -6,6 +6,74 @@
         ?>
         <!-- Minimal CSS for Order Tabs -->
         <link href="assets/css/order-tabs-minimal.css" rel="stylesheet" type="text/css" />
+        
+        <style>
+            /* Yellow styling for started/pending orders */
+            .order-item.started {
+                background-color: rgba(251, 191, 36, 0.1) !important;
+                border-left: 5px solid #f59e0b !important;
+            }
+            
+            .order-item.started .order-status-dot {
+                background-color: #f59e0b !important;
+            }
+            
+            .order-item.started .order-badge {
+                background-color: #f59e0b !important;
+                color: #78350f !important;
+            }
+            
+            /* Orange styling for overdue orders (past ETA) */
+            .order-item.overdue {
+                background-color: rgba(249, 115, 22, 0.15) !important;
+                border-left: 5px solid #ea580c !important;
+            }
+            
+            .order-item.overdue .order-status-dot {
+                background-color: #ea580c !important;
+            }
+            
+            .order-item.overdue .order-badge {
+                background-color: #ea580c !important;
+                color: #7c2d12 !important;
+            }
+            
+            /* Overdue takes precedence over started */
+            .order-item.overdue.started {
+                background-color: rgba(249, 115, 22, 0.15) !important;
+                border-left: 5px solid #ea580c !important;
+            }
+            
+            /* Normal green for completed on time */
+            .order-item.completed-on-time {
+                background-color: rgba(16, 185, 129, 0.1) !important;
+                border-left: 5px solid #10b981 !important;
+            }
+            
+            .order-item.completed-on-time .order-status-dot {
+                background-color: #10b981 !important;
+            }
+            
+            .order-item.completed-on-time .order-badge {
+                background-color: #10b981 !important;
+                color: #065f46 !important;
+            }
+            
+            /* Teal/Emerald for completed late (after overdue) - distinct from normal green */
+            .order-item.completed-late {
+                background-color: rgba(20, 184, 166, 0.15) !important;
+                border-left: 5px solid #14b8a6 !important;
+            }
+            
+            .order-item.completed-late .order-status-dot {
+                background-color: #14b8a6 !important;
+            }
+            
+            .order-item.completed-late .order-badge {
+                background-color: #14b8a6 !important;
+                color: #134e4a !important;
+            }
+        </style>
 
 
         <!-- ============================================================== -->
@@ -53,7 +121,10 @@
                                 <select id="statusFilter" class="filter-select">
                                     <option value="">All Status</option>
                                     <option value="pending">Pending</option>
-                                    <option value="completed">Completed</option>
+                                    <option value="started">Started/In Production</option>
+                                    <option value="overdue">Overdue</option>
+                                    <option value="completed-on-time">Completed (On Time)</option>
+                                    <option value="completed-late">Completed (Overdue)</option>
                                     <option value="cancelled">Cancelled</option>
                                 </select>
                             </div>
@@ -62,16 +133,61 @@
                         <!-- Order List -->
                         <div class="order-list" id="ordersList">
                             <?php foreach($displayed_orders as $order): ?>
-                            <div class="order-item <?= $order['status'] === 'completed' ? 'completed' : '' ?>" data-order-id="<?= $order['invoice_id'] ?>">
+                            <?php 
+                                $isStarted = isset($order['production_status']) && $order['production_status'] === 'started';
+                                $isCompleted = $order['status'] === 'completed';
+                                
+                                // Check if order is overdue by calculating from ETA (independent of profit_loss_status)
+                                $isOverdue = false;
+                                $wasCompletedLate = false;
+                                
+                                if ($isStarted && !empty($order['estimated_completion_date'])) {
+                                    $etaDate = new DateTime($order['estimated_completion_date']);
+                                    $currentDate = new DateTime();
+                                    
+                                    if (!$isCompleted) {
+                                        // Still pending - check if overdue
+                                        $isOverdue = $currentDate > $etaDate;
+                                    } else {
+                                        // Completed - check if it was completed after ETA (late)
+                                        $completionDate = !empty($order['completion_date']) ? new DateTime($order['completion_date']) : $currentDate;
+                                        $wasCompletedLate = $completionDate > $etaDate;
+                                    }
+                                }
+                                
+                                // Determine order class based on status
+                                if ($isOverdue) {
+                                    $orderClass = 'overdue started';
+                                } elseif ($isCompleted) {
+                                    $orderClass = $wasCompletedLate ? 'completed-late' : 'completed-on-time';
+                                } elseif ($isStarted) {
+                                    $orderClass = 'started';
+                                } else {
+                                    $orderClass = '';
+                                }
+                            ?>
+                            <div class="order-item <?= $orderClass ?>" data-order-id="<?= $order['invoice_id'] ?>">
                                 <div class="order-row">
                                     <div class="order-status-indicator">
-                                        <div class="order-status-dot <?= $order['status'] === 'completed' ? 'completed' : 'pending' ?>"></div>
+                                        <div class="order-status-dot <?= $isCompleted ? 'completed' : ($isStarted ? 'started' : 'pending') ?>"></div>
                                     </div>
                                     
                                     <div class="order-info-main">
                                         <div class="order-number">
                                             Order #<?= htmlspecialchars($order['invoice_number']) ?>
-                                            <span class="order-badge"><?= ucfirst($order['status']) ?></span>
+                                            <span class="order-badge">
+                                                <?php 
+                                                if ($isOverdue) {
+                                                    echo 'OVERDUE';
+                                                } elseif ($isCompleted) {
+                                                    echo $wasCompletedLate ? 'Completed (Overdue)' : 'Completed';
+                                                } elseif ($isStarted) {
+                                                    echo 'Pending';
+                                                } else {
+                                                    echo ucfirst($order['status']);
+                                                }
+                                                ?>
+                                            </span>
                                         </div>
                                         <div class="order-customer">
                                             <i class="ri-building-line" style="font-size: 0.75rem;"></i>
@@ -81,6 +197,7 @@
                                             <?php endif; ?>
                                         </div>
                                     </div>
+
                                     
                                     <div class="order-amounts">
                                         <div class="amount-row">
@@ -105,7 +222,7 @@
                                     </div>
                                     
                                     <div class="order-actions-compact">
-                                        <?php if ($order['has_payment'] && $order['max_lead_time']): ?>
+                                        <?php if ($isStarted && $order['max_lead_time']): ?>
                                         <div class="eta-indicator">
                                             <i class="ri-time-line"></i>
                                             ETA: <?= $order['max_lead_time'] ?>d
@@ -128,10 +245,12 @@
                                                 Payment
                                             </button>
                                             
-                                            <button class="btn-compact btn-info" onclick="debugInvoice(<?= $order['invoice_id'] ?>)" title="Debug Invoice">
-                                                <i class="ri-bug-line"></i>
-                                                Debug
+                                            <?php if ($order['has_payment'] && !$isStarted && !$isCompleted): ?>
+                                            <button class="btn-compact btn-warning" onclick="startOrder(<?= $order['invoice_id'] ?>)" title="Start Production">
+                                                <i class="ri-play-line"></i>
+                                                Start Order
                                             </button>
+                                            <?php endif; ?>
                                             
                                             <button class="btn-compact <?= $order['status'] === 'completed' ? 'btn-warning' : 'btn-success' ?>" onclick="toggleOrderStatus(<?= $order['invoice_id'] ?>, '<?= $order['status'] ?>')">
                                                 <i class="<?= $order['status'] === 'completed' ? 'ri-arrow-go-back-line' : 'ri-check-line' ?>"></i>
@@ -154,11 +273,27 @@
                                             </div>
                                         </div>
                                         
-                                        <?php if ($order['has_payment'] && $order['max_lead_time']): ?>
+                                        <?php if ($isStarted && $order['max_lead_time']): ?>
                                         <div class="detail-item">
                                             <div class="detail-label">Delivery Timeline</div>
                                             <div class="detail-value">
                                                 <?= date('d M Y', strtotime($order['estimated_completion_date'])) ?>
+                                                <?php if ($isCompleted && !empty($order['completion_date'])): ?>
+                                                <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--order-border);">
+                                                    <small style="color: <?= $wasCompletedLate ? '#047857' : '#10b981' ?>; font-weight: 600;">
+                                                        <i class="ri-check-line"></i> Completed: <?= date('d M Y', strtotime($order['completion_date'])) ?>
+                                                    </small>
+                                                    <?php if ($wasCompletedLate): ?>
+                                                    <small style="color: #f59e0b; display: block; margin-top: 0.25rem;">
+                                                        <i class="ri-alarm-warning-line"></i> Completed after due date
+                                                    </small>
+                                                    <?php else: ?>
+                                                    <small style="color: #10b981; display: block; margin-top: 0.25rem;">
+                                                        <i class="ri-checkbox-circle-line"></i> Completed on time
+                                                    </small>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <?php endif; ?>
                                                 <div class="detail-breakdown">
                                                     <span class="breakdown-item">Production: <?= $order['max_production_lead_time'] ?? 0 ?>d</span>
                                                     <span class="breakdown-item">Delivery: <?= $order['delivery_days'] ?? 0 ?>d</span>
@@ -425,6 +560,14 @@
     <script src="assets/js/app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Check for overdue orders on page load
+            fetch('../private/view-order-tabs-backend.php?action=check_overdue')
+                .then(response => response.json())
+                .then(data => {
+                })
+                .catch(error => {
+                });
+            
             // Payment calculation
             const paymentForm = document.getElementById('paymentForm');
             const totalAmountInput = document.getElementById('totalAmount');
@@ -482,8 +625,6 @@
                 const alreadyPaid = parseFloat(document.getElementById('alreadyPaid').value) || 0;
                 const outstandingBalance = parseFloat(document.getElementById('outstandingBalance').value) || 0;
                 const remainingAmount = outstandingBalance - paidAmount;
-
-                console.log('Form submitted - Amount:', paidAmount, 'Total:', totalAmount, 'Already Paid:', alreadyPaid);
 
                 if (!paidAmount || isNaN(paidAmount) || paidAmount === 0) {
                     Swal.fire({
@@ -596,7 +737,6 @@
                         // If currentInvoiceId is null, try to get it from the hidden field
                         if (!invoiceIdToUse) {
                             invoiceIdToUse = document.getElementById('hiddenInvoiceId').value;
-                            console.log('currentInvoiceId was null, using hiddenInvoiceId:', invoiceIdToUse);
                         }
                         
                         if (!invoiceIdToUse) {
@@ -607,8 +747,6 @@
                             });
                             return;
                         }
-                        
-                        console.log('Submitting payment for invoice:', invoiceIdToUse, 'amount:', amountPaidInput.value);
                         
                         // Show loading indicator
                         Swal.fire({
@@ -626,37 +764,21 @@
                         formData.append('amount_paid', amountPaidInput.value);
                         formData.append('is_first_payment', totalAmount === parseFloat(amountPaidInput.value));
                         
-                        // Debug: log FormData contents
-                        for (let [key, value] of formData.entries()) {
-                            console.log('FormData:', key, '=', value);
-                        }
-                        
                         fetch('../private/view-order-tabs-backend.php?action=submit_payment', {
                             method: 'POST',
                             body: formData
                         })
                         .then(res => {
-                            // Log the raw response for debugging
-                            console.log('Raw response status:', res.status);
-                            console.log('Raw response headers:', res.headers);
-                            
-                            // Clone response to read as text first for debugging
-                            return res.clone().text().then(text => {
-                                console.log('Raw response text:', text);
-                                
-                                // Check if the response is valid JSON
+                            return res.text().then(text => {
                                 try {
                                     const data = JSON.parse(text);
                                     return data;
                                 } catch (jsonError) {
-                                    console.error('JSON Parse Error:', jsonError);
-                                    console.error('Response text that failed to parse:', text);
-                                    throw new Error('Server returned invalid JSON response. Check console for details.');
+                                    throw new Error('Server returned invalid JSON response');
                                 }
                             });
                         })
                         .then(data => {
-                            console.log('Parsed response data:', data);
                             
                             if(data.success) {
                                 Swal.fire({
@@ -684,7 +806,6 @@
                             }
                         })
                         .catch(error => {
-                            console.error('Payment submission error:', error);
                             Swal.fire({
                                 title: 'Error!',
                                 text: 'Error processing payment: ' + error.message,
@@ -742,7 +863,34 @@
                         customerName.includes(searchTerm) ||
                         statusBadge.includes(searchTerm);
                     
-                    const matchesStatus = !selectedStatus || statusBadge.includes(selectedStatus);
+                    // Enhanced status matching - check both badge text and order item classes
+                    let matchesStatus = !selectedStatus;
+                    
+                    if (selectedStatus) {
+                        if (selectedStatus === 'started') {
+                            // Match orders with 'started' class but not overdue
+                            matchesStatus = item.classList.contains('started') && !item.classList.contains('overdue');
+                        } else if (selectedStatus === 'overdue') {
+                            // Match orders with 'overdue' class
+                            matchesStatus = item.classList.contains('overdue');
+                        } else if (selectedStatus === 'completed-on-time') {
+                            // Match orders completed on time (green)
+                            matchesStatus = item.classList.contains('completed-on-time');
+                        } else if (selectedStatus === 'completed-late') {
+                            // Match orders completed late (teal)
+                            matchesStatus = item.classList.contains('completed-late');
+                        } else if (selectedStatus === 'pending') {
+                            // Match orders that are pending (not started, not completed)
+                            matchesStatus = !item.classList.contains('started') && 
+                                          !item.classList.contains('completed-on-time') && 
+                                          !item.classList.contains('completed-late') &&
+                                          !item.classList.contains('overdue') &&
+                                          statusBadge.includes('pending');
+                        } else {
+                            // Fallback to badge text matching for other statuses like 'cancelled'
+                            matchesStatus = statusBadge.includes(selectedStatus);
+                        }
+                    }
                     
                     const shouldShow = matchesSearch && matchesStatus;
                     item.style.display = shouldShow ? '' : 'none';
@@ -751,7 +899,6 @@
                 });
                 
                 // Update any results summary if present
-                console.log(`Showing ${visibleCount} of ${orderItems.length} orders`);
             }
         });
 
@@ -906,11 +1053,8 @@
 
         // Prepare payment modal
         window.preparePayment = function(invoiceId, totalAmount) {
-            console.log('preparePayment called with:', { invoiceId, totalAmount });
-            
             // Validate inputs
             if (!invoiceId) {
-                console.error('preparePayment: invoiceId is missing!');
                 Swal.fire({
                     title: 'Error',
                     text: 'Invoice ID is missing. Cannot prepare payment.',
@@ -920,7 +1064,6 @@
             }
             
             if (!totalAmount || totalAmount <= 0) {
-                console.error('preparePayment: totalAmount is invalid!', totalAmount);
                 Swal.fire({
                     title: 'Error',
                     text: 'Total amount is invalid. Cannot prepare payment.',
@@ -951,8 +1094,6 @@
                 });
             }
             
-            console.log('Total paid found:', totalPaid);
-            
             const outstandingBalance = totalAmount - totalPaid;
             
             document.getElementById('totalAmount').value = totalAmount.toFixed(2);
@@ -961,13 +1102,6 @@
             document.getElementById('amountPaid').value = ''; // Keep blank for user to enter
             document.getElementById('remainingAmount').value = outstandingBalance.toFixed(2); // Will update as user types
             document.getElementById('hiddenInvoiceId').value = invoiceId;
-            
-            console.log('Payment modal initialized:', {
-                invoiceId,
-                totalAmount: totalAmount.toFixed(2),
-                totalPaid: totalPaid.toFixed(2),
-                outstandingBalance: outstandingBalance.toFixed(2)
-            });
             
             // Update modal title with invoice details
             const modalTitle = document.querySelector('#paymentModal .modal-title');
@@ -1009,7 +1143,6 @@
                     }
                 })
                 .catch(error => {
-                    console.error('Error loading payment history:', error);
                     section.innerHTML = '<p class="text-danger mb-0"><i class="ri-error-warning-line"></i> Failed to load payment history</p>';
                 });
         }
@@ -1019,8 +1152,6 @@
          */
         function displayPaymentHistory(payments) {
             const section = document.getElementById('paymentHistorySection');
-            
-            console.log('Payment history data received:', payments); // Debug log
             
             let html = '<div class="table-responsive">';
             html += '<table class="table table-sm mb-0">';
@@ -1035,7 +1166,6 @@
             let totalPaid = 0;
             payments.forEach(payment => {
                 const amount = parseFloat(payment.amount_paid);
-                console.log('Processing payment:', payment.payment_id, 'Amount:', amount, 'Type:', typeof payment.amount_paid); // Debug log
                 totalPaid += amount;
                 
                 // Check if it's a deduction (negative payment)
@@ -1077,6 +1207,67 @@
             
             section.innerHTML = html;
         }
+
+        // Start Order Function
+        window.startOrder = function(invoiceId) {
+            Swal.fire({
+                title: 'Start Production?',
+                html: '<p>This will:</p><ul style="text-align: left; margin: 1rem 0;"><li>Change status to <strong>Pending</strong></li><li>Calculate delivery timeline and ETA</li><li>Mark the order as <strong>in production</strong></li></ul><p>Are you sure you want to start this order?</p>',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Start Order!',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#f59e0b'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('invoice_id', invoiceId);
+                    
+                    // Show loading
+                    Swal.fire({
+                        title: 'Starting Order...',
+                        html: 'Please wait while we process your request.',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    fetch('../private/view-order-tabs-backend.php?action=start_order', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.success) {
+                            Swal.fire({
+                                title: 'Order Started!',
+                                text: 'Production has been started and timeline has been calculated.',
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.error || 'Failed to start order',
+                                icon: 'error'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Failed to connect to server',
+                            icon: 'error'
+                        });
+                    });
+                }
+            });
+        };
 
         // Toggle order status
         window.toggleOrderStatus = function(invoiceId, currentStatus) {
@@ -1122,55 +1313,6 @@
                         });
                     });
                 }
-            });
-        };
-
-        // Debug invoice function
-        window.debugInvoice = function(invoiceId) {
-            console.log('Debug invoice called for ID:', invoiceId);
-            
-            fetch('../private/view-order-tabs-backend.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `action=debug_invoice&invoice_id=${invoiceId}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Debug invoice response:', data);
-                
-                if (data.success) {
-                    Swal.fire({
-                        title: 'Invoice Debug Info',
-                        html: `
-                            <div style="text-align: left;">
-                                <strong>Invoice ID:</strong> ${data.invoice_id}<br>
-                                <strong>Status:</strong> ${data.status}<br>
-                                <strong>Total Amount:</strong> RM ${data.total_amount}<br>
-                                <strong>Customer:</strong> ${data.customer_name}<br>
-                                <strong>Date:</strong> ${data.date}<br>
-                                <strong>Items Count:</strong> ${data.items_count}
-                            </div>
-                        `,
-                        icon: 'info',
-                        confirmButtonText: 'OK'
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Debug Error',
-                        text: data.message || 'Failed to get invoice debug info',
-                        icon: 'error'
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Debug invoice error:', error);
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Failed to debug invoice: ' + error.message,
-                    icon: 'error'
-                });
             });
         };
 

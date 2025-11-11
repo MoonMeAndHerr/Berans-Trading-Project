@@ -89,6 +89,19 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
             }
             break;
             
+        case 'change_profit_loss_status':
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $invoiceId = $_POST['invoice_id'] ?? null;
+                $newStatus = $_POST['new_status'] ?? null;
+                
+                if($invoiceId && $newStatus) {
+                    echo json_encode(changeProfitLossStatus($pdo, $invoiceId, $newStatus));
+                } else {
+                    echo json_encode(['success' => false, 'error' => 'Invoice ID and new status required']);
+                }
+            }
+            break;
+            
         case 'get_payment_history':
             if(isset($_GET['invoice_id'])) {
                 echo json_encode(getPaymentHistory($pdo, $_GET['invoice_id']));
@@ -232,9 +245,13 @@ function getProfitLossOrders($pdo) {
         
         // Get filter parameters
         $monthFilter = isset($_GET['month']) ? $_GET['month'] : '';
+        $statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
         $searchFilter = isset($_GET['search']) ? $_GET['search'] : '';
         $dateFromFilter = isset($_GET['date_from']) ? $_GET['date_from'] : '';
         $dateToFilter = isset($_GET['date_to']) ? $_GET['date_to'] : '';
+        
+        // Check if we need to fetch all records for PHP filtering
+        $needsPhpFiltering = !empty($statusFilter) && in_array($statusFilter, ['completed_on_time', 'completed_late', 'overdue', 'pending']);
         
         // Build WHERE conditions
         $whereConditions = ["c.deleted_at IS NULL"];
@@ -244,6 +261,36 @@ function getProfitLossOrders($pdo) {
         if (!empty($monthFilter)) {
             $whereConditions[] = "DATE_FORMAT(i.created_at, '%Y-%m') = ?";
             $queryParams[] = $monthFilter;
+        }
+        
+        // Status filter - store for later PHP filtering if needed
+        $statusFilterType = $statusFilter;
+        
+        if (!empty($statusFilter)) {
+            // Map frontend status values to database values
+            switch ($statusFilter) {
+                case 'not_started':
+                    // Orders with no production status at all
+                    $whereConditions[] = "(i.production_status IS NULL OR i.production_status = '')";
+                    break;
+                case 'pending':
+                    // Orders with yellow "PENDING" badge (started but not overdue) - will filter in PHP
+                    $whereConditions[] = "i.production_status = 'started' AND (i.profit_loss_status IS NULL OR i.profit_loss_status != 'Completed')";
+                    break;
+                case 'started':
+                    // Orders that have started but not completed (includes on-track and overdue)
+                    $whereConditions[] = "i.production_status = 'started' AND (i.profit_loss_status IS NULL OR i.profit_loss_status != 'Completed')";
+                    break;
+                case 'overdue':
+                    // Orders that are started, not completed, and past ETA - will filter in PHP
+                    $whereConditions[] = "i.production_status = 'started' AND (i.profit_loss_status IS NULL OR i.profit_loss_status != 'Completed')";
+                    break;
+                case 'completed_on_time':
+                case 'completed_late':
+                    // Fetch all completed orders - will filter in PHP after
+                    $whereConditions[] = "i.profit_loss_status = 'Completed'";
+                    break;
+            }
         }
         
         // Date range filter
@@ -273,6 +320,9 @@ function getProfitLossOrders($pdo) {
                 i.invoice_id,
                 i.invoice_number as order_number,
                 i.status,
+                i.completion_date,
+                i.production_status,
+                i.profit_loss_status,
                 i.created_at as order_date,
                 i.total_amount as total_revenue,
                 i.supplier_payments_total,
@@ -287,6 +337,21 @@ function getProfitLossOrders($pdo) {
                 i.commission_paid_amount,
                 i.commission_payment_date,
                 s.staff_name,
+                -- Calculate ETA for overdue checking (same logic as view_order_tabs)
+                CASE 
+                    WHEN i.production_status = 'started' THEN DATE_ADD(
+                        COALESCE(i.production_start_date, CURRENT_DATE()), 
+                        INTERVAL (
+                            SELECT MAX(pr.production_lead_time + COALESCE(psh.delivery_days, 0)) 
+                            FROM invoice_item ii 
+                            JOIN product pr ON pr.product_id = ii.product_id 
+                            LEFT JOIN price p ON p.product_id = pr.product_id
+                            LEFT JOIN price_shipping psh ON p.new_freight_method = psh.shipping_code
+                            WHERE ii.invoice_id = i.invoice_id
+                        ) DAY
+                    )
+                    ELSE NULL
+                END as estimated_completion_date,
                 -- Calculate total supplier cost using new_unit_price_yen (same as modal)
                 COALESCE((
                     SELECT SUM(p.new_unit_price_yen * ii.quantity) 
@@ -308,6 +373,13 @@ function getProfitLossOrders($pdo) {
                     JOIN price p ON p.product_id = ii.product_id 
                     WHERE ii.invoice_id = i.invoice_id
                 ), 0)) as theoretical_profit,
+                -- Calculate profit with zakat (profit after 10% zakat deduction)
+                ((i.total_amount - COALESCE((
+                    SELECT SUM((p.new_unit_price_yen / COALESCE(p.new_conversion_rate, 0.032) + p.new_unit_freight_cost_rm) * ii.quantity) 
+                    FROM invoice_item ii 
+                    JOIN price p ON p.product_id = ii.product_id 
+                    WHERE ii.invoice_id = i.invoice_id
+                ), 0)) * 0.90) as profit_with_zakat,
                 -- Calculate ACTUAL profit (revenue - actual payments made)
                 -- Convert supplier payments from yen to RM using average conversion rate, then subtract both payments from revenue
                 (i.total_amount - (
@@ -330,24 +402,86 @@ function getProfitLossOrders($pdo) {
             LEFT JOIN staff s ON i.commission_staff_id = s.staff_id
             WHERE $whereClause
             ORDER BY i.created_at DESC
-            LIMIT $limit OFFSET $offset
         ";
+        
+        // Add LIMIT only if we don't need PHP filtering
+        if (!$needsPhpFiltering) {
+            $query .= " LIMIT $limit OFFSET $offset";
+        }
         
         $stmt = $pdo->prepare($query);
         $stmt->execute($queryParams);
         $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
+        // Filter orders by status if needed (pending, overdue, completed on-time, completed late)
+        if ($needsPhpFiltering) {
+            $orders = array_filter($orders, function($order) use ($statusFilterType) {
+                if ($statusFilterType === 'pending') {
+                    // Check if order is pending (started but NOT overdue)
+                    if (!$order['estimated_completion_date']) {
+                        return true; // No ETA, still pending
+                    }
+                    $now = time();
+                    $etaDate = strtotime($order['estimated_completion_date']);
+                    return $now <= $etaDate; // Not past ETA = pending
+                    
+                } else if ($statusFilterType === 'overdue') {
+                    // Check if order is overdue (started, not completed, past ETA)
+                    if (!$order['estimated_completion_date']) {
+                        return false; // No ETA, can't be overdue
+                    }
+                    $now = time();
+                    $etaDate = strtotime($order['estimated_completion_date']);
+                    return $now > $etaDate;
+                    
+                } else {
+                    // Check if order was completed on time or late
+                    $wasCompletedLate = false;
+                    
+                    if ($order['completion_date'] && $order['estimated_completion_date']) {
+                        // Has both dates - compare them
+                        $completionDate = strtotime($order['completion_date']);
+                        $etaDate = strtotime($order['estimated_completion_date']);
+                        $wasCompletedLate = $completionDate > $etaDate;
+                    } else if ($order['estimated_completion_date']) {
+                        // No completion date but has ETA - check if current date is past ETA
+                        $now = time();
+                        $etaDate = strtotime($order['estimated_completion_date']);
+                        $wasCompletedLate = $now > $etaDate;
+                    }
+                    
+                    // Return based on filter type
+                    if ($statusFilterType === 'completed_on_time') {
+                        return !$wasCompletedLate;
+                    } else { // completed_late
+                        return $wasCompletedLate;
+                    }
+                }
+            });
+            
+            // Re-index array after filtering
+            $orders = array_values($orders);
+            
+            // Apply pagination after filtering
+            $totalRecords = count($orders);
+            $orders = array_slice($orders, $offset, $limit);
+        }
+        
         // Get total count for pagination with same filters
-        $countQuery = "
-            SELECT COUNT(*) as total
-            FROM invoice i
-            LEFT JOIN customer c ON i.customer_id = c.customer_id
-            LEFT JOIN staff s ON i.commission_staff_id = s.staff_id
-            WHERE $whereClause
-        ";
-        $countStmt = $pdo->prepare($countQuery);
-        $countStmt->execute($queryParams);
-        $totalRecords = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+        if (!$needsPhpFiltering) {
+            $countQuery = "
+                SELECT COUNT(*) as total
+                FROM invoice i
+                LEFT JOIN customer c ON i.customer_id = c.customer_id
+                LEFT JOIN staff s ON i.commission_staff_id = s.staff_id
+                WHERE $whereClause
+            ";
+            $countStmt = $pdo->prepare($countQuery);
+            $countStmt->execute($queryParams);
+            $totalRecords = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+        }
+        // If we used PHP filtering, $totalRecords was already set above
+        
         $totalPages = ceil($totalRecords / $limit);
         
         // Calculate remaining amount for each order - keep separate like modal
@@ -364,6 +498,9 @@ function getProfitLossOrders($pdo) {
             // Total paid in their respective currencies
             $order['supplier_total_paid'] = $supplierPaidYen;
             $order['shipping_total_paid'] = $shippingPaidRm;
+            
+            // Use profit with zakat for display (profit after 10% zakat deduction)
+            $order['total_profit'] = floatval($order['profit_with_zakat']);
         }
         
         return [
@@ -458,7 +595,6 @@ function getOrderProfitDetails($pdo, $invoiceId) {
         $totalRevenueAfterDiscount = floatval($order['total_amount']); // Post-discount for profit calculation
         $totalSupplierCostYen = array_sum(array_column($items, 'total_supplier_cost_yen'));
         $totalShippingCostRm = array_sum(array_column($items, 'total_shipping_cost_rm'));
-        $totalProfit = array_sum(array_column($items, 'item_profit'));
         
         // Calculate actual profit/loss (revenue - actual payments made)
         $supplierPaymentsMade = $order['supplier_payments_total'] ?: 0;
@@ -474,7 +610,23 @@ function getOrderProfitDetails($pdo, $invoiceId) {
             }
         }
         
+        // Calculate total supplier cost in RM and total cost
+        $totalSupplierCostRm = $totalSupplierCostYen / $avgConversionRate;
+        $totalCost = $totalSupplierCostRm + $totalShippingCostRm;
+        
+        // Calculate total profit (same formula as frontend display: revenue - total cost)
+        $totalProfit = $totalRevenueAfterDiscount - $totalCost;
+        
         $actualProfitLoss = $totalRevenueAfterDiscount - ($supplierPaymentsMade / $avgConversionRate + $shippingPaymentsMade);
+        
+        // Calculate zakat (10% of total profit displayed)
+        $zakatAmount = $totalProfit * 0.10;
+        
+        // Update zakat_amount in database if changed
+        if (abs(floatval($order['zakat_amount']) - $zakatAmount) > 0.01) {
+            $updateStmt = $pdo->prepare("UPDATE invoice SET zakat_amount = ? WHERE invoice_id = ?");
+            $updateStmt->execute([$zakatAmount, $invoiceId]);
+        }
         
         return [
             'success' => true,
@@ -487,6 +639,8 @@ function getOrderProfitDetails($pdo, $invoiceId) {
                 'total_supplier_cost_yen' => $totalSupplierCostYen,
                 'total_shipping_cost_rm' => $totalShippingCostRm, // Correctly named as RM
                 'total_profit' => $totalProfit,
+                'zakat_amount' => $zakatAmount, // 10% of total profit
+                'profit_after_zakat' => $totalProfit - $zakatAmount, // Profit after zakat deduction
                 'actual_profit_loss' => $actualProfitLoss,
                 'supplier_payments_made' => $supplierPaymentsMade,
                 'shipping_payments_made' => $shippingPaymentsMade,
@@ -634,18 +788,47 @@ function addShippingPayment($pdo, $invoiceId, $amount, $description = null) {
 }
 
 /**
- * Mark order as complete
+ * Mark order as complete (Profit/Loss page only - does not affect View Order status)
  */
 function markOrderComplete($pdo, $invoiceId) {
     try {
-        $query = "UPDATE invoice SET status = 'completed' WHERE invoice_id = ?";
+        // Update profit_loss_status only (does not affect main order status)
+        $query = "UPDATE invoice SET profit_loss_status = 'Completed' WHERE invoice_id = ?";
         $stmt = $pdo->prepare($query);
         $stmt->execute([$invoiceId]);
         
-        return ['success' => true, 'message' => 'Order marked as complete'];
+        return ['success' => true, 'message' => 'Order marked as complete in Profit/Loss tracking'];
         
     } catch(PDOException $e) {
         error_log("Error marking order complete: " . $e->getMessage());
+        return ['success' => false, 'error' => 'Database error: ' . $e->getMessage()];
+    }
+}
+
+/**
+ * Change Profit/Loss status manually (does not affect View Order page)
+ */
+function changeProfitLossStatus($pdo, $invoiceId, $newStatus) {
+    try {
+        // Validate status
+        $allowedStatuses = ['pending', 'overdue', 'completed'];
+        if (!in_array($newStatus, $allowedStatuses)) {
+            return ['success' => false, 'error' => 'Invalid status value'];
+        }
+        
+        // Update profit_loss_status only (does not affect main order status)
+        $query = "UPDATE invoice SET profit_loss_status = ? WHERE invoice_id = ?";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$newStatus, $invoiceId]);
+        
+        if ($stmt->rowCount() === 0) {
+            return ['success' => false, 'error' => 'Invoice not found or no changes made'];
+        }
+        
+        return ['success' => true, 'message' => 'Profit/Loss status updated to ' . $newStatus];
+        
+    } catch(PDOException $e) {
+        error_log("Error changing profit/loss status: " . $e->getMessage());
         return ['success' => false, 'error' => 'Database error: ' . $e->getMessage()];
     }
 }
@@ -963,6 +1146,16 @@ function getPaymentSummaries($pdo, $monthFilter = '', $searchFilter = '', $dateF
         $whereConditions = ["c.deleted_at IS NULL"];
         $queryParams = [];
         
+        // IMPORTANT: Only count orders with highlighted status (started, overdue, or completed)
+        // This excludes orders without status highlighting
+        // Orders are highlighted when: production_status='started' OR profit_loss_status='completed'/'overdue' OR status='completed'
+        $whereConditions[] = "(
+            i.production_status = 'started' OR 
+            i.profit_loss_status = 'completed' OR
+            i.profit_loss_status = 'overdue' OR
+            (i.profit_loss_status IS NULL AND i.status = 'completed')
+        )";
+        
         // Month filter
         if (!empty($monthFilter)) {
             $whereConditions[] = "DATE_FORMAT(i.created_at, '%Y-%m') = ?";
@@ -1002,6 +1195,9 @@ function getPaymentSummaries($pdo, $monthFilter = '', $searchFilter = '', $dateF
                         ELSE 0 
                     END
                 ) as total_commission_remaining,
+                
+                -- Zakat calculations (10% of profit)
+                SUM(COALESCE(i.zakat_amount, 0)) as total_zakat,
                 
                 -- Shipping calculations (already in RM)
                 SUM(COALESCE(i.shipping_payments_total, 0)) as total_shipping_payments,
@@ -1051,15 +1247,251 @@ function getPaymentSummaries($pdo, $monthFilter = '', $searchFilter = '', $dateF
         $stmt->execute($queryParams);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
+        // Get order counts (included vs excluded)
+        // Rebuild WHERE conditions for base filters only (without status filter)
+        $baseWhereConditions = ["c.deleted_at IS NULL"];
+        $baseQueryParams = [];
+        
+        // Apply same filters (month, search, date range) but without status filter
+        if (!empty($monthFilter)) {
+            $baseWhereConditions[] = "DATE_FORMAT(i.created_at, '%Y-%m') = ?";
+            $baseQueryParams[] = $monthFilter;
+        }
+        if (!empty($dateFromFilter)) {
+            $baseWhereConditions[] = "DATE(i.created_at) >= ?";
+            $baseQueryParams[] = $dateFromFilter;
+        }
+        if (!empty($dateToFilter)) {
+            $baseWhereConditions[] = "DATE(i.created_at) <= ?";
+            $baseQueryParams[] = $dateToFilter;
+        }
+        if (!empty($searchFilter)) {
+            $baseWhereConditions[] = "(i.invoice_number LIKE ? OR c.customer_name LIKE ? OR c.customer_company_name LIKE ? OR DATE_FORMAT(i.created_at, '%Y-%m-%d') LIKE ?)";
+            $searchTerm = '%' . $searchFilter . '%';
+            $baseQueryParams[] = $searchTerm;
+            $baseQueryParams[] = $searchTerm;
+            $baseQueryParams[] = $searchTerm;
+            $baseQueryParams[] = $searchTerm;
+        }
+        
+        $baseWhereClause = implode(' AND ', $baseWhereConditions);
+        
+        // Count included orders (with highlighted status)
+        // Must match frontend logic EXACTLY:
+        // Frontend ONLY highlights when: isCompleted=true OR isOverdue=true OR isStarted=true
+        // 
+        // isCompleted=true when: profit_loss_status='completed' OR (profit_loss_status IS NULL AND status='completed')
+        // isOverdue=true when: profit_loss_status='overdue'
+        // isStarted=true when: production_status='started'
+        //
+        // NOTE: profit_loss_status='pending' does NOT automatically highlight unless production_status='started'
+        $includedCountQuery = "
+            SELECT COUNT(*) as included_count
+            FROM invoice i
+            LEFT JOIN customer c ON i.customer_id = c.customer_id
+            WHERE $baseWhereClause
+            AND (
+                i.profit_loss_status = 'completed' OR
+                (i.profit_loss_status IS NULL AND i.status = 'completed') OR
+                i.profit_loss_status = 'overdue' OR
+                COALESCE(i.production_status, '') = 'started'
+            )
+        ";
+        
+        $stmtIncluded = $pdo->prepare($includedCountQuery);
+        $stmtIncluded->execute($baseQueryParams);
+        $includedCount = $stmtIncluded->fetchColumn();
+        
+        // Count excluded orders (without any status)
+        // Fixed: Use proper NULL handling for production_status
+        $excludedCountQuery = "
+            SELECT COUNT(*) as excluded_count
+            FROM invoice i
+            LEFT JOIN customer c ON i.customer_id = c.customer_id
+            WHERE $baseWhereClause
+            AND NOT (
+                i.profit_loss_status = 'completed' OR
+                (i.profit_loss_status IS NULL AND i.status = 'completed') OR
+                i.profit_loss_status = 'overdue' OR
+                COALESCE(i.production_status, '') = 'started'
+            )
+        ";
+        
+        error_log("Excluded count query: " . $excludedCountQuery);
+        
+        $stmtExcluded = $pdo->prepare($excludedCountQuery);
+        $stmtExcluded->execute($baseQueryParams);
+        $excludedCount = $stmtExcluded->fetchColumn();
+        
+        error_log("Raw excluded count result: " . $excludedCount);
+        
+        // Debug logging - get actual orders to see what's happening
+        $debugQuery = "
+            SELECT 
+                i.invoice_id,
+                i.invoice_number,
+                i.status,
+                i.profit_loss_status,
+                i.production_status,
+                CASE 
+                    WHEN (
+                        i.profit_loss_status = 'completed' OR
+                        (i.profit_loss_status IS NULL AND i.status = 'completed') OR
+                        i.profit_loss_status = 'overdue' OR
+                        i.production_status = 'started'
+                    ) THEN 'INCLUDED'
+                    ELSE 'EXCLUDED'
+                END as category
+            FROM invoice i
+            LEFT JOIN customer c ON i.customer_id = c.customer_id
+            WHERE $baseWhereClause
+            ORDER BY i.invoice_id DESC
+        ";
+        
+        $stmtDebug = $pdo->prepare($debugQuery);
+        $stmtDebug->execute($baseQueryParams);
+        $allOrders = $stmtDebug->fetchAll(PDO::FETCH_ASSOC);
+        
+        error_log("=== PROFIT LOSS COUNT DEBUG ===");
+        error_log("Base WHERE: " . $baseWhereClause);
+        error_log("Total orders found: " . count($allOrders));
+        error_log("Included count: " . $includedCount);
+        error_log("Excluded count: " . $excludedCount);
+        error_log("Month filter: " . ($monthFilter ?? 'none'));
+        error_log("Search filter: " . ($searchFilter ?? 'none'));
+        error_log("Date from: " . ($dateFromFilter ?? 'none'));
+        error_log("Date to: " . ($dateToFilter ?? 'none'));
+        error_log("\nOrder Details:");
+        foreach ($allOrders as $order) {
+            error_log(sprintf(
+                "  Invoice #%d (%s) - status=%s, profit_loss_status=%s, production_status=%s => %s",
+                $order['invoice_id'],
+                $order['invoice_number'],
+                $order['status'] ?? 'NULL',
+                $order['profit_loss_status'] ?? 'NULL',
+                $order['production_status'] ?? 'NULL',
+                $order['category']
+            ));
+        }
+        
+        // Calculate totals for EXCLUDED orders (orders without status)
+        $excludedTotalsQuery = "
+            SELECT 
+                -- Commission calculations for excluded orders
+                SUM(COALESCE(i.commission_paid_amount, 0)) as excluded_commission_payments,
+                SUM(
+                    CASE 
+                        WHEN i.commission_staff_id IS NOT NULL AND i.commission_percentage > 0 
+                        THEN (i.total_amount * (i.commission_percentage / 100)) - COALESCE(i.commission_paid_amount, 0)
+                        ELSE 0 
+                    END
+                ) as excluded_commission_remaining,
+                
+                -- Shipping calculations for excluded orders
+                SUM(COALESCE(i.shipping_payments_total, 0)) as excluded_shipping_payments,
+                SUM(
+                    COALESCE((
+                        SELECT SUM(ii.quantity * p.new_unit_freight_cost_rm) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id
+                    ), 0) - COALESCE(i.shipping_payments_total, 0)
+                ) as excluded_shipping_remaining,
+                
+                -- Supplier calculations for excluded orders
+                SUM(
+                    COALESCE(i.supplier_payments_total, 0) / COALESCE((
+                        SELECT AVG(p.new_conversion_rate) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id AND p.new_conversion_rate > 0
+                    ), 0.032)
+                ) as excluded_supplier_payments_rm,
+                SUM(
+                    COALESCE((
+                        SELECT SUM(ii.quantity * p.new_unit_price_yen) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id
+                    ), 0) / COALESCE((
+                        SELECT AVG(p.new_conversion_rate) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id AND p.new_conversion_rate > 0
+                    ), 0.032) - 
+                    COALESCE(i.supplier_payments_total, 0) / COALESCE((
+                        SELECT AVG(p.new_conversion_rate) 
+                        FROM invoice_item ii 
+                        JOIN price p ON p.product_id = ii.product_id 
+                        WHERE ii.invoice_id = i.invoice_id AND p.new_conversion_rate > 0
+                    ), 0.032)
+                ) as excluded_supplier_remaining_rm,
+                
+                -- Zakat calculations for excluded orders (10% of profit)
+                -- Calculate profit dynamically: Revenue - Supplier Cost (RM) - Shipping Cost (RM)
+                SUM(
+                    (
+                        i.total_amount - 
+                        (
+                            COALESCE((
+                                SELECT SUM(ii.quantity * p.new_unit_price_yen) 
+                                FROM invoice_item ii 
+                                JOIN price p ON p.product_id = ii.product_id 
+                                WHERE ii.invoice_id = i.invoice_id
+                            ), 0) / COALESCE((
+                                SELECT AVG(p.new_conversion_rate) 
+                                FROM invoice_item ii 
+                                JOIN price p ON p.product_id = ii.product_id 
+                                WHERE ii.invoice_id = i.invoice_id AND p.new_conversion_rate > 0
+                            ), 0.032)
+                        ) - 
+                        COALESCE((
+                            SELECT SUM(ii.quantity * p.new_unit_freight_cost_rm) 
+                            FROM invoice_item ii 
+                            JOIN price p ON p.product_id = ii.product_id 
+                            WHERE ii.invoice_id = i.invoice_id
+                        ), 0)
+                    ) * 0.10
+                ) as excluded_zakat
+            FROM invoice i
+            LEFT JOIN customer c ON i.customer_id = c.customer_id
+            WHERE $baseWhereClause
+            AND NOT (
+                i.profit_loss_status = 'completed' OR
+                (i.profit_loss_status IS NULL AND i.status = 'completed') OR
+                i.profit_loss_status = 'overdue' OR
+                COALESCE(i.production_status, '') = 'started'
+            )
+        ";
+        
+        $stmtExcludedTotals = $pdo->prepare($excludedTotalsQuery);
+        $stmtExcludedTotals->execute($baseQueryParams);
+        $excludedTotals = $stmtExcludedTotals->fetch(PDO::FETCH_ASSOC);
+        
         return [
             'success' => true,
             'summaries' => [
                 'total_commission_payments' => floatval($result['total_commission_payments'] ?? 0),
                 'total_commission_remaining' => floatval($result['total_commission_remaining'] ?? 0),
+                'total_zakat' => floatval($result['total_zakat'] ?? 0),
                 'total_shipping_payments' => floatval($result['total_shipping_payments'] ?? 0),
                 'total_shipping_remaining' => floatval($result['total_shipping_remaining'] ?? 0),
                 'total_supplier_payments' => floatval($result['total_supplier_payments_rm'] ?? 0),
                 'total_supplier_remaining' => floatval($result['total_supplier_remaining_rm'] ?? 0)
+            ],
+            'excluded_summaries' => [
+                'total_commission_payments' => floatval($excludedTotals['excluded_commission_payments'] ?? 0),
+                'total_commission_remaining' => floatval($excludedTotals['excluded_commission_remaining'] ?? 0),
+                'total_shipping_payments' => floatval($excludedTotals['excluded_shipping_payments'] ?? 0),
+                'total_shipping_remaining' => floatval($excludedTotals['excluded_shipping_remaining'] ?? 0),
+                'total_supplier_payments' => floatval($excludedTotals['excluded_supplier_payments_rm'] ?? 0),
+                'total_supplier_remaining' => floatval($excludedTotals['excluded_supplier_remaining_rm'] ?? 0),
+                'total_zakat' => floatval($excludedTotals['excluded_zakat'] ?? 0)
+            ],
+            'order_counts' => [
+                'included' => intval($includedCount),
+                'excluded' => intval($excludedCount),
+                'total' => intval($includedCount) + intval($excludedCount)
             ]
         ];
         
