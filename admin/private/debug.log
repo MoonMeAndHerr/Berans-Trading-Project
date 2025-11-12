@@ -2699,21 +2699,87 @@
 [2025-11-11 15:46:29] Last login updated - {
     "staff_id": "1"
 }
+[2025-11-12 16:49:55] Login attempt failed - {
 [2025-11-11 22:44:23] Login attempt failed - {
     "username": "",
     "error": "",
     "ip": "::1"
 }
+[2025-11-12 16:50:09] Login attempt started - {
+    "username": "admin",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/142.0.0.0 Safari\/537.36"
+}
+[2025-11-12 16:50:09] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-11-12 16:50:09] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-11-12 16:50:09] Password verification successful - {
+    "staff_id": 1
+}
+[2025-11-12 16:50:09] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-11-12 16:50:09] Session token created in database - {
+    "staff_id": "1",
+    "token": "58e8ba46e932a14ee5186e1ebf06ceda"
+}
+[2025-11-12 16:50:09] Last login updated - {
+    "staff_id": "1"
+}
+[2025-11-12 17:44:48] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-11-12 17:44:48] Login attempt failed - {
 [2025-11-11 22:44:23] Login attempt failed - {
     "username": "",
     "error": "",
     "ip": "::1"
 }
+[2025-11-12 17:44:55] Login attempt started - {
+    "username": "admin ",
+    "ip": "::1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/142.0.0.0 Safari\/537.36"
+}
+[2025-11-12 17:44:55] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-11-12 17:44:55] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-11-12 17:44:55] Password verification failed - {
+    "username": "admin"
+}
+[2025-11-12 17:44:55] Login attempt failed - {
+    "username": "admin",
+    "error": "Invalid password",
+    "ip": "::1"
+}
+[2025-11-12 17:45:01] Login attempt started - {
 [2025-11-11 22:44:26] Login attempt started - {
     "username": "admin",
     "ip": "::1",
     "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/142.0.0.0 Safari\/537.36"
 }
+[2025-11-12 17:45:01] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-11-12 17:45:01] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-11-12 17:45:01] Password verification successful - {
+    "staff_id": 1
+}
+[2025-11-12 17:45:01] Session created - {
 [2025-11-11 22:44:26] Attempting database query for user - {
     "username": "admin"
 }
@@ -2729,6 +2795,14 @@
     "username": "admin",
     "role": "admin"
 }
+[2025-11-12 17:45:01] Session token created in database - {
+    "staff_id": "1",
+    "token": "b0d5676f969ec19a49590c66e2c89cfa"
+}
+[2025-11-12 17:45:01] Last login updated - {
+    "staff_id": "1"
+}
+[2025-11-12 20:07:57] Login attempt failed - {
 [2025-11-11 22:44:27] Session token created in database - {
     "staff_id": "1",
     "token": "5df11686af8a98c4b912d1cef29d15f3"
@@ -2741,16 +2815,29 @@
     "error": "",
     "ip": "::1"
 }
+[2025-11-12 20:07:57] Login attempt failed - {
 [2025-11-12 22:46:56] Login attempt failed - {
     "username": "",
     "error": "",
     "ip": "::1"
 }
+[2025-11-12 20:08:02] Login attempt started - {
 [2025-11-12 22:47:00] Login attempt started - {
     "username": "admin",
     "ip": "::1",
     "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/142.0.0.0 Safari\/537.36"
 }
+[2025-11-12 20:08:02] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-11-12 20:08:02] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-11-12 20:08:02] Password verification successful - {
+    "staff_id": 1
+}
+[2025-11-12 20:08:02] Session created - {
 [2025-11-12 22:47:00] Attempting database query for user - {
     "username": "admin"
 }
@@ -2766,6 +2853,11 @@
     "username": "admin",
     "role": "admin"
 }
+[2025-11-12 20:08:02] Session token created in database - {
+    "staff_id": "1",
+    "token": "3d94f29a4ecc138df2ab2f22e85521ce"
+}
+[2025-11-12 20:08:02] Last login updated - {
 [2025-11-12 22:47:00] Session token created in database - {
     "staff_id": "1",
     "token": "c93f80435fea77cde0f62dc83e1c024a"

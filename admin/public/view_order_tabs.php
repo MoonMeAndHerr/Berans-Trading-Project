@@ -182,7 +182,7 @@
                                                 } elseif ($isCompleted) {
                                                     echo $wasCompletedLate ? 'Completed (Overdue)' : 'Completed';
                                                 } elseif ($isStarted) {
-                                                    echo 'Pending';
+                                                    echo 'Started/In Production';
                                                 } else {
                                                     echo ucfirst($order['status']);
                                                 }
@@ -245,7 +245,7 @@
                                                 Payment
                                             </button>
                                             
-                                            <?php if ($order['has_payment'] && !$isStarted && !$isCompleted): ?>
+                                            <?php if (!$isStarted && !$isCompleted): ?>
                                             <button class="btn-compact btn-warning" onclick="startOrder(<?= $order['invoice_id'] ?>)" title="Start Production">
                                                 <i class="ri-play-line"></i>
                                                 Start Order
@@ -336,24 +336,8 @@
                         </div>
 
                         <!-- Pagination -->
-                        <div class="pagination-minimal">
-                            <?php if($current_page > 1): ?>
-                            <a href="?page=<?= $current_page - 1 ?>" class="page-link">
-                                <i class="ri-arrow-left-line"></i> Previous
-                            </a>
-                            <?php endif; ?>
-                            
-                            <?php for($i = 1; $i <= $total_pages; $i++): ?>
-                            <div class="page-item <?= ($current_page == $i) ? 'active' : '' ?>">
-                                <a href="?page=<?= $i ?>" class="page-link"><?= $i ?></a>
-                            </div>
-                            <?php endfor; ?>
-                            
-                            <?php if($current_page < $total_pages): ?>
-                            <a href="?page=<?= $current_page + 1 ?>" class="page-link">
-                                Next <i class="ri-arrow-right-line"></i>
-                            </a>
-                            <?php endif; ?>
+                        <div class="pagination-minimal" id="paginationControls">
+                            <!-- Pagination will be managed by JavaScript to preserve filters -->
                         </div>
                     </div>
 
@@ -851,7 +835,6 @@
                 const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
                 const selectedStatus = statusFilter ? statusFilter.value.toLowerCase() : '';
                 const orderItems = document.querySelectorAll('.order-item');
-                let visibleCount = 0;
                 
                 orderItems.forEach(item => {
                     const orderNumber = item.querySelector('.order-number')?.textContent.toLowerCase() || '';
@@ -868,38 +851,132 @@
                     
                     if (selectedStatus) {
                         if (selectedStatus === 'started') {
-                            // Match orders with 'started' class but not overdue
+                            // Match orders with 'started' class but not overdue (yellow badge)
                             matchesStatus = item.classList.contains('started') && !item.classList.contains('overdue');
                         } else if (selectedStatus === 'overdue') {
-                            // Match orders with 'overdue' class
+                            // Match orders with 'overdue' class (orange badge)
                             matchesStatus = item.classList.contains('overdue');
                         } else if (selectedStatus === 'completed-on-time') {
-                            // Match orders completed on time (green)
+                            // Match orders completed on time (green badge)
                             matchesStatus = item.classList.contains('completed-on-time');
                         } else if (selectedStatus === 'completed-late') {
-                            // Match orders completed late (teal)
+                            // Match orders completed late (teal badge)
                             matchesStatus = item.classList.contains('completed-late');
                         } else if (selectedStatus === 'pending') {
-                            // Match orders that are pending (not started, not completed)
+                            // Match orders that are pending (no class, just pending status)
                             matchesStatus = !item.classList.contains('started') && 
                                           !item.classList.contains('completed-on-time') && 
                                           !item.classList.contains('completed-late') &&
-                                          !item.classList.contains('overdue') &&
-                                          statusBadge.includes('pending');
+                                          !item.classList.contains('overdue');
+                        } else if (selectedStatus === 'cancelled') {
+                            // Match cancelled orders
+                            matchesStatus = statusBadge.includes('cancelled');
                         } else {
-                            // Fallback to badge text matching for other statuses like 'cancelled'
+                            // Fallback to badge text matching
                             matchesStatus = statusBadge.includes(selectedStatus);
                         }
                     }
                     
                     const shouldShow = matchesSearch && matchesStatus;
-                    item.style.display = shouldShow ? '' : 'none';
                     
-                    if (shouldShow) visibleCount++;
+                    // Mark items as filtered or not (don't hide yet, pagination will handle display)
+                    if (shouldShow) {
+                        item.setAttribute('data-filtered', 'true');
+                    } else {
+                        item.setAttribute('data-filtered', 'false');
+                    }
                 });
                 
-                // Update any results summary if present
+                // Reset to page 1 when filters change
+                currentPage = 1;
+                
+                // Update pagination after filtering
+                updatePagination();
             }
+            
+            // Pagination variables
+            let currentPage = 1;
+            const itemsPerPage = 8;
+            
+            function updatePagination() {
+                const orderItems = document.querySelectorAll('.order-item');
+                
+                // Get only items that pass the filter
+                const filteredItems = Array.from(orderItems).filter(item => 
+                    item.getAttribute('data-filtered') === 'true'
+                );
+                
+                const totalItems = filteredItems.length;
+                const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+                
+                // Make sure currentPage is within bounds
+                if (currentPage > totalPages) {
+                    currentPage = totalPages;
+                }
+                
+                // Hide all items first
+                orderItems.forEach(item => {
+                    item.style.display = 'none';
+                });
+                
+                // Show only items for current page that pass the filter
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                
+                filteredItems.slice(startIndex, endIndex).forEach(item => {
+                    item.style.display = '';
+                });
+                
+                // Update pagination controls
+                const paginationControls = document.getElementById('paginationControls');
+                if (!paginationControls) return;
+                
+                let html = '';
+                
+                // Only show pagination if there are items
+                if (totalItems === 0) {
+                    paginationControls.innerHTML = '<p class="text-muted text-center">No orders found</p>';
+                    return;
+                }
+                
+                // Previous button
+                if (currentPage > 1) {
+                    html += `<a href="#" class="page-link" onclick="changePage(${currentPage - 1}); return false;">
+                        <i class="ri-arrow-left-line"></i> Previous
+                    </a>`;
+                }
+                
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    html += `<div class="page-item ${currentPage === i ? 'active' : ''}">
+                        <a href="#" class="page-link" onclick="changePage(${i}); return false;">${i}</a>
+                    </div>`;
+                }
+                
+                // Next button
+                if (currentPage < totalPages) {
+                    html += `<a href="#" class="page-link" onclick="changePage(${currentPage + 1}); return false;">
+                        Next <i class="ri-arrow-right-line"></i>
+                    </a>`;
+                }
+                
+                paginationControls.innerHTML = html;
+            }
+            
+            window.changePage = function(page) {
+                currentPage = page;
+                updatePagination();
+                // Scroll to top of order list
+                document.querySelector('.order-container').scrollIntoView({ behavior: 'smooth' });
+            };
+            
+            // Initialize all items as visible on page load
+            document.querySelectorAll('.order-item').forEach(item => {
+                item.setAttribute('data-filtered', 'true');
+            });
+            
+            // Initialize pagination on page load
+            updatePagination();
         });
 
         // Toggle order details

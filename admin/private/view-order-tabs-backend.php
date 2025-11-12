@@ -670,19 +670,6 @@ if(isset($_GET['action']) || isset($_POST['action'])) {
                     throw new Exception('Missing required parameter: invoice_id');
                 }
                 
-                // Check if order has payment
-                $stmt = $pdo->prepare("
-                    SELECT COUNT(*) as payment_count 
-                    FROM payment_history 
-                    WHERE invoice_id = ?
-                ");
-                $stmt->execute([$invoice_id]);
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                
-                if ($result['payment_count'] == 0) {
-                    throw new Exception('Cannot start order without payment');
-                }
-                
                 // Check if order is already started
                 $stmt = $pdo->prepare("
                     SELECT production_status, production_start_date 
