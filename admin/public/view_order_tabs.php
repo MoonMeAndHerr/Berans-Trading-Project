@@ -96,16 +96,6 @@
                         </div>
                     </div>
 
-                    <?php
-                    // Pagination logic
-                    $items_per_page = 8;
-                    $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-                    $total_items = count($orders);
-                    $total_pages = ceil($total_items / $items_per_page);
-                    $offset = ($current_page - 1) * $items_per_page;
-                    $displayed_orders = array_slice($orders, $offset, $items_per_page);
-                    ?>
-
                     <!-- Order Container -->
                     <div class="order-container">
                         <!-- Header Section -->
@@ -132,7 +122,7 @@
 
                         <!-- Order List -->
                         <div class="order-list" id="ordersList">
-                            <?php foreach($displayed_orders as $order): ?>
+                            <?php foreach($orders as $order): ?>
                             <?php 
                                 $isStarted = isset($order['production_status']) && $order['production_status'] === 'started';
                                 $isCompleted = $order['status'] === 'completed';
