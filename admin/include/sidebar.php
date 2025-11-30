@@ -296,6 +296,9 @@
                                             <li class="nav-item">
                                                 <a href="profit_loss.php" class="nav-link" data-key="t-basic-elements">Profit & Loss</a>
                                             </li>
+                                            <li class="nav-item">
+                                                <a href="usos-manage.php" class="nav-link" data-key="t-basic-elements">USOS System</a>
+                                            </li>
                                         </ul>
                                     </div>
                                 </li>
