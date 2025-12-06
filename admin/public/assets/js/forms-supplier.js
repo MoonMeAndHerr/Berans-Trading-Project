@@ -132,6 +132,7 @@ function deleteSupplier(supplierId, supplierName) {
                                 icon: 'success',
                                 confirmButtonColor: '#2ab57d'
                             }).then(() => {
+                                localStorage.setItem('supplierTableFromEdit', 'true');
                                 window.location.reload();
                             });
                         } else {

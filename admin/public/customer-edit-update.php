@@ -288,11 +288,12 @@ if (isset($_SESSION['errors'])) {
                 <!-- Update Button -->
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary">Update Customer</button>
+                    <a href="customer-add.php" class="btn btn-secondary" onclick="localStorage.setItem('customerFromEdit', 'true');">Cancel</a>
                 </div>
             </form>
 
             <!-- Delete form OUTSIDE the update form -->
-            <form method="post" onsubmit="return confirm('Are you sure you want to delete this customer?');" class="mt-3">
+            <form method="post" onsubmit="localStorage.setItem('customerFromEdit', 'true'); return confirm('Are you sure you want to delete this customer?');" class="mt-3">
                 <input type="hidden" name="delete_customer" value="1">
                 <button type="submit" class="btn btn-danger">Delete Customer</button>
             </form>
@@ -323,6 +324,25 @@ if (isset($_SESSION['errors'])) {
     <script src="assets/libs/prismjs/prism.js"></script>
 
     <script src="assets/js/app.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        <?php if (isset($success) && $success): ?>
+        // Show success message and redirect back to customer list
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '<?= addslashes($success) ?>',
+            timer: 2000,
+            showConfirmButton: false
+        }).then(() => {
+            localStorage.setItem('customerFromEdit', 'true');
+            window.location.href = 'customer-add.php';
+        });
+        <?php endif; ?>
+    </script>
 
 </body>
 

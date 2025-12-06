@@ -118,6 +118,9 @@
                                     <option value="cancelled">Cancelled</option>
                                 </select>
                             </div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="clearAllFilters" style="display: none;">
+                                <i class="ri-filter-off-line"></i> Clear Filters
+                            </button>
                         </div>
 
                         <!-- Order List -->
@@ -773,6 +776,7 @@
                                         }
                                     }
                                     // Reload the page to update the main list
+                                    localStorage.setItem('orderTabsFromUpdate', 'true');
                                     setTimeout(() => window.location.reload(), 500);
                                 });
                             } else {
@@ -789,10 +793,94 @@
                         });
             }
 
-            // Enhanced search functionality
+            // Enhanced search functionality with state saving
             const searchInput = document.getElementById('searchInput');
             const statusFilter = document.getElementById('statusFilter');
             const clearSearchBtn = document.getElementById('clearSearch');
+            const clearAllFiltersBtn = document.getElementById('clearAllFilters');
+            
+            // Check if we should restore filters (only if coming from forms-update-order.php)
+            function shouldRestoreFilters() {
+                const fromUpdatePage = localStorage.getItem('orderTabsFromUpdate');
+                if (fromUpdatePage === 'true') {
+                    localStorage.removeItem('orderTabsFromUpdate');
+                    return true;
+                }
+                return false;
+            }
+            
+            // Restore saved filter state on page load (only if coming from update page)
+            function restoreFilterState() {
+                try {
+                    if (!shouldRestoreFilters()) {
+                        // Clear saved state if not coming from update page
+                        localStorage.removeItem('orderTabsFilterState');
+                        return;
+                    }
+                    
+                    const savedState = JSON.parse(localStorage.getItem('orderTabsFilterState'));
+                    if (savedState) {
+                        if (searchInput && savedState.searchTerm) {
+                            searchInput.value = savedState.searchTerm;
+                            if (clearSearchBtn) {
+                                clearSearchBtn.style.display = savedState.searchTerm ? 'flex' : 'none';
+                            }
+                        }
+                        if (statusFilter && savedState.statusFilter) {
+                            statusFilter.value = savedState.statusFilter;
+                        }
+                        if (savedState.currentPage) {
+                            currentPage = savedState.currentPage;
+                        }
+                        updateClearAllButton();
+                    }
+                } catch (e) {
+                    console.error('Error restoring filter state:', e);
+                }
+            }
+            
+            // Save filter state to localStorage
+            function saveFilterState() {
+                try {
+                    const state = {
+                        searchTerm: searchInput ? searchInput.value : '',
+                        statusFilter: statusFilter ? statusFilter.value : '',
+                        currentPage: currentPage
+                    };
+                    localStorage.setItem('orderTabsFilterState', JSON.stringify(state));
+                    updateClearAllButton();
+                } catch (e) {
+                    console.error('Error saving filter state:', e);
+                }
+            }
+            
+            // Update clear all filters button visibility
+            function updateClearAllButton() {
+                if (clearAllFiltersBtn) {
+                    const hasFilters = (searchInput && searchInput.value) || (statusFilter && statusFilter.value);
+                    clearAllFiltersBtn.style.display = hasFilters ? 'inline-block' : 'none';
+                }
+            }
+            
+            // Clear all filters
+            function clearAllFilters() {
+                if (searchInput) {
+                    searchInput.value = '';
+                    if (clearSearchBtn) {
+                        clearSearchBtn.style.display = 'none';
+                    }
+                }
+                if (statusFilter) {
+                    statusFilter.value = '';
+                }
+                localStorage.removeItem('orderTabsFilterState');
+                updateClearAllButton();
+                filterOrders();
+                if (searchInput) searchInput.focus();
+            }
+            
+            // Restore state on page load
+            restoreFilterState();
             
             if (searchInput) {
                 searchInput.addEventListener('input', function(e) {
@@ -803,6 +891,7 @@
                         clearSearchBtn.style.display = searchTerm ? 'flex' : 'none';
                     }
                     
+                    saveFilterState();
                     filterOrders();
                 });
                 
@@ -811,6 +900,7 @@
                     clearSearchBtn.addEventListener('click', function() {
                         searchInput.value = '';
                         clearSearchBtn.style.display = 'none';
+                        saveFilterState();
                         filterOrders();
                         searchInput.focus();
                     });
@@ -818,7 +908,15 @@
             }
             
             if (statusFilter) {
-                statusFilter.addEventListener('change', filterOrders);
+                statusFilter.addEventListener('change', function() {
+                    saveFilterState();
+                    filterOrders();
+                });
+            }
+            
+            // Clear all filters button
+            if (clearAllFiltersBtn) {
+                clearAllFiltersBtn.addEventListener('click', clearAllFilters);
             }
             
             function filterOrders() {
@@ -955,6 +1053,7 @@
             
             window.changePage = function(page) {
                 currentPage = page;
+                saveFilterState();
                 updatePagination();
                 // Scroll to top of order list
                 document.querySelector('.order-container').scrollIntoView({ behavior: 'smooth' });
@@ -965,8 +1064,8 @@
                 item.setAttribute('data-filtered', 'true');
             });
             
-            // Initialize pagination on page load
-            updatePagination();
+            // Apply saved filters on page load
+            filterOrders();
         });
 
         // Toggle order details
@@ -1315,6 +1414,7 @@
                                 timer: 2000,
                                 showConfirmButton: false
                             }).then(() => {
+                                localStorage.setItem('orderTabsFromUpdate', 'true');
                                 location.reload();
                             });
                         } else {
@@ -1367,7 +1467,10 @@
                                 text: `Order has been marked as ${newStatus}.`,
                                 icon: 'success',
                                 confirmButtonText: 'OK'
-                            }).then(() => window.location.reload());
+                            }).then(() => {
+                                localStorage.setItem('orderTabsFromUpdate', 'true');
+                                window.location.reload();
+                            });
                         } else {
                             throw new Error(data.error || 'Failed to update status');
                         }
@@ -1513,12 +1616,16 @@
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Set flag to restore filters when returning
+                        localStorage.setItem('orderTabsFromUpdate', 'true');
                         // Navigate to edit page
                         window.location.href = `forms-update-order.php?invoice_id=${invoiceId}`;
                     }
                 });
             } else {
                 // No payments - directly navigate to edit page
+                // Set flag to restore filters when returning
+                localStorage.setItem('orderTabsFromUpdate', 'true');
                 window.location.href = `forms-update-order.php?invoice_id=${invoiceId}`;
             }
         }

@@ -272,9 +272,6 @@
                                             <li class="nav-item">
                                                 <a href="forms-product-add-new.php" class="nav-link" data-key="t-basic-elements">Add Product</a>
                                             </li>
-                                            <li class="nav-item">
-                                                <a href="forms-price-add-new.php" class="nav-link" data-key="t-basic-elements">Add Product Pricing</a>
-                                            </li>
                                         </ul>
                                     </div>
                                 </li>

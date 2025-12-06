@@ -808,6 +808,7 @@ $usosConfigs = getUsosConfigs();
                         text: data.message,
                         timer: 2000
                     }).then(() => {
+                        localStorage.setItem('usosFromEdit', 'true');
                         window.location.reload();
                     });
                 } else {
@@ -1413,6 +1414,7 @@ $usosConfigs = getUsosConfigs();
                     timer: 3000,
                     timerProgressBar: true
                 }).then(() => {
+                    localStorage.setItem('usosFromEdit', 'true');
                     window.location.reload();
                 });
             } else {
@@ -1824,6 +1826,7 @@ $usosConfigs = getUsosConfigs();
                         timer: 2000
                     }).then(() => {
                         bootstrap.Modal.getInstance(document.getElementById('editUsosModal')).hide();
+                        localStorage.setItem('usosFromEdit', 'true');
                         window.location.reload();
                     });
                 });
@@ -2006,6 +2009,7 @@ $usosConfigs = getUsosConfigs();
                             text: data.message,
                             timer: 2000
                         }).then(() => {
+                            localStorage.setItem('usosFromEdit', 'true');
                             window.location.reload();
                         });
                     } else {
@@ -2020,11 +2024,58 @@ $usosConfigs = getUsosConfigs();
         });
     }
 
+    // Check if we should restore filters (only if coming from edit actions)
+    function shouldRestoreFilters() {
+        const fromEdit = localStorage.getItem('usosFromEdit');
+        if (fromEdit === 'true') {
+            localStorage.removeItem('usosFromEdit');
+            return true;
+        }
+        return false;
+    }
+    
+    // Save filter state to localStorage
+    function saveFilterState() {
+        try {
+            const state = {
+                customer: document.getElementById('filterCustomer').value,
+                status: document.getElementById('filterStatus').value,
+                sort: document.getElementById('filterSort').value
+            };
+            localStorage.setItem('usosFilterState', JSON.stringify(state));
+        } catch (e) {
+            console.error('Error saving filter state:', e);
+        }
+    }
+    
+    // Restore filter state on page load (only if coming from edit)
+    function restoreFilterState() {
+        try {
+            if (!shouldRestoreFilters()) {
+                // Clear saved state if not coming from edit
+                localStorage.removeItem('usosFilterState');
+                return;
+            }
+            
+            const savedState = JSON.parse(localStorage.getItem('usosFilterState'));
+            if (savedState) {
+                if (savedState.customer) document.getElementById('filterCustomer').value = savedState.customer;
+                if (savedState.status) document.getElementById('filterStatus').value = savedState.status;
+                if (savedState.sort) document.getElementById('filterSort').value = savedState.sort;
+            }
+        } catch (e) {
+            console.error('Error restoring filter state:', e);
+        }
+    }
+
     // Filter functionality
     function filterCards() {
         const customerFilter = document.getElementById('filterCustomer').value.toLowerCase();
         const statusFilter = document.getElementById('filterStatus').value;
         const sortFilter = document.getElementById('filterSort').value;
+        
+        // Save state when filters change
+        saveFilterState();
         
         const cards = Array.from(document.querySelectorAll('.usos-card'));
         
@@ -2077,13 +2128,20 @@ $usosConfigs = getUsosConfigs();
         document.getElementById('filterCustomer').value = '';
         document.getElementById('filterStatus').value = '';
         document.getElementById('filterSort').value = 'newest';
+        localStorage.removeItem('usosFilterState');
         filterCards();
     }
+    
+    // Restore filters on page load
+    restoreFilterState();
     
     // Attach filter listeners
     document.getElementById('filterCustomer').addEventListener('input', filterCards);
     document.getElementById('filterStatus').addEventListener('change', filterCards);
     document.getElementById('filterSort').addEventListener('change', filterCards);
+    
+    // Apply filters after restoration
+    filterCards();
 </script>
 </body>
 </html>

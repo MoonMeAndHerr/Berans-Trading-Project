@@ -61,26 +61,26 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="flex-grow-1">
-                                    <p class="text-uppercase fw-medium text-muted mb-0">Database Status</p>
+                                    <p class="text-uppercase fw-medium text-muted mb-0">Last Added</p>
                                 </div>
                                 <div class="flex-shrink-0">
                                     <h5 class="text-info fs-14 mb-0">
-                                        <i class="ri-database-2-line fs-13 align-middle"></i> Synced
+                                        <i class="ri-time-line fs-13 align-middle"></i> Recent
                                     </h5>
                                 </div>
                             </div>
                             <div class="d-flex align-items-end justify-content-between mt-4">
                                 <div>
                                     <h4 class="fs-22 fw-semibold ff-secondary mb-2">
-                                        Xero
+                                        <?= $lastSupplierDate ? date('d M', strtotime($lastSupplierDate)) : 'N/A' ?>
                                     </h4>
                                     <span class="badge bg-info-subtle text-info mb-0">
-                                        <i class="ri-links-line align-middle"></i> Connected
+                                        <?= $lastSupplierDate ? date('Y', strtotime($lastSupplierDate)) : 'No Data' ?>
                                     </span>
                                 </div>
                                 <div class="avatar-sm flex-shrink-0">
                                     <span class="avatar-title bg-info-subtle rounded fs-3">
-                                        <i class="ri-cloud-line text-info"></i>
+                                        <i class="ri-calendar-check-line text-info"></i>
                                     </span>
                                 </div>
                             </div>
@@ -97,8 +97,11 @@
                                 </div>
                             </div>
                             <div class="d-flex gap-2 mt-4">
-                                <button class="btn btn-light btn-sm flex-fill" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+                                <button class="btn btn-light btn-sm flex-fill" onclick="showAddForm()">
                                     <i class="ri-add-circle-line align-middle me-1"></i> Add New
+                                </button>
+                                <button class="btn btn-light btn-sm flex-fill" onclick="showUpdateForm()">
+                                    <i class="ri-edit-2-line align-middle me-1"></i> Update
                                 </button>
                                 <button class="btn btn-light btn-sm flex-fill" onclick="refreshTable()">
                                     <i class="ri-refresh-line align-middle me-1"></i> Refresh
@@ -163,6 +166,198 @@
                 </div>
             <?php endif; ?>
 
+            <!-- Add Supplier Form (Collapsible) -->
+            <div class="row" id="addFormContainer" style="display: none;">
+                <div class="col-12">
+                    <div class="card border-success">
+                        <div class="card-header bg-success-subtle">
+                            <div class="d-flex align-items-center">
+                                <h5 class="card-title mb-0 flex-grow-1">
+                                    <i class="ri-add-circle-line align-middle me-2"></i> Add New Supplier
+                                </h5>
+                                <button type="button" class="btn btn-sm btn-ghost-danger" onclick="hideAddForm()">
+                                    <i class="ri-close-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <form action="" method="POST" id="addSupplierForm">
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
+                                        <input type="text" name="supplier_name" class="form-control" placeholder="Enter supplier name" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Contact Person</label>
+                                        <input type="text" name="supplier_contact_person" class="form-control" placeholder="Enter contact person">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone Number</label>
+                                        <input type="tel" name="phone" class="form-control" placeholder="+60 12-345 6789">
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" name="email" class="form-control" placeholder="example@supplier.com">
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label">Address</label>
+                                        <textarea name="address" class="form-control" rows="2" placeholder="Enter complete address"></textarea>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">City</label>
+                                        <input type="text" name="city" class="form-control" placeholder="e.g., Kuala Lumpur">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Region/State</label>
+                                        <input type="text" name="region" class="form-control" placeholder="e.g., Selangor">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Postal Code</label>
+                                        <input type="text" name="postcode" class="form-control" placeholder="e.g., 50000">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Country</label>
+                                        <input type="text" name="country" class="form-control" placeholder="e.g., Malaysia">
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label">Notes</label>
+                                        <textarea name="notes" class="form-control" rows="3" placeholder="Additional notes or special instructions (optional)"></textarea>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="text-end">
+                                            <button type="button" class="btn btn-light" onclick="hideAddForm()">Cancel</button>
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="ri-save-line align-middle me-1"></i> Save Supplier
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Update Supplier Form (Collapsible) -->
+            <div class="row" id="updateFormContainer" style="display: none;">
+                <div class="col-12">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary-subtle">
+                            <div class="d-flex align-items-center">
+                                <h5 class="card-title mb-0 flex-grow-1">
+                                    <i class="ri-edit-2-line align-middle me-2"></i> Update Supplier
+                                </h5>
+                                <button type="button" class="btn btn-sm btn-ghost-danger" onclick="hideUpdateForm()">
+                                    <i class="ri-close-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Select Supplier to Update</label>
+                                <select id="supplierSelectUpdate" class="form-select">
+                                    <option value="">-- Choose a supplier --</option>
+                                    <?php foreach ($allSuppliers as $sup): ?>
+                                        <option 
+                                            value="<?= $sup['supplier_id'] ?>"
+                                            data-name="<?= htmlspecialchars($sup['supplier_name'], ENT_QUOTES) ?>"
+                                            data-contact="<?= htmlspecialchars($sup['supplier_contact_person'], ENT_QUOTES) ?>"
+                                            data-phone="<?= htmlspecialchars($sup['phone'], ENT_QUOTES) ?>"
+                                            data-email="<?= htmlspecialchars($sup['email'], ENT_QUOTES) ?>"
+                                            data-address="<?= htmlspecialchars($sup['address'], ENT_QUOTES) ?>"
+                                            data-city="<?= htmlspecialchars($sup['city'], ENT_QUOTES) ?>"
+                                            data-region="<?= htmlspecialchars($sup['region'], ENT_QUOTES) ?>"
+                                            data-postcode="<?= htmlspecialchars($sup['postcode'], ENT_QUOTES) ?>"
+                                            data-country="<?= htmlspecialchars($sup['country'], ENT_QUOTES) ?>"
+                                            data-notes="<?= htmlspecialchars($sup['notes'], ENT_QUOTES) ?>"
+                                            data-xero="<?= htmlspecialchars($sup['xero_relation'], ENT_QUOTES) ?>"
+                                        >
+                                            <?= htmlspecialchars($sup['supplier_name']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <form id="updateForm" action="" method="POST">
+                                <input type="hidden" name="supplier_id" id="update_supplier_id">
+                                <input type="hidden" name="xero_relation" id="update_supplier_xero_relation">
+                                
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
+                                        <input type="text" name="supplier_name" id="update_supplier_name" class="form-control" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Contact Person</label>
+                                        <input type="text" name="supplier_contact_person" id="update_supplier_contact" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone</label>
+                                        <input type="text" name="phone" id="update_supplier_phone" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" name="email" id="update_supplier_email" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label">Address</label>
+                                        <textarea name="address" id="update_supplier_address" class="form-control" rows="2"></textarea>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">City</label>
+                                        <input type="text" name="city" id="update_supplier_city" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Region</label>
+                                        <input type="text" name="region" id="update_supplier_region" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Postcode</label>
+                                        <input type="text" name="postcode" id="update_supplier_postcode" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Country</label>
+                                        <input type="text" name="country" id="update_supplier_country" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label">Notes</label>
+                                        <textarea name="notes" id="update_supplier_notes" class="form-control" rows="3"></textarea>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="text-end">
+                                            <button type="button" class="btn btn-light" onclick="hideUpdateForm()">Cancel</button>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="ri-save-line align-middle me-1"></i> Update Supplier
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Supplier List Table -->
             <div class="row">
                 <div class="col-12">
@@ -173,7 +368,7 @@
                                     <i class="ri-list-check-2 align-middle me-2"></i> Supplier Directory
                                 </h5>
                                 <div class="flex-shrink-0">
-                                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+                                    <button type="button" class="btn btn-success btn-sm" onclick="showAddForm()">
                                         <i class="ri-add-line align-middle me-1"></i> Add Supplier
                                     </button>
                                 </div>
@@ -215,17 +410,17 @@
                                             <td><?= htmlspecialchars($supplier['country'] ?? 'N/A') ?></td>
                                             <td>
                                                 <div class="hstack gap-2 justify-content-center">
-                                                    <button class="btn btn-sm btn-info" 
+                                                    <button class="btn btn-sm btn-soft-info" 
                                                             onclick='viewSupplierDetails(<?= json_encode($supplier) ?>)'
                                                             data-bs-toggle="tooltip" title="View Details">
                                                         <i class="ri-eye-line"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-primary" 
+                                                    <button class="btn btn-sm btn-soft-primary" 
                                                             onclick="editSupplier(<?= $supplier['supplier_id'] ?>)"
                                                             data-bs-toggle="tooltip" title="Edit">
                                                         <i class="ri-edit-2-line"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-danger" 
+                                                    <button class="btn btn-sm btn-soft-danger" 
                                                             onclick="deleteSupplier(<?= $supplier['supplier_id'] ?>, '<?= htmlspecialchars($supplier['supplier_name']) ?>')"
                                                             data-bs-toggle="tooltip" title="Delete">
                                                         <i class="ri-delete-bin-line"></i>
@@ -331,159 +526,6 @@
     </div>
 </div>
 
-<!-- Add Supplier Modal -->
-<div class="modal fade" id="addSupplierModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-success-subtle">
-                <h5 class="modal-title">
-                    <i class="ri-add-circle-line me-2"></i>Add New Supplier
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form action="" method="POST" id="addSupplierForm">
-                    <div class="row g-3">
-                        <div class="col-md-12">
-                            <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
-                            <input type="text" name="supplier_name" class="form-control" placeholder="Enter supplier name" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Contact Person</label>
-                            <input type="text" name="supplier_contact_person" class="form-control" placeholder="Enter contact person">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Phone Number</label>
-                            <input type="tel" name="phone" class="form-control" placeholder="+60 12-345 6789">
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" placeholder="example@supplier.com">
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">Address</label>
-                            <textarea name="address" class="form-control" rows="2" placeholder="Enter complete address"></textarea>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">City</label>
-                            <input type="text" name="city" class="form-control" placeholder="e.g., Kuala Lumpur">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Region/State</label>
-                            <input type="text" name="region" class="form-control" placeholder="e.g., Selangor">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Postal Code</label>
-                            <input type="text" name="postcode" class="form-control" placeholder="e.g., 50000">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Country</label>
-                            <input type="text" name="country" class="form-control" placeholder="e.g., Malaysia">
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">Notes</label>
-                            <textarea name="notes" class="form-control" rows="3" placeholder="Additional notes or special instructions (optional)"></textarea>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success" onclick="$('#addSupplierForm').submit()">
-                    <i class="ri-save-line align-middle me-1"></i> Save Supplier
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Update Supplier Modal -->
-<div class="modal fade" id="updateSupplierModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary-subtle">
-                <h5 class="modal-title">
-                    <i class="ri-edit-2-line me-2"></i>Update Supplier
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="updateForm" action="" method="POST">
-                    <input type="hidden" name="supplier_id" id="update_supplier_id">
-                    <input type="hidden" name="xero_relation" id="update_supplier_xero_relation">
-                    
-                    <div class="row g-3">
-                        <div class="col-md-12">
-                            <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
-                            <input type="text" name="supplier_name" id="update_supplier_name" class="form-control" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Contact Person</label>
-                            <input type="text" name="supplier_contact_person" id="update_supplier_contact" class="form-control">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Phone</label>
-                            <input type="text" name="phone" id="update_supplier_phone" class="form-control">
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" id="update_supplier_email" class="form-control">
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">Address</label>
-                            <textarea name="address" id="update_supplier_address" class="form-control" rows="2"></textarea>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">City</label>
-                            <input type="text" name="city" id="update_supplier_city" class="form-control">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Region</label>
-                            <input type="text" name="region" id="update_supplier_region" class="form-control">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Postcode</label>
-                            <input type="text" name="postcode" id="update_supplier_postcode" class="form-control">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Country</label>
-                            <input type="text" name="country" id="update_supplier_country" class="form-control">
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">Notes</label>
-                            <textarea name="notes" id="update_supplier_notes" class="form-control" rows="3"></textarea>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="$('#updateForm').submit()">
-                    <i class="ri-save-line align-middle me-1"></i> Update Supplier
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <?php include __DIR__ . '/../include/themesetting.php';?>
 
 <!-- Scripts -->
@@ -512,7 +554,32 @@
 <script>
 // Global variable
 var currentSupplier = null;
-var allSuppliersData = <?= json_encode($allSuppliers) ?>;
+
+// Show/Hide Form Functions
+function showAddForm() {
+    $('#addFormContainer').slideDown(300);
+    $('#updateFormContainer').slideUp(300);
+    $('html, body').animate({
+        scrollTop: $('#addFormContainer').offset().top - 100
+    }, 300);
+}
+
+function hideAddForm() {
+    $('#addFormContainer').slideUp(300);
+}
+
+function showUpdateForm() {
+    $('#updateFormContainer').slideDown(300);
+    $('#addFormContainer').slideUp(300);
+    $('html, body').animate({
+        scrollTop: $('#updateFormContainer').offset().top - 100
+    }, 300);
+}
+
+function hideUpdateForm() {
+    $('#updateFormContainer').slideUp(300);
+    $('#supplierSelectUpdate').val(null).trigger('change');
+}
 
 function refreshTable() {
     location.reload();
@@ -534,37 +601,18 @@ function viewSupplierDetails(supplier) {
     $('#viewSupplierModal').modal('show');
 }
 
-// Edit Supplier - Auto populate and show modal
+// Edit Supplier
 function editSupplier(supplierId) {
-    // Find supplier data
-    const supplier = allSuppliersData.find(s => s.supplier_id == supplierId);
-    
-    if (supplier) {
-        // Populate form fields
-        $('#update_supplier_id').val(supplier.supplier_id);
-        $('#update_supplier_name').val(supplier.supplier_name || '');
-        $('#update_supplier_contact').val(supplier.supplier_contact_person || '');
-        $('#update_supplier_phone').val(supplier.phone || '');
-        $('#update_supplier_email').val(supplier.email || '');
-        $('#update_supplier_address').val(supplier.address || '');
-        $('#update_supplier_city').val(supplier.city || '');
-        $('#update_supplier_region').val(supplier.region || '');
-        $('#update_supplier_postcode').val(supplier.postcode || '');
-        $('#update_supplier_country').val(supplier.country || '');
-        $('#update_supplier_notes').val(supplier.notes || '');
-        $('#update_supplier_xero_relation').val(supplier.xero_relation || '');
-        
-        // Show modal
-        $('#updateSupplierModal').modal('show');
-    }
+    showUpdateForm();
+    setTimeout(() => {
+        $('#supplierSelectUpdate').val(supplierId).trigger('change');
+    }, 350);
 }
 
 function editSupplierFromModal() {
     if (currentSupplier) {
         $('#viewSupplierModal').modal('hide');
-        setTimeout(() => {
-            editSupplier(currentSupplier.supplier_id);
-        }, 300);
+        editSupplier(currentSupplier.supplier_id);
     }
 }
 
@@ -649,6 +697,37 @@ $(document).ready(function() {
                 localStorage.removeItem('supplierTableFromEdit');
             }
         }
+    });
+
+    // Initialize Select2
+    $('#supplierSelectUpdate').select2({
+        placeholder: "-- Choose a supplier --",
+        allowClear: true,
+        width: '100%'
+    });
+
+    // Populate update form when supplier selected
+    $('#supplierSelectUpdate').on('select2:select', function(e) {
+        const selectedOption = $(this).find('option:selected');
+        $('#update_supplier_id').val(selectedOption.val());
+        $('#update_supplier_name').val(selectedOption.data('name') || '');
+        $('#update_supplier_contact').val(selectedOption.data('contact') || '');
+        $('#update_supplier_phone').val(selectedOption.data('phone') || '');
+        $('#update_supplier_email').val(selectedOption.data('email') || '');
+        $('#update_supplier_address').val(selectedOption.data('address') || '');
+        $('#update_supplier_city').val(selectedOption.data('city') || '');
+        $('#update_supplier_region').val(selectedOption.data('region') || '');
+        $('#update_supplier_postcode').val(selectedOption.data('postcode') || '');
+        $('#update_supplier_country').val(selectedOption.data('country') || '');
+        $('#update_supplier_notes').val(selectedOption.data('notes') || '');
+        $('#update_supplier_xero_relation').val(selectedOption.data('xero') || '');
+    });
+
+    // Clear form when selection cleared
+    $('#supplierSelectUpdate').on('select2:clear', function() {
+        $('#updateForm')[0].reset();
+        $('#update_supplier_id').val('');
+        $('#update_supplier_xero_relation').val('');
     });
 
     // Add form submission

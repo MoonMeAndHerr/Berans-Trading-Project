@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_supplier_id'])
 
             // Redirect with success for delete
             $_SESSION['success_delete'] = "🗑️ Supplier deleted successfully!";
-            header('Location: ' . $_SERVER['PHP_SELF']);
+            header('Location: ../public/forms-supplier.php');
             exit();
         } else {
             $errors[] = "Supplier not found, cannot delete.";
@@ -134,11 +134,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_supplier_id']
                 $errors[] = 'Xero API error: ' . $responseBody;
 
             }
-                // Update query
+                // Update query - use supplier_id as primary key
                 $stmt = $pdo->prepare("
                     UPDATE supplier 
                     SET supplier_name=?, supplier_contact_person=?, phone=?, email=?, address=?, city=?, region=?, postcode=?, country=?, notes=? 
-                    WHERE xero_relation=? AND supplier_id=?");
+                    WHERE supplier_id=?");
                 $stmt->execute([
                     $supplier_name,
                     $contact_person,
@@ -150,13 +150,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_supplier_id']
                     $postcode,
                     $country,
                     $notes,
-                    $xero_relation,
                     $supplier_id
                 ]);
 
                 // Redirect with success for update
                 $_SESSION['success_update'] = "✅ Supplier updated successfully!";
-                header('Location: ' . $_SERVER['PHP_SELF'] . '?supplier_id=' . $supplier_id);
+                header('Location: ../public/forms-supplier.php?supplier_id=' . $supplier_id);
                 exit();
 
             } else {
@@ -226,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_supplier_id']
 
                 // Redirect with success for add
                 $_SESSION['success_add'] = "✅ Supplier added successfully!";
-                header('Location: ' . $_SERVER['PHP_SELF']);
+                header('Location: ../public/forms-supplier.php');
                 exit();
             }
         } catch (PDOException $e) {
