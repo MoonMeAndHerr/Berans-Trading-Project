@@ -270,6 +270,7 @@ include __DIR__ . '/../include/header.php';
 
                                             <div class="col-12 mt-5 text-center">
                                                 <button type="submit" class="btn btn-primary">Save Pricing</button>
+                                                <a href="table-product-list.php" class="btn btn-secondary" onclick="localStorage.setItem('productTableFromEdit', 'true');">Cancel</a>
                                             </div>
 
                                         </div>

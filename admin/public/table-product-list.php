@@ -157,14 +157,14 @@ include __DIR__ . '/../include/header.php';
                                                                     title="Edit Product">
                                                                 <i class="ri-edit-line"></i>
                                                             </button>
-                                                            <a href="forms-update-image.php?product_id=<?php echo $product['product_id'];?>">
+                                                            <a href="forms-update-image.php?product_id=<?php echo $product['product_id'];?>" onclick="localStorage.setItem('productTableFromEdit', 'true');">
                                                             <button type="button" class="btn btn-sm btn-primary" 
                                                                     title="Edit Images">
                                                                 <i class="ri-image-line"></i>
                                                             </button>
                                                             </a>
                                                             <a href="forms-price-add-new.php?product_id=<?= $product['product_id'] ?>" 
-                                                               class="btn btn-sm btn-warning" title="Update Pricing">
+                                                               class="btn btn-sm btn-warning" title="Update Pricing" onclick="localStorage.setItem('productTableFromEdit', 'true');">
                                                                 <i class="ri-price-tag-3-line"></i>
                                                             </a>
                                                             <?php
@@ -616,14 +616,41 @@ include __DIR__ . '/../include/header.php';
 
         // Wait for DOM to be ready
         $(document).ready(function() {
-            // Initialize DataTable
-            $('#productTable').DataTable({
+            // Check if we should restore filters (only if coming from edit pages or actions)
+            function shouldRestoreFilters() {
+                const fromEdit = localStorage.getItem('productTableFromEdit');
+                if (fromEdit === 'true') {
+                    localStorage.removeItem('productTableFromEdit');
+                    return true;
+                }
+                return false;
+            }
+            
+            // Initialize DataTable with state saving
+            var table = $('#productTable').DataTable({
                 responsive: true,
                 pageLength: 25,
                 order: [[11, 'desc']], // Order by created date (now column 11)
                 columnDefs: [
                     { orderable: false, targets: [12] } // Disable sorting on Actions column (now column 12)
-                ]
+                ],
+                stateSave: true,
+                stateDuration: -1, // Store state indefinitely (use sessionStorage)
+                stateSaveCallback: function(settings, data) {
+                    localStorage.setItem('DataTables_productTable', JSON.stringify(data));
+                },
+                stateLoadCallback: function(settings) {
+                    try {
+                        // Only restore state if coming from edit pages
+                        if (!shouldRestoreFilters()) {
+                            localStorage.removeItem('DataTables_productTable');
+                            return null;
+                        }
+                        return JSON.parse(localStorage.getItem('DataTables_productTable'));
+                    } catch (e) {
+                        return null;
+                    }
+                }
             });
 
             // Event delegation for View button (works with DataTables pagination)
@@ -713,6 +740,8 @@ include __DIR__ . '/../include/header.php';
                                 timerProgressBar: true,
                                 showConfirmButton: true
                             }).then(() => {
+                                // Set flag to restore filters when page reloads
+                                localStorage.setItem('productTableFromEdit', 'true');
                                 // Reload page to show updated data
                                 window.location.reload();
                             });

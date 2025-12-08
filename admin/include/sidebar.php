@@ -272,9 +272,6 @@
                                             <li class="nav-item">
                                                 <a href="forms-product-add-new.php" class="nav-link" data-key="t-basic-elements">Add Product</a>
                                             </li>
-                                            <li class="nav-item">
-                                                <a href="forms-price-add-new.php" class="nav-link" data-key="t-basic-elements">Add Product Pricing</a>
-                                            </li>
                                         </ul>
                                     </div>
                                 </li>
@@ -295,6 +292,9 @@
                                             </li>
                                             <li class="nav-item">
                                                 <a href="profit_loss.php" class="nav-link" data-key="t-basic-elements">Profit & Loss</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="usos-manage.php" class="nav-link" data-key="t-basic-elements">USOS System</a>
                                             </li>
                                         </ul>
                                     </div>

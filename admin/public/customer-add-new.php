@@ -339,13 +339,13 @@ $customersWithCompany = count(array_filter($allCustomers, function($c) {
                                             <td><?= htmlspecialchars($customer['customer_country'] ?? 'N/A') ?></td>
                                             <td>
                                                 <div class="hstack gap-2 justify-content-center">
-                                                    <button class="btn btn-sm btn-info" 
+                                                    <button class="btn btn-sm btn-soft-info" 
                                                             onclick='viewCustomerDetails(<?= json_encode($customer) ?>)'
                                                             data-bs-toggle="tooltip" title="View Details">
                                                         <i class="ri-eye-line"></i>
                                                     </button>
                                                     <a href="customer-edit-update.php?id=<?= $customer['customer_id'] ?>" 
-                                                       class="btn btn-sm btn-primary"
+                                                       class="btn btn-sm btn-soft-primary"
                                                        onclick="localStorage.setItem('customerFromEdit', 'true');"
                                                        data-bs-toggle="tooltip" title="Edit">
                                                         <i class="ri-edit-2-line"></i>
