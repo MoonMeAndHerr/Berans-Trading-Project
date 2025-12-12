@@ -832,161 +832,42 @@ $usosConfigs = getUsosConfigs();
         initActualArrivalInputs();
     });
     
+    // Store pending actual arrival updates
+    let pendingActualArrivals = new Map();
+    
     function initActualArrivalInputs() {
-        // Handle actual arrival date input
+        // Handle actual arrival date input - just store the value, no confirmation yet
         document.querySelectorAll('.actual-arrival-input').forEach(input => {
             // Remove old listeners to avoid duplicates
             const newInput = input.cloneNode(true);
             input.parentNode.replaceChild(newInput, input);
             
+            // Store the original value
+            let originalValue = newInput.value || '';
+            
+            // Use change event to store the pending change (works well on iOS)
             newInput.addEventListener('change', function() {
                 const scheduleId = this.dataset.scheduleId;
-                const usosId = this.dataset.usosId;
                 const actualArrivalDate = this.value;
-                const plannedArrivalDate = this.dataset.plannedArrival;
                 
-                if (!actualArrivalDate) return;
+                console.log('Actual arrival date changed:', {scheduleId, actualArrivalDate, originalValue});
                 
-                // Get USOS config data from the row or card
-                let totalQty, dailyUsage, leadTime;
-                
-                const row = this.closest('tr');
-                if (row && row.dataset.totalQty) {
-                    // Data from modal table row
-                    totalQty = parseFloat(row.dataset.totalQty);
-                    dailyUsage = parseFloat(row.dataset.dailyUsage);
-                    leadTime = parseInt(row.dataset.leadTime);
-                } else {
-                    // Data from main page card
-                    const usosCard = this.closest('.usos-card');
-                    totalQty = parseFloat(usosCard.querySelector('.stat-value').textContent.replace(/,/g, ''));
-                    dailyUsage = parseFloat(usosCard.querySelectorAll('.stat-value')[2].textContent.replace(/,/g, ''));
-                    leadTime = parseInt(usosCard.querySelectorAll('.stat-value')[3].textContent);
+                // Store or remove from pending changes
+                if (actualArrivalDate && actualArrivalDate !== originalValue && actualArrivalDate.trim() !== '') {
+                    // Store all data needed for later confirmation
+                    pendingActualArrivals.set(scheduleId, {
+                        scheduleId: scheduleId,
+                        usosId: this.dataset.usosId,
+                        actualArrivalDate: actualArrivalDate,
+                        plannedArrivalDate: this.dataset.plannedArrival,
+                        element: this
+                    });
+                    console.log('Added to pending arrivals. Total pending:', pendingActualArrivals.size);
+                } else if (!actualArrivalDate || actualArrivalDate === originalValue) {
+                    // Remove from pending if user cleared it or reverted
+                    pendingActualArrivals.delete(scheduleId);
+                    console.log('Removed from pending arrivals. Total pending:', pendingActualArrivals.size);
                 }
-                
-                // Compare actual vs planned arrival
-                const actualDate = new Date(actualArrivalDate);
-                const plannedDate = new Date(plannedArrivalDate);
-                const diffTime = actualDate - plannedDate;
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                
-                let arrivalStatus = '';
-                let arrivalStatusColor = '';
-                if (diffDays < 0) {
-                    arrivalStatus = `✅ Early by ${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? 's' : ''}`;
-                    arrivalStatusColor = '#10b981'; // Green
-                } else if (diffDays > 0) {
-                    arrivalStatus = `⚠️ Late by ${diffDays} day${diffDays > 1 ? 's' : ''}`;
-                    arrivalStatusColor = '#f59e0b'; // Orange
-                } else {
-                    arrivalStatus = '✓ On Time';
-                    arrivalStatusColor = '#10b981'; // Green
-                }
-                
-                // Calculate what will happen
-                const daysUntilRunout = Math.floor(totalQty / dailyUsage);
-                
-                // Current run out date (when this stock runs out)
-                const currentRunOutDate = new Date(actualArrivalDate);
-                currentRunOutDate.setDate(currentRunOutDate.getDate() + daysUntilRunout);
-                
-                // Next arrival = current run out (just-in-time delivery, no gap)
-                const nextArrivalDate = new Date(currentRunOutDate);
-                
-                // Next order date: arrival - lead time (order early enough)
-                const nextOrderDate = new Date(nextArrivalDate);
-                nextOrderDate.setDate(nextOrderDate.getDate() - leadTime);
-                
-                // Next run out date (when NEXT stock runs out)
-                const nextRunOutDate = new Date(nextArrivalDate);
-                nextRunOutDate.setDate(nextRunOutDate.getDate() + daysUntilRunout);
-                
-                const formatDate = (date) => {
-                    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                };
-                
-                // Detect dark mode
-                const isDarkMode = document.documentElement.getAttribute('data-layout-mode') === 'dark';
-                
-                // Define colors based on theme
-                const colors = isDarkMode ? {
-                    box1Bg: 'rgba(59, 130, 246, 0.15)',
-                    box1Border: '#60a5fa',
-                    box1Text: '#93c5fd',
-                    box2Bg: 'rgba(245, 158, 11, 0.15)',
-                    box2Border: '#fbbf24',
-                    box2Text: '#fcd34d',
-                    box3Bg: 'rgba(16, 185, 129, 0.15)',
-                    box3Border: '#34d399',
-                    box3Text: '#6ee7b7',
-                    mutedText: '#9ca3af',
-                    strongText: '#e5e7eb'
-                } : {
-                    box1Bg: '#f0f9ff',
-                    box1Border: '#3b82f6',
-                    box1Text: '#1e40af',
-                    box2Bg: '#fef3c7',
-                    box2Border: '#f59e0b',
-                    box2Text: '#92400e',
-                    box3Bg: '#d1fae5',
-                    box3Border: '#10b981',
-                    box3Text: '#065f46',
-                    mutedText: '#6b7280',
-                    strongText: '#111827'
-                };
-                
-                Swal.fire({
-                    title: 'Confirm Actual Arrival',
-                    html: `
-                        <div style="text-align: left; padding: 1rem;">
-                            <p class="mb-3" style="color: ${colors.strongText};"><strong>📦 What will happen when you confirm:</strong></p>
-                            
-                            <div style="background: ${colors.box1Bg}; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid ${colors.box1Border}; margin-bottom: 1rem;">
-                                <p style="margin: 0; font-size: 0.9rem; color: ${colors.box1Text};">
-                                    <strong>1. Current Delivery Marked Complete</strong><br>
-                                    <span style="color: ${colors.mutedText};">Planned arrival: <strong>${formatDate(plannedDate)}</strong></span><br>
-                                    <span style="color: ${colors.mutedText};">Actual arrival: <strong>${formatDate(actualDate)}</strong></span><br>
-                                    <span style="color: ${arrivalStatusColor}; font-weight: bold;">${arrivalStatus}</span>
-                                </p>
-                            </div>
-                            
-                            <div style="background: ${colors.box2Bg}; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid ${colors.box2Border}; margin-bottom: 1rem;">
-                                <p style="margin: 0; font-size: 0.9rem; color: ${colors.box2Text};">
-                                    <strong>2. Current Stock Will Run Out</strong><br>
-                                    <span style="color: ${colors.mutedText};">Run Out Date: <strong>${formatDate(currentRunOutDate)}</strong> (in ${daysUntilRunout} days)</span><br>
-                                    <span style="color: ${colors.mutedText}; font-size: 0.85rem;">Based on: ${totalQty.toLocaleString()} units ÷ ${dailyUsage.toLocaleString()} daily usage</span>
-                                </p>
-                            </div>
-                            
-                            <div style="background: ${colors.box3Bg}; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid ${colors.box3Border};">
-                                <p style="margin: 0; font-size: 0.9rem; color: ${colors.box3Text};">
-                                    <strong>3. Next Order Schedule Created (Just-in-Time)</strong><br>
-                                    <span style="color: ${colors.mutedText};">📅 Order Date: <strong>${formatDate(nextOrderDate)}</strong></span><br>
-                                    <span style="color: ${colors.mutedText};">📦 Arrival Date: <strong>${formatDate(nextArrivalDate)}</strong> (same as run out date)</span><br>
-                                    <span style="color: ${colors.mutedText};">⚠️ Next Run Out: <strong>${formatDate(nextRunOutDate)}</strong> (${daysUntilRunout} days later)</span><br>
-                                    <span style="color: ${colors.mutedText};">⏱️ Lead Time: <strong>${leadTime} days</strong></span>
-                                </p>
-                            </div>
-                            
-                            <p style="margin-top: 1rem; font-size: 0.85rem; color: ${colors.mutedText}; font-style: italic;">
-                                💡 Just-in-Time Delivery: New stock arrives exactly when current stock runs out, ensuring zero downtime!
-                            </p>
-                        </div>
-                    `,
-                    icon: 'question',
-                    width: '600px',
-                    showCancelButton: true,
-                    confirmButtonText: '✓ Confirm & Create Next Schedule',
-                    cancelButtonText: '✕ Cancel',
-                    confirmButtonColor: '#10b981',
-                    cancelButtonColor: '#6b7280'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        updateActualArrival(scheduleId, actualArrivalDate, usosId);
-                    } else {
-                        newInput.value = '';
-                    }
-                });
             });
         });
     }
@@ -1487,6 +1368,14 @@ $usosConfigs = getUsosConfigs();
                                 ? `<span class="text-success fw-bold">${new Date(entry.actual_arrival_date).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})}</span>`
                                 : `<span class="text-muted">Not recorded</span>`;
                             
+                            // Status: if no actual arrival date, force status to Pending
+                            // Same logic as edit modal
+                            const statusBadge = entry.actual_arrival_date 
+                                ? (entry.is_completed 
+                                    ? '<span class="badge bg-success-subtle text-success"><i class="ri-check-line"></i> Completed</span>' 
+                                    : '<span class="badge bg-warning-subtle text-warning"><i class="ri-time-line"></i> Pending</span>')
+                                : '<span class="badge bg-warning-subtle text-warning"><i class="ri-time-line"></i> Pending</span>';
+                            
                             scheduleHtml += `
                                 <tr class="schedule-row">
                                     <td>${index + 1}</td>
@@ -1495,7 +1384,7 @@ $usosConfigs = getUsosConfigs();
                                     <td>${new Date(entry.run_out_date).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})}</td>
                                     <td>${actualArrivalCell}</td>
                                     <td>${timingBadge}</td>
-                                    <td>${entry.is_completed ? '<span class="badge bg-success-subtle text-success"><i class="ri-check-line"></i> Completed</span>' : '<span class="badge bg-warning-subtle text-warning"><i class="ri-time-line"></i> Pending</span>'}</td>
+                                    <td>${statusBadge}</td>
                                 </tr>`;
                         });
                         
@@ -1607,25 +1496,50 @@ $usosConfigs = getUsosConfigs();
                                     </thead>
                                     <tbody>`;
                         
+                        // Find first schedule without actual arrival (earliest pending delivery)
+                        // Schedule is ordered by order_date DESC, so we need to find the LAST one without actual arrival
+                        let lastPendingIndex = -1;
+                        for (let i = schedule.length - 1; i >= 0; i--) {
+                            if (!schedule[i].actual_arrival_date) {
+                                lastPendingIndex = i;
+                                break;
+                            }
+                        }
+                        
                         schedule.forEach((entry, index) => {
-                            const actualArrivalCell = entry.actual_arrival_date 
-                                ? `<span class="text-success fw-bold">${new Date(entry.actual_arrival_date).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})}</span>`
-                                : `<input type="date" class="form-control form-control-sm actual-arrival-input" 
+                            // Only show actual arrival input for the EARLIEST schedule without actual arrival
+                            // (which is the last one in DESC order)
+                            let actualArrivalCell;
+                            if (entry.actual_arrival_date) {
+                                // Already has actual arrival - show it
+                                actualArrivalCell = `<span class="text-success fw-bold">${new Date(entry.actual_arrival_date).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})}</span>`;
+                            } else if (index === lastPendingIndex) {
+                                // This is the earliest pending delivery - allow input
+                                actualArrivalCell = `<input type="date" class="form-control form-control-sm actual-arrival-input" 
                                     data-schedule-id="${entry.schedule_id}" 
                                     data-usos-id="${config.usos_id}" 
                                     data-planned-arrival="${entry.arrival_date}">`;
+                            } else {
+                                // Future delivery - show placeholder
+                                actualArrivalCell = `<span class="text-muted"><i class="ri-time-line"></i> Awaiting previous</span>`;
+                            }
                             
-                            // Editable status dropdown
-                            const statusCell = `
-                                <select class="form-select form-select-sm status-select" 
+                            // Status: if no actual arrival date, force status to Pending (read-only)
+                            // if actual arrival exists, allow editing
+                            const statusCell = entry.actual_arrival_date 
+                                ? `<select class="form-select form-select-sm status-select" 
                                         data-schedule-id="${entry.schedule_id}" 
                                         style="width: auto;">
                                     <option value="0" ${!entry.is_completed ? 'selected' : ''}>Pending</option>
                                     <option value="1" ${entry.is_completed ? 'selected' : ''}>Completed</option>
-                                </select>`;
+                                </select>`
+                                : `<span class="badge bg-warning-subtle text-warning"><i class="ri-time-line"></i> Pending</span>`;
+                            
+                            // Calculate daily usage for this row
+                            const dailyUsage = config.monthly_usage / 30;
                             
                             scheduleHtml += `
-                                <tr class="schedule-row" data-total-qty="${config.total_quantity_ordered}" data-daily-usage="${config.daily_usage}" data-lead-time="${config.production_lead_time_days}">
+                                <tr class="schedule-row" data-total-qty="${config.total_quantity_ordered}" data-daily-usage="${dailyUsage}" data-lead-time="${config.production_lead_time_days}">
                                     <td>${index + 1}</td>
                                     <td>${new Date(entry.order_date).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})}</td>
                                     <td>${new Date(entry.arrival_date).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})}</td>
@@ -1801,6 +1715,59 @@ $usosConfigs = getUsosConfigs();
         
         const formData = new FormData(this);
         
+        console.log('Form submitted. Pending arrivals:', pendingActualArrivals.size);
+        
+        // Check if there are any pending actual arrival updates that need confirmation
+        if (pendingActualArrivals.size > 0) {
+            console.log('Processing pending arrivals...');
+            // Process all pending arrivals first, then submit form
+            processPendingActualArrivals(formData);
+        } else {
+            console.log('No pending arrivals. Submitting form directly...');
+            // No pending arrivals - submit form directly
+            submitEditForm(formData);
+        }
+    });
+    
+    // Process all pending actual arrival confirmations before form submission
+    function processPendingActualArrivals(formData) {
+        const pendingArray = Array.from(pendingActualArrivals.values());
+        let currentIndex = 0;
+        
+        function processNext() {
+            if (currentIndex >= pendingArray.length) {
+                // All processed - now submit the form
+                submitEditForm(formData);
+                return;
+            }
+            
+            const data = pendingArray[currentIndex];
+            currentIndex++;
+            
+            // Show confirmation for this arrival
+            showActualArrivalConfirmation(data, function(confirmed) {
+                if (confirmed) {
+                    // User confirmed - process this arrival
+                    updateActualArrival(data.scheduleId, data.actualArrivalDate, data.usosId);
+                } else {
+                    // User cancelled - reset the input
+                    data.element.value = '';
+                }
+                
+                // Remove from pending
+                pendingActualArrivals.delete(data.scheduleId);
+                
+                // Process next pending arrival
+                processNext();
+            });
+        }
+        
+        processNext();
+    }
+    
+    // Submit the edit form after processing actual arrivals
+    function submitEditForm(formData) {
+        
         Swal.fire({
             title: 'Updating...',
             allowOutsideClick: false,
@@ -1845,7 +1812,125 @@ $usosConfigs = getUsosConfigs();
                 text: 'Failed to update: ' + error.message
             });
         });
-    });
+    }
+    
+    // Show actual arrival confirmation dialog
+    function showActualArrivalConfirmation(data, callback) {
+        // Get USOS config data from the element's row
+        const row = data.element.closest('tr');
+        const totalQty = parseFloat(row.dataset.totalQty);
+        const dailyUsage = parseFloat(row.dataset.dailyUsage);
+        const leadTime = parseInt(row.dataset.leadTime);
+        
+        // Compare actual vs planned arrival
+        const actualDate = new Date(data.actualArrivalDate);
+        const plannedDate = new Date(data.plannedArrivalDate);
+        const diffTime = actualDate - plannedDate;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        
+        let arrivalStatus = '';
+        let arrivalStatusColor = '';
+        if (diffDays < 0) {
+            arrivalStatus = `✅ Early by ${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? 's' : ''}`;
+            arrivalStatusColor = '#10b981';
+        } else if (diffDays > 0) {
+            arrivalStatus = `⚠️ Late by ${diffDays} day${diffDays > 1 ? 's' : ''}`;
+            arrivalStatusColor = '#f59e0b';
+        } else {
+            arrivalStatus = '✓ On Time';
+            arrivalStatusColor = '#10b981';
+        }
+        
+        // Calculate schedule
+        const daysUntilRunout = Math.floor(totalQty / dailyUsage);
+        const currentRunOutDate = new Date(actualDate);
+        currentRunOutDate.setDate(currentRunOutDate.getDate() + daysUntilRunout);
+        
+        const nextArrivalDate = new Date(currentRunOutDate);
+        nextArrivalDate.setDate(nextArrivalDate.getDate() - 1); // 1 day before runout
+        
+        const nextOrderDate = new Date(nextArrivalDate);
+        nextOrderDate.setDate(nextOrderDate.getDate() - leadTime);
+        
+        const nextRunOutDate = new Date(nextArrivalDate);
+        nextRunOutDate.setDate(nextRunOutDate.getDate() + daysUntilRunout);
+        
+        const formatDate = (date) => {
+            return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        };
+        
+        const isDarkMode = document.documentElement.getAttribute('data-layout-mode') === 'dark';
+        const colors = isDarkMode ? {
+            box1Bg: 'rgba(59, 130, 246, 0.15)',
+            box1Border: '#60a5fa',
+            box1Text: '#93c5fd',
+            box2Bg: 'rgba(245, 158, 11, 0.15)',
+            box2Border: '#fbbf24',
+            box2Text: '#fcd34d',
+            box3Bg: 'rgba(16, 185, 129, 0.15)',
+            box3Border: '#34d399',
+            box3Text: '#6ee7b7',
+            mutedText: '#9ca3af',
+            strongText: '#e5e7eb'
+        } : {
+            box1Bg: '#f0f9ff',
+            box1Border: '#3b82f6',
+            box1Text: '#1e40af',
+            box2Bg: '#fef3c7',
+            box2Border: '#f59e0b',
+            box2Text: '#92400e',
+            box3Bg: '#d1fae5',
+            box3Border: '#10b981',
+            box3Text: '#065f46',
+            mutedText: '#6b7280',
+            strongText: '#111827'
+        };
+        
+        Swal.fire({
+            title: 'Confirm Actual Arrival',
+            html: `
+                <div style="text-align: left; padding: 1rem;">
+                    <p class="mb-3" style="color: ${colors.strongText};"><strong>📦 What will happen when you confirm:</strong></p>
+                    
+                    <div style="background: ${colors.box1Bg}; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid ${colors.box1Border}; margin-bottom: 1rem;">
+                        <p style="margin: 0; font-size: 0.9rem; color: ${colors.box1Text};">
+                            <strong>1. Current Delivery Marked Complete</strong><br>
+                            <span style="color: ${colors.mutedText};">Planned arrival: <strong>${formatDate(plannedDate)}</strong></span><br>
+                            <span style="color: ${colors.mutedText};">Actual arrival: <strong>${formatDate(actualDate)}</strong></span><br>
+                            <span style="color: ${arrivalStatusColor}; font-weight: bold;">${arrivalStatus}</span>
+                        </p>
+                    </div>
+                    
+                    <div style="background: ${colors.box2Bg}; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid ${colors.box2Border}; margin-bottom: 1rem;">
+                        <p style="margin: 0; font-size: 0.9rem; color: ${colors.box2Text};">
+                            <strong>2. Current Stock Will Run Out</strong><br>
+                            <span style="color: ${colors.mutedText};">Run Out Date: <strong>${formatDate(currentRunOutDate)}</strong> (in ${daysUntilRunout} days)</span><br>
+                            <span style="color: ${colors.mutedText}; font-size: 0.85rem;">Based on: ${totalQty.toLocaleString()} units ÷ ${dailyUsage.toLocaleString()} daily usage</span>
+                        </p>
+                    </div>
+                    
+                    <div style="background: ${colors.box3Bg}; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid ${colors.box3Border};">
+                        <p style="margin: 0; font-size: 0.9rem; color: ${colors.box3Text};">
+                            <strong>3. Next Order Schedule Created</strong><br>
+                            <span style="color: ${colors.mutedText};">📅 Order Date: <strong>${formatDate(nextOrderDate)}</strong></span><br>
+                            <span style="color: ${colors.mutedText};">📦 Arrival Date: <strong>${formatDate(nextArrivalDate)}</strong></span><br>
+                            <span style="color: ${colors.mutedText};">⚠️ Next Run Out: <strong>${formatDate(nextRunOutDate)}</strong></span><br>
+                            <span style="color: ${colors.mutedText};">⏱️ Lead Time: <strong>${leadTime} days</strong></span>
+                        </p>
+                    </div>
+                </div>
+            `,
+            icon: 'question',
+            width: '600px',
+            showCancelButton: true,
+            confirmButtonText: '✓ Confirm & Create Next Schedule',
+            cancelButtonText: '✕ Cancel',
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#6b7280'
+        }).then((result) => {
+            callback(result.isConfirmed);
+        });
+    }
     
     // Initialize status change listeners
     function initStatusChangeListeners() {
