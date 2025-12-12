@@ -141,24 +141,45 @@ if (isset($_GET['action']) || isset($_POST['action'])) {
                         }
                     }
                     
-                    // Create initial schedule entry using production_lead_time + delivery_days
+                    // Create initial 2 schedule entries
                     $total_lead_time = $production_lead_time + $delivery_days;
-                    $arrival_date = date('Y-m-d', strtotime($order_date . ' + ' . $total_lead_time . ' days'));
                     $daily_usage = $monthly_usage / 30;
                     $days_until_runout = floor($total_quantity / $daily_usage);
-                    $run_out_date = date('Y-m-d', strtotime($arrival_date . ' + ' . $days_until_runout . ' days'));
+                    
+                    // First delivery schedule
+                    $first_arrival_date = date('Y-m-d', strtotime($order_date . ' + ' . $total_lead_time . ' days'));
+                    
+                    // First run out = first arrival + days until stock runs out
+                    $first_run_out_date = date('Y-m-d', strtotime($first_arrival_date . ' + ' . $days_until_runout . ' days'));
+                    
+                    // Second delivery arrives 1 day BEFORE first stock runs out (safety buffer)
+                    $second_arrival_date = date('Y-m-d', strtotime($first_run_out_date . ' - 1 day'));
+                    
+                    // Second run out = second arrival + days until stock runs out
+                    $second_run_out_date = date('Y-m-d', strtotime($second_arrival_date . ' + ' . $days_until_runout . ' days'));
                     
                     $scheduleQuery = "INSERT INTO usos_schedule (usos_id, order_date, arrival_date, run_out_date) 
                                      VALUES (:usos_id, :order_date, :arrival_date, :run_out_date)";
                     
                     $scheduleStmt = $pdo->prepare($scheduleQuery);
                     $scheduleStmt->bindParam(':usos_id', $usos_id);
+                    
+                    // Insert first schedule
                     $scheduleStmt->bindParam(':order_date', $order_date);
-                    $scheduleStmt->bindParam(':arrival_date', $arrival_date);
-                    $scheduleStmt->bindParam(':run_out_date', $run_out_date);
+                    $scheduleStmt->bindParam(':arrival_date', $first_arrival_date);
+                    $scheduleStmt->bindParam(':run_out_date', $first_run_out_date);
                     $scheduleStmt->execute();
                     
-                    echo json_encode(['success' => true, 'message' => 'USOS configuration created successfully', 'usos_id' => $usos_id]);
+                    // Second delivery schedule
+                    $second_order_date = date('Y-m-d', strtotime($second_arrival_date . ' - ' . $total_lead_time . ' days'));
+                    
+                    // Insert second schedule
+                    $scheduleStmt->bindParam(':order_date', $second_order_date);
+                    $scheduleStmt->bindParam(':arrival_date', $second_arrival_date);
+                    $scheduleStmt->bindParam(':run_out_date', $second_run_out_date);
+                    $scheduleStmt->execute();
+                    
+                    echo json_encode(['success' => true, 'message' => 'USOS configuration created successfully with 2 initial schedules', 'usos_id' => $usos_id]);
                 } else {
                     echo json_encode(['success' => false, 'error' => 'Failed to create USOS configuration']);
                 }
@@ -241,7 +262,7 @@ if (isset($_GET['action']) || isset($_POST['action'])) {
                     exit;
                 }
                 
-                // Update the actual arrival date
+                // Update the actual arrival date and mark as completed
                 $updateQuery = "UPDATE usos_schedule SET actual_arrival_date = :actual_arrival_date, is_completed = 1 
                                WHERE schedule_id = :schedule_id";
                 $updateStmt = $pdo->prepare($updateQuery);
@@ -266,28 +287,81 @@ if (isset($_GET['action']) || isset($_POST['action'])) {
                     // Calculate when current stock will run out
                     $daily_usage = $config['monthly_usage'] / 30;
                     $days_until_runout = floor($config['total_quantity_ordered'] / $daily_usage);
+                    
+                    // Current run out = actual arrival + days until stock runs out
                     $current_run_out_date = date('Y-m-d', strtotime($actual_arrival_date . ' + ' . $days_until_runout . ' days'));
                     
-                    // Next arrival should be exactly when current stock runs out (no gap in supply)
-                    $next_arrival_date = $current_run_out_date;
+                    // Next arrival should be 1 day BEFORE current stock runs out (safety buffer)
+                    $next_arrival_date = date('Y-m-d', strtotime($current_run_out_date . ' - 1 day'));
                     
-                    // Next order date: arrival date - (production_lead_time + delivery_days)
+                    // Update the current schedule's run_out_date to match the new calculation
+                    $updateRunOutQuery = "UPDATE usos_schedule SET run_out_date = :run_out_date WHERE schedule_id = :schedule_id";
+                    $updateRunOutStmt = $pdo->prepare($updateRunOutQuery);
+                    $updateRunOutStmt->bindParam(':run_out_date', $current_run_out_date);
+                    $updateRunOutStmt->bindParam(':schedule_id', $schedule_id);
+                    $updateRunOutStmt->execute();
+                    
+                    // Calculate next order and arrival dates
                     $total_lead_time = $config['production_lead_time_days'] + $delivery_days;
                     $next_order_date = date('Y-m-d', strtotime($next_arrival_date . ' - ' . $total_lead_time . ' days'));
                     
-                    // Calculate when the NEXT stock will run out (after next arrival)
+                    // Calculate when the NEXT stock will run out
                     $next_run_out_date = date('Y-m-d', strtotime($next_arrival_date . ' + ' . $days_until_runout . ' days'));
                     
-                    // Create next schedule entry
-                    $insertQuery = "INSERT INTO usos_schedule (usos_id, order_date, arrival_date, run_out_date) 
-                                   VALUES (:usos_id, :order_date, :arrival_date, :run_out_date)";
+                    // Check if there's already a future schedule (without actual arrival) for this USOS
+                    $checkFutureQuery = "SELECT schedule_id, arrival_date FROM usos_schedule 
+                                        WHERE usos_id = :usos_id 
+                                        AND actual_arrival_date IS NULL 
+                                        AND schedule_id != :current_schedule_id
+                                        ORDER BY arrival_date ASC 
+                                        LIMIT 1";
+                    $checkFutureStmt = $pdo->prepare($checkFutureQuery);
+                    $checkFutureStmt->bindParam(':usos_id', $usos_id);
+                    $checkFutureStmt->bindParam(':current_schedule_id', $schedule_id);
+                    $checkFutureStmt->execute();
+                    $existingFuture = $checkFutureStmt->fetch(PDO::FETCH_ASSOC);
                     
-                    $insertStmt = $pdo->prepare($insertQuery);
-                    $insertStmt->bindParam(':usos_id', $usos_id);
-                    $insertStmt->bindParam(':order_date', $next_order_date);
-                    $insertStmt->bindParam(':arrival_date', $next_arrival_date);
-                    $insertStmt->bindParam(':run_out_date', $next_run_out_date);
-                    $insertStmt->execute();
+                    if ($existingFuture) {
+                        // Future schedule already exists - update it with recalculated dates
+                        $updateFutureQuery = "UPDATE usos_schedule 
+                                             SET order_date = :order_date, 
+                                                 arrival_date = :arrival_date, 
+                                                 run_out_date = :run_out_date 
+                                             WHERE schedule_id = :future_schedule_id";
+                        $updateFutureStmt = $pdo->prepare($updateFutureQuery);
+                        $updateFutureStmt->bindParam(':order_date', $next_order_date);
+                        $updateFutureStmt->bindParam(':arrival_date', $next_arrival_date);
+                        $updateFutureStmt->bindParam(':run_out_date', $next_run_out_date);
+                        $updateFutureStmt->bindParam(':future_schedule_id', $existingFuture['schedule_id']);
+                        $updateFutureStmt->execute();
+                        
+                        // Now create ANOTHER schedule after the updated one
+                        $future_run_out = date('Y-m-d', strtotime($next_arrival_date . ' + ' . $days_until_runout . ' days'));
+                        $future_next_arrival = date('Y-m-d', strtotime($future_run_out . ' - 1 day'));
+                        $future_next_order = date('Y-m-d', strtotime($future_next_arrival . ' - ' . $total_lead_time . ' days'));
+                        $future_next_runout = date('Y-m-d', strtotime($future_next_arrival . ' + ' . $days_until_runout . ' days'));
+                        
+                        $insertQuery = "INSERT INTO usos_schedule (usos_id, order_date, arrival_date, run_out_date) 
+                                       VALUES (:usos_id, :order_date, :arrival_date, :run_out_date)";
+                        
+                        $insertStmt = $pdo->prepare($insertQuery);
+                        $insertStmt->bindParam(':usos_id', $usos_id);
+                        $insertStmt->bindParam(':order_date', $future_next_order);
+                        $insertStmt->bindParam(':arrival_date', $future_next_arrival);
+                        $insertStmt->bindParam(':run_out_date', $future_next_runout);
+                        $insertStmt->execute();
+                    } else {
+                        // No future schedule exists - create a new one
+                        $insertQuery = "INSERT INTO usos_schedule (usos_id, order_date, arrival_date, run_out_date) 
+                                       VALUES (:usos_id, :order_date, :arrival_date, :run_out_date)";
+                        
+                        $insertStmt = $pdo->prepare($insertQuery);
+                        $insertStmt->bindParam(':usos_id', $usos_id);
+                        $insertStmt->bindParam(':order_date', $next_order_date);
+                        $insertStmt->bindParam(':arrival_date', $next_arrival_date);
+                        $insertStmt->bindParam(':run_out_date', $next_run_out_date);
+                        $insertStmt->execute();
+                    }
                     
                     echo json_encode(['success' => true, 'message' => 'Actual arrival updated and next schedule created']);
                 } else {
