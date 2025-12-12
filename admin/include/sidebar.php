@@ -272,6 +272,9 @@
                                             <li class="nav-item">
                                                 <a href="forms-product-add-new.php" class="nav-link" data-key="t-basic-elements">Add Product</a>
                                             </li>
+                                            <li class="nav-item">
+                                                <a href="catalogue-arranger.php" class="nav-link" data-key="t-basic-elements">Catalogue Arranger</a>
+                                            </li>
                                         </ul>
                                     </div>
                                 </li>

@@ -36,11 +36,13 @@ SELECT
     ii.quantity,
     ii.unit_price,
     ii.total_price,
-    p.image_url
+    p.image_url,
+    pr.pcs_per_carton
 FROM invoice i
 JOIN customer c ON i.customer_id = c.customer_id
 JOIN invoice_item ii ON i.invoice_id = ii.invoice_id
 JOIN product p ON ii.product_id = p.product_id
+JOIN price pr ON i.price_id = pr.price_id
 WHERE i.invoice_id = ?
 ORDER BY ii.invoice_item_id
 ");
@@ -144,7 +146,7 @@ $html = '
         }
         .info-col {
             display: table-cell;
-            width: 33.33%;
+            width: 50%;
             vertical-align: top;
             padding-right: 30px;
         }
@@ -360,7 +362,7 @@ for ($page = 0; $page < $totalPages; $page++) {
             <div class="company-tagline">Premium Trading Solutions</div>
         </div>
         <div class="header-right">
-            <div class="invoice-title">INVOICE</div>
+            <div class="invoice-title">ITEM LIST</div>
             <div class="invoice-number">#' . htmlspecialchars($invoice['invoice_number']) . '</div>
         </div>
     </div>
@@ -411,29 +413,6 @@ $html .= '
                 </div>
             </div>
         </div>
-        <div class="info-col">
-            <div class="info-title">Payment Summary</div>
-            <div class="info-content">
-                <div class="info-row">
-                    <span class="info-label">Subtotal</span>
-                    <span class="info-value">RM ' . number_format($invoice['subtotal'], 2) . '</span>
-                </div>';
-
-if ($invoice['discount_amount'] > 0) {
-    $html .= '
-                <div class="info-row">
-                    <span class="info-label">Discount</span>
-                    <span class="info-value" style="color:#ef4444;">-RM ' . number_format($invoice['discount_amount'], 2) . '</span>
-                </div>';
-}
-
-$html .= '
-                <div class="info-row" style="margin-top:8px;padding-top:8px;border-top:1px solid #e2e8f0;">
-                    <span class="info-label" style="font-weight:700;color:#06b6d4;">Total</span>
-                    <span class="info-value" style="font-size:14pt;color:#06b6d4;font-weight:700;">RM ' . number_format($invoice['total_amount'], 2) . '</span>
-                </div>
-            </div>
-        </div>
     </div>';
     } else {
 
@@ -453,9 +432,9 @@ $html .= '
                 <th style="width:5%;">NO</th>
                 <th style="width:12%;" class="text-center">IMAGE</th>
                 <th style="width:40%;">PRODUCT</th>
-                <th style="width:10%;" class="text-center">QTY</th>
-                <th style="width:15%;" class="text-right">UNIT PRICE</th>
-                <th style="width:18%;" class="text-right">TOTAL</th>
+                <th style="width:10%;" class="text-center">QUANTITY</th>
+                <th style="width:15%;" class="text-right">CARTON QUANTITY</th>
+                <th style="width:18%;" class="text-right">QUANTITY/CARTON</th>
             </tr>
         </thead>
         <tbody>';
@@ -494,6 +473,14 @@ foreach ($itemsOnPage as $item) {
         $imageTag = '<div style="width:60px;height:60px;background:#f1f5f9;border-radius:4px;"></div>';
     }
 
+    $pcsPerCarton = (isset($item['pcs_per_carton']) && $item['pcs_per_carton'] > 0) 
+                    ? $item['pcs_per_carton'] 
+                    : 1;
+
+    $rawCartonQty = $item['quantity'] / $pcsPerCarton;
+
+    $finalCartonQty = ceil($rawCartonQty);
+
 
     $html .= '
             <tr>
@@ -501,8 +488,8 @@ foreach ($itemsOnPage as $item) {
                 <td class="text-center">' . $imageTag . '</td>
                 <td><span class="product-name">' . htmlspecialchars($item['product_name']) . '</span></td>
                 <td class="text-center" style="font-weight:600;">' . number_format($item['quantity']) . '</td>
-                <td class="text-right">RM ' . number_format($item['unit_price'], 2) . '</td>
-                <td class="text-right" style="font-weight:600;color:#1e293b;">RM ' . number_format($item['total_price'], 2) . '</td>
+                <td class="text-right">' . $finalCartonQty . '</td>
+                <td class="text-right" style="font-weight:600;color:#1e293b;">' . $pcsPerCarton . '</td>
             </tr>';
     $itemNo++;
 }

@@ -1,0 +1,839 @@
+<?php
+include __DIR__ . '/../private/catalogue-arranger-backend.php';
+include __DIR__ . '/../include/header.php';
+?>
+
+
+        <!-- Custom CSS for Product List -->
+        <link href="assets/css/table-product-list-minimal.css" rel="stylesheet" type="text/css" />
+        <style>
+            /* Custom styling for disabled selects to maintain readability in both modes */
+            select:disabled {
+                opacity: 1 !important;
+                cursor: default !important;
+                -webkit-appearance: none !important;
+                -moz-appearance: none !important;
+                appearance: none !important;
+                background-image: none !important;
+                padding-right: 0.75rem !important;
+            }
+            /* Light mode */
+            [data-bs-theme="light"] select:disabled {
+                background-color: #f8f9fa !important;
+                color: #212529 !important;
+            }
+            /* Dark mode */
+            [data-bs-theme="dark"] select:disabled {
+                background-color: #2b3035 !important;
+                color: #e9ecef !important;
+                border-color: #424850 !important;
+            }
+            
+            /* Force modal to appear on top */
+            #viewProductModal.modal,
+            #updateProductModal.modal {
+                z-index: 1060 !important;
+            }
+            
+            .modal-backdrop {
+                z-index: 1050 !important;
+            }
+            
+            /* Ensure modal is visible */
+            .modal.show {
+                display: block !important;
+            }
+            
+            /* Fix modal dimensions */
+            .modal-dialog {
+                margin: 1.75rem auto !important;
+                max-width: 1140px !important;
+            }
+            
+            .modal-dialog.modal-xl {
+                max-width: 90% !important;
+            }
+            
+            /* Force modal content to have proper sizing */
+            .modal-content {
+                width: 100% !important;
+                min-height: 200px !important;
+            }
+        </style>
+
+        <!-- ============================================================== -->
+        <!-- Start right Content here -->
+        <!-- ============================================================== -->
+        <div class="main-content">
+            <div class="page-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                                <h4 class="mb-sm-0">Folder List</h4>
+                                <div class="page-title-right">
+                                    <ol class="breadcrumb m-0">
+                                        <li class="breadcrumb-item"><a href="javascript: void(0);">Product</a></li>
+                                        <li class="breadcrumb-item active">Folder List</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">All Folder</h5>
+                                    <a href="catalogue-wizard.php?action=create" class="btn btn-success">
+                                        <i class="ri-add-line align-middle me-1"></i> Add New Folder
+                                    </a>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="productTable" class="table table-striped table-bordered nowrap" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Folder ID</th>
+                                                    <th>Folder Name</th>
+                                                    <th>Section</th>
+                                                    <th>Category</th>
+                                                    <th>Subcategory</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach($folders as $folder): ?>
+                                                <tr>
+                                                    <td><strong><?= htmlspecialchars($folder['folder_id']) ?></strong></td>
+                                                    <td><?= htmlspecialchars($folder['folder_name']) ?></td>
+                                                    <td><?php echo $folder['section_name']?> (ID: <?php echo $folder['section_id']; ?>)</td>
+                                                    <td><?php echo $folder['category_name'] ?? NULL; ?> (ID: <?php echo $folder['category_id'] ?? NULL; ?>)</td>
+                                                    <td><?php echo $folder['subcategory_name'] ?? NULL; ?> (ID: <?php echo $folder['subcategory_id'] ?? NULL; ?>)</td>
+
+                                                    <td>
+                                                        <div class="d-flex gap-1">
+                                                            <a href="catalogue-wizard.php?action=edit&id=<?= htmlspecialchars($folder['folder_id']) ?>">
+                                                            <button type="button" class="btn btn-sm btn-info" 
+                                                                    title="Edit Folder">
+                                                                <i class="ri-pencil-line"></i>
+                                                            </button>
+                                                            </a>
+
+                                                            <button type="button" class="btn btn-sm btn-danger"
+                                                                    onclick="deleteFolder(<?= $folder['folder_id'] ?>)"
+                                                                    title="Delete Folder">
+                                                                <i class="ri-delete-bin-line"></i>
+                                                            </button>
+
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- container-fluid -->           
+            </div><!-- End Page-content -->
+            <?php include __DIR__ . '/../include/footer.php';?>
+        </div><!-- end main content-->
+    </div><!-- END layout-wrapper -->
+
+    
+    <?php include __DIR__ . '/../include/themesetting.php';?>
+
+    <!-- JAVASCRIPT - Load in correct order -->
+    <!-- jQuery is already loaded in head -->
+    <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/libs/simplebar/simplebar.min.js"></script>
+    <script src="assets/libs/node-waves/waves.min.js"></script>
+    <script src="assets/libs/feather-icons/feather.min.js"></script>
+    <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
+    <script src="assets/js/plugins.js"></script>
+    <script src="assets/libs/prismjs/prism.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+
+    <!-- jQuery FIRST -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- DataTables JS - After jQuery -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    
+    <!-- App JS - Load after other libraries -->
+    <script src="assets/js/app.js"></script>
+
+    <script>
+    function deleteFolder(id) {
+        // 1. Prompt the user
+        if (confirm("Are you sure you want to delete this folder? This action cannot be undone.")) {
+            // 2. If they click "OK", redirect to the delete URL
+            window.location.href = "../private/catalogue-arranger-backend.php?action=delete&id=" + id;
+        }
+    }
+</script>
+
+    <script>
+        let updateAdditionalCount = 0;
+        const updateMaxAdditional = 6;
+        let updateSupplierChoices = null;
+
+        function initUpdateSupplierChoices() {
+            if (updateSupplierChoices) {
+                updateSupplierChoices.destroy();
+                updateSupplierChoices = null;
+            }
+            updateSupplierChoices = new Choices('#update_supplier', {
+                searchEnabled: true,
+                shouldSort: false,
+                placeholder: true,
+                placeholderValue: 'Select Supplier...',
+                searchPlaceholderValue: 'Search supplier...',
+                itemSelectText: '',
+                removeItemButton: false
+            });
+        }
+
+        // Wait for DOM to be ready
+        $(document).ready(function() {
+            // Check if we should restore filters (only if coming from edit pages or actions)
+            function shouldRestoreFilters() {
+                const fromEdit = localStorage.getItem('productTableFromEdit');
+                if (fromEdit === 'true') {
+                    localStorage.removeItem('productTableFromEdit');
+                    return true;
+                }
+                return false;
+            }
+            
+            // Event delegation for View button (works with DataTables pagination)
+            $(document).on('click', '.view-product-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const productData = $(this).data('product');
+                viewProductDetails(productData);
+            });
+
+            // Event delegation for Edit button
+            $(document).on('click', '.edit-product-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const productData = $(this).data('product');
+                openUpdateModal(productData);
+            });
+
+            // Show success/error messages from session (for regular form submissions)
+            <?php if (isset($_SESSION['show_success']) && $_SESSION['show_success']): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: <?= json_encode($_SESSION['success']) ?>,
+                    confirmButtonColor: '#28a745',
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+                <?php unset($_SESSION['success'], $_SESSION['show_success']); ?>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['show_error']) && $_SESSION['show_error']): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: <?= json_encode($_SESSION['error']) ?>,
+                    confirmButtonColor: '#dc3545',
+                    timer: 5000,
+                    timerProgressBar: true
+                });
+                <?php unset($_SESSION['error'], $_SESSION['show_error']); ?>
+            <?php endif; ?>
+
+            // Handle form submission with AJAX
+            $('#updateProductForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loading message
+                Swal.fire({
+                    title: 'Updating Product...',
+                    text: 'Please wait while we update the product information.',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Prepare form data
+                const formData = new FormData(this);
+                formData.append('ajax_update', '1');
+
+                // Submit form directly to backend to ensure pure JSON response
+                $.ajax({
+                    url: '../private/table-product-list-backend.php',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: function(data) {
+                        Swal.close();
+                        
+                        if (data.status === 'success') {
+                            // Close modal first
+                            $('#updateProductModal').modal('hide');
+                            
+                            // Show success message
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: data.message,
+                                confirmButtonColor: '#28a745',
+                                timer: 3000,
+                                timerProgressBar: true,
+                                showConfirmButton: true
+                            }).then(() => {
+                                // Set flag to restore filters when page reloads
+                                localStorage.setItem('productTableFromEdit', 'true');
+                                // Reload page to show updated data
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: data.message || 'An error occurred while updating the product.',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.close();
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'An unexpected error occurred. Please try again. (' + status + ')',
+                            confirmButtonColor: '#dc3545'
+                        });
+                    }
+                });
+            });
+
+            initUpdateSupplierChoices();
+
+            // Re-init when modal is shown, then reapply current selection so it stays preloaded
+            $('#updateProductModal').on('shown.bs.modal', function () {
+                initUpdateSupplierChoices();
+                const currentSupplier = $('#update_supplier').val();
+                if (updateSupplierChoices && currentSupplier) {
+                    updateSupplierChoices.setChoiceByValue(String(currentSupplier));
+                }
+            });
+
+            // Optional: clean up when hidden
+            $('#updateProductModal').on('hidden.bs.modal', function () {
+                if (updateSupplierChoices) {
+                    updateSupplierChoices.removeActiveItems(); // reset selection
+                }
+            });
+        });
+
+        // CBM Calculation functions
+        function calculateUpdateCBM(w, h, l) {
+            return (w * h * l) / 1000000 * 1.28;
+        }
+
+        function calculateAllUpdateCBM() {
+            // Main carton
+            const width = parseFloat($('#update_carton_width').val()) || 0;
+            const height = parseFloat($('#update_carton_height').val()) || 0;
+            const length = parseFloat($('#update_carton_length').val()) || 0;
+            
+            $('#update_cbm_carton').val(calculateUpdateCBM(width, height, length).toFixed(6));
+
+            // Additional cartons
+            for (let i = 1; i <= updateAdditionalCount; i++) {
+                const cbmField = $(`#update_add_carton${i}_cbm`);
+                if (cbmField.length) {
+                    const w = parseFloat($(`#update_add_carton${i}_width`).val()) || 0;
+                    const h = parseFloat($(`#update_add_carton${i}_height`).val()) || 0;
+                    const l = parseFloat($(`#update_add_carton${i}_length`).val()) || 0;
+                    cbmField.val(calculateUpdateCBM(w, h, l).toFixed(6));
+                }
+            }
+        }
+
+        function openUpdateModal(product) {
+            // Reset form
+            $('#updateProductForm')[0].reset();
+            
+            // Populate basic product data
+            $('#update_product_id').val(product.product_id);
+            $('#update_xero_relation').val(product.xero_relation);
+            $('#update_product_code').val(product.product_code);
+            $('#update_material_name').val(product.material_name);
+            $('#update_product_type_name').val(product.product_type_name);
+            $('#update_variant').val(product.variant || '');
+            $('#update_description').val(product.description || '');
+            $('#update_production_lead_time').val(product.production_lead_time || '');
+
+            // Populate hierarchy display fields
+            $('#update_section_display').html(`<option value="${product.section_id}">${product.section_name || ''}</option>`);
+            $('#update_category_display').html(`<option value="${product.category_id}">${product.category_name || ''}</option>`);
+            $('#update_subcategory_display').html(`<option value="${product.subcategory_id}">${product.subcategory_name || ''}</option>`);
+            
+            // Set supplier value on native select
+            $('#update_supplier').val(product.supplier_id || '');
+            // After Choices.js is initialized, set the value again
+            setTimeout(function() {
+                if (updateSupplierChoices && product.supplier_id) {
+                    updateSupplierChoices.setChoiceByValue(String(product.supplier_id));
+                }
+            }, 100);
+
+            // Handle sizes with metrics (parse combined values like "10 cm")
+            for (let i = 1; i <= 3; i++) {
+                const sizeValue = product[`size_${i}`] || '';
+                if (sizeValue) {
+                    // Separate number and metric using regex
+                    const numberPart = sizeValue.match(/[\d.]+/);   // 10, 15.5, etc.
+                    const metricPart = sizeValue.match(/[a-zA-Z]+/); // cm, mm, in, etc.
+
+                    $(`#update_size_${i}`).val(numberPart ? numberPart[0] : '');
+                    $(`#update_metric_${i}`).val(metricPart ? metricPart[0] : '');
+                }
+            }
+
+            // Populate carton data
+            $('#update_carton_width').val(product.carton_width || '');
+            $('#update_carton_height').val(product.carton_height || '');
+            $('#update_carton_length').val(product.carton_length || '');
+            $('#update_pcs_per_carton').val(product.pcs_per_carton || '');
+            $('#update_weight_carton').val(product.carton_weight || '');
+            $('#update_cbm_carton').val(product.cbm_carton || '');
+
+            // Clear additional cartons container
+            $('#updateAdditionalCartonsContainer').empty();
+            updateAdditionalCount = 0;
+
+            // Add existing additional cartons
+            for (let i = 1; i <= 6; i++) {
+                if (product[`add_carton${i}_width`] && product[`add_carton${i}_width`] > 0) {
+                    addUpdateAdditionalCarton(i, product);
+                }
+            }
+
+            // Add CBM calculation event listeners
+            $('#update_carton_width, #update_carton_height, #update_carton_length').off('input').on('input', calculateAllUpdateCBM);
+
+            // Add blur event handlers for 3-decimal formatting on carton dimensions
+            $('#update_carton_width, #update_carton_height, #update_carton_length, #update_weight_carton').off('blur').on('blur', function() {
+                const value = parseFloat($(this).val());
+                if (!isNaN(value)) {
+                    $(this).val(value.toFixed(3));
+                }
+            });
+
+            // Load initial material options based on subcategory
+            loadMaterialOptions(product.subcategory_id, product.material_id, product.product_type_id);
+
+            // Show the modal
+            $('#updateProductModal').modal('show');
+        }
+
+        function loadMaterialOptions(subcategoryId, selectedMaterialId = '', selectedProductTypeId = '') {
+            if (!subcategoryId) return;
+            
+            $.ajax({
+                url: '',
+                type: 'GET',
+                data: {
+                    ajax: 1,
+                    type: 'material',
+                    parent_id: subcategoryId
+                },
+                success: function(materials) {
+                    let options = '<option value="">Select Material...</option>';
+                    materials.forEach(function(material) {
+                        const selected = material.material_id == selectedMaterialId ? 'selected' : '';
+                        options += `<option value="${material.material_id}" ${selected}>${material.material_name}</option>`;
+                    });
+                    $('#update_material').html(options);
+                    
+                    // If we have a selected material, load product types
+                    if (selectedMaterialId) {
+                        loadProductTypes(selectedMaterialId, selectedProductTypeId);
+                    }
+                }
+            });
+        }
+
+        function loadProductTypes(materialId, selectedProductTypeId = '') {
+            if (!materialId) return;
+            
+            $.ajax({
+                url: '',
+                type: 'GET',
+                data: {
+                    ajax: 1,
+                    type: 'product_type',
+                    parent_id: materialId
+                },
+                success: function(productTypes) {
+                    let options = '<option value="">Select Product Type...</option>';
+                    productTypes.forEach(function(type) {
+                        const selected = type.product_type_id == selectedProductTypeId ? 'selected' : '';
+                        options += `<option value="${type.product_type_id}" ${selected}>${type.product_name}</option>`;
+                    });
+                    $('#update_product_type').html(options);
+                    
+                    // Force select the value after options are loaded
+                    if (selectedProductTypeId) {
+                        $('#update_product_type').val(selectedProductTypeId);
+                    }
+                }
+            });
+        }
+
+        // Add change event handlers for material selection
+        $(document).ready(function() {
+            $('#update_material').on('change', function() {
+                const materialId = $(this).val();
+                if (materialId) {
+                    loadProductTypes(materialId);
+                } else {
+                    $('#update_product_type').html('<option value="">Select Product Type...</option>');
+                }
+            });
+        });
+
+        function addUpdateAdditionalCarton(index = null, product = null) {
+            if (updateAdditionalCount >= updateMaxAdditional) return;
+            
+            if (index === null) {
+                updateAdditionalCount++;
+                index = updateAdditionalCount;
+            } else {
+                updateAdditionalCount = Math.max(updateAdditionalCount, index);
+            }
+
+            const container = $('#updateAdditionalCartonsContainer');
+            const row = $(`
+                <div class="row g-3 mb-3" id="updateCartonRow${index}">
+                    <div class="col-lg-2">
+                        <div class="form-floating">
+                            <input type="number" step="0.001" class="form-control" name="carton[width][]" id="update_add_carton${index}_width" placeholder="Width" value="${product ? (product[`add_carton${index}_width`] || '') : ''}">
+                            <label>Width (cm)</label>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="form-floating">
+                            <input type="number" step="0.001" class="form-control" name="carton[height][]" id="update_add_carton${index}_height" placeholder="Height" value="${product ? (product[`add_carton${index}_height`] || '') : ''}">
+                            <label>Height (cm)</label>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="form-floating">
+                            <input type="number" step="0.001" class="form-control" name="carton[length][]" id="update_add_carton${index}_length" placeholder="Length" value="${product ? (product[`add_carton${index}_length`] || '') : ''}">
+                            <label>Length (cm)</label>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="form-floating">
+                            <input type="number" class="form-control" name="carton[pcs][]" id="update_add_carton${index}_pcs" placeholder="Qty/Carton" value="${product ? (product[`add_carton${index}_pcs`] || '') : ''}">
+                            <label>Qty/Carton</label>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="form-floating">
+                            <input type="number" step="0.001" class="form-control" name="carton[weight][]" id="update_add_carton${index}_weight" placeholder="Weight" value="${product ? (product[`add_carton${index}_weight`] || '') : ''}">
+                            <label>Weight (kg)</label>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 d-flex align-items-start gap-2">
+                        <div class="form-floating flex-grow-1">
+                            <input type="number" step="0.000001" class="form-control" name="carton[cbm][]" id="update_add_carton${index}_cbm" placeholder="CBM" readonly value="${product ? (product[`add_carton${index}_total_cbm`] || '') : ''}">
+                            <label>CBM (m³)</label>
+                        </div>
+                        <button type="button" class="btn btn-danger btn-sm mt-2 remove-update-carton" data-id="${index}">×</button>
+                    </div>
+                </div>
+            `);
+
+            container.append(row);
+
+            // Add CBM calculation event listeners
+            $(`#update_add_carton${index}_width, #update_add_carton${index}_height, #update_add_carton${index}_length`).on('input', calculateAllUpdateCBM);
+
+            // Add blur event handlers for 3-decimal formatting on additional carton dimensions
+            $(`#update_add_carton${index}_width, #update_add_carton${index}_height, #update_add_carton${index}_length, #update_add_carton${index}_weight`).on('blur', function() {
+                const value = parseFloat($(this).val());
+                if (!isNaN(value)) {
+                    $(this).val(value.toFixed(3));
+                }
+            });
+
+            // Attach remove event
+            row.find('.remove-update-carton').on('click', function() {
+                const id = parseInt($(this).data('id'));
+                $(`#updateCartonRow${id}`).remove();
+                calculateAllUpdateCBM();
+            });
+
+            calculateAllUpdateCBM();
+        }
+
+        // Add carton button event listener
+        $(document).on('click', '#updateAddCartonButton', function() {
+            addUpdateAdditionalCarton();
+        });
+
+        function deleteProduct(productId, productCode) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Do you want to delete product "${productCode}"? This action cannot be undone!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading
+                    Swal.fire({
+                        title: 'Deleting...',
+                        text: 'Please wait while we delete the product.',
+                        icon: 'info',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    // Create form and submit
+                    const form = $('<form>', {
+                        method: 'POST',
+                        action: ''
+                    });
+                    
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: 'product_id',
+                        value: productId
+                    }));
+                    
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: 'delete_product',
+                        value: '1'
+                    }));
+                    
+                    $('body').append(form);
+                    form.submit();
+                }
+            });
+        }
+
+        function changeVisibility(productId, productCode, newVisibility) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Do you want to change visibility for product "${productCode}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, change it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading
+                    Swal.fire({
+                        title: 'Changing...',
+                        text: 'Please wait while we change visibility of the product.',
+                        icon: 'info',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    // Create form and submit
+                    const form = $('<form>', {
+                        method: 'POST',
+                        action: ''
+                    });
+                    
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: 'product_id',
+                        value: productId
+                    }));
+                    
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: 'visibility',
+                        value: newVisibility
+                    }));
+
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: 'change_visibility',
+                        value: '1'
+                    }));
+                    
+                    $('body').append(form);
+                    form.submit();
+                }
+            });
+        }
+
+        // Store current product data for modal switching
+        let currentProductData = null;
+
+        function viewProductDetails(product) {
+            currentProductData = product; // Store for potential edit action
+            
+            try {
+                // Basic Information
+                $('#view_product_code').text(product.product_code || 'N/A');
+                $('#view_variant').text(product.variant || 'N/A');
+                $('#view_lead_time').text(product.production_lead_time ? product.production_lead_time + ' days' : 'N/A');
+                $('#view_description').text(product.description || 'N/A');
+                
+                // Product Classification
+                $('#view_section').text(product.section_name || 'N/A');
+                $('#view_category').text(product.category_name || 'N/A');
+                $('#view_subcategory').text(product.subcategory_name || 'N/A');
+                $('#view_material').text(product.material_name || 'N/A');
+                $('#view_product_type').text(product.product_type_name || 'N/A');
+                
+                // Specifications
+                $('#view_dimensions').text(product.dimensions || 'N/A');
+                $('#view_supplier').text(product.supplier_name || 'N/A');
+                $('#view_selling_price').text(product.new_selling_price ? 'RM ' + parseFloat(product.new_selling_price).toFixed(3) : 'N/A');
+                $('#view_unit_price_rm').text(product.new_unit_price_rm ? 'RM ' + parseFloat(product.new_unit_price_rm).toFixed(3) : 'Price N/A');
+                $('#view_profit').text(product.new_unit_profit_rm ? 'RM ' + parseFloat(product.new_unit_profit_rm).toFixed(3) : 'Price N/A');
+                $('#view_created_at').text(product.created_at ? new Date(product.created_at).toLocaleString() : 'N/A');
+                $('#view_updated_at').text(product.updated_at ? new Date(product.updated_at).toLocaleString() : 'N/A');
+                
+                // Main Carton Information
+                $('#view_carton_width').text(product.carton_width || 'N/A');
+                $('#view_carton_height').text(product.carton_height || 'N/A');
+                $('#view_carton_length').text(product.carton_length || 'N/A');
+                $('#view_pcs_per_carton').text(product.pcs_per_carton || 'N/A');
+                $('#view_carton_weight').text(product.carton_weight || 'N/A');
+                $('#view_cbm_carton').text(product.cbm_carton ? parseFloat(product.cbm_carton).toFixed(6) : 'N/A');
+                
+                // Clear and populate additional cartons
+                $('#viewAdditionalCartonsContainer').empty();
+                
+                let hasAdditionalCartons = false;
+                for (let i = 1; i <= 6; i++) {
+                    if (product[`add_carton${i}_width`] && product[`add_carton${i}_width`] > 0) {
+                        hasAdditionalCartons = true;
+                        const cartonHtml = `
+                            <div class="row g-3 mb-3 border-top pt-3">
+                                <div class="col-12">
+                                    <h6 class="text-secondary">Additional Carton ${i}</h6>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted small">Width (cm)</label>
+                                    <div class="fw-semibold">${product[`add_carton${i}_width`] || 'N/A'}</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted small">Height (cm)</label>
+                                    <div class="fw-semibold">${product[`add_carton${i}_height`] || 'N/A'}</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted small">Length (cm)</label>
+                                    <div class="fw-semibold">${product[`add_carton${i}_length`] || 'N/A'}</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted small">Qty/Carton</label>
+                                    <div class="fw-semibold">${product[`add_carton${i}_pcs`] || 'N/A'}</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted small">Weight (kg)</label>
+                                    <div class="fw-semibold">${product[`add_carton${i}_weight`] || 'N/A'}</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted small">CBM (m³)</label>
+                                    <div class="fw-semibold text-info">${product[`add_carton${i}_total_cbm`] ? parseFloat(product[`add_carton${i}_total_cbm`]).toFixed(6) : 'N/A'}</div>
+                                </div>
+                            </div>
+                        `;
+                        $('#viewAdditionalCartonsContainer').append(cartonHtml);
+                    }
+                }
+                
+                if (!hasAdditionalCartons) {
+                    $('#viewAdditionalCartonsContainer').append(`
+                        <div class="row">
+                            <div class="col-12">
+                                <p class="text-muted text-center">No additional cartons configured</p>
+                            </div>
+                        </div>
+                    `);
+                }
+                
+                // Check if modal element exists
+                const modalElement = document.getElementById('viewProductModal');
+                if (!modalElement) {
+                    console.error('Modal element #viewProductModal not found!');
+                    return;
+                }
+                
+                // Remove any existing modal-backdrop and clean state
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
+                $('#viewProductModal').removeClass('show').css('display', 'none');
+                
+                // Move modal to body if not already there
+                if (!$('body > #viewProductModal').length) {
+                    $('#viewProductModal').detach().appendTo('body');
+                }
+                
+                // Use Bootstrap 5's proper modal initialization
+                const bsModal = new bootstrap.Modal(modalElement, {
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true
+                });
+                
+                bsModal.show();
+                
+            } catch (error) {
+                console.error('Error in viewProductDetails:', error);
+                alert('Error opening product details. Please check the console for more information.');
+            }
+        }
+
+        function openUpdateModalFromView() {
+            // Close view modal first
+            $('#viewProductModal').modal('hide');
+            
+            // Wait for modal to close, then open update modal
+            setTimeout(() => {
+                if (currentProductData) {
+                    openUpdateModal(currentProductData);
+                }
+            }, 300);
+        }
+    </script>
+
+</body>
+</html>
