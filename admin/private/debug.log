@@ -3480,3 +3480,13 @@
     "error": "",
     "ip": "::1"
 }
+[2025-12-19 21:36:53] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-12-19 22:04:17] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
