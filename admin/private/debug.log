@@ -3480,3 +3480,56 @@
     "error": "",
     "ip": "::1"
 }
+[2025-12-19 23:06:24] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "::1"
+}
+[2025-12-19 23:06:25] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "127.0.0.1"
+}
+[2025-12-19 23:06:37] Login attempt started - {
+    "username": "moonmeandher",
+    "ip": "127.0.0.1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/143.0.0.0 Safari\/537.36"
+}
+[2025-12-19 23:06:37] Attempting database query for user - {
+    "username": "moonmeandher"
+}
+[2025-12-19 23:06:37] User not found or inactive - {
+    "username": "moonmeandher"
+}
+[2025-12-19 23:06:37] Login attempt failed - {
+    "username": "moonmeandher",
+    "error": "User not found or inactive",
+    "ip": "127.0.0.1"
+}
+[2025-12-19 23:06:48] Login attempt started - {
+    "username": "admin",
+    "ip": "127.0.0.1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/143.0.0.0 Safari\/537.36"
+}
+[2025-12-19 23:06:48] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-12-19 23:06:48] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-12-19 23:06:48] Password verification successful - {
+    "staff_id": 1
+}
+[2025-12-19 23:06:48] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-12-19 23:06:49] Session token created in database - {
+    "staff_id": "1",
+    "token": "17df2b83e05800b657edda61b9061b11"
+}
+[2025-12-19 23:06:49] Last login updated - {
+    "staff_id": "1"
+}
