@@ -104,6 +104,7 @@
                                 <div class="row g-3">
                                     <div class="col-lg-12">
                                         <button class="btn btn-info" type="submit" name="update_img">Update Images</button>
+                                        <button type="button" class="btn btn-secondary" onclick="window.history.back();"><i class="ri-arrow-left-line"></i> Back</button>
                                         <a href="table-product-list.php" class="btn btn-secondary" onclick="localStorage.setItem('productTableFromEdit', 'true');">Cancel</a>
                                     </div>
                                 </div><br>                  
