@@ -184,7 +184,7 @@
                                                         <div class="row g-3 mt-3">
                                                             <div class="col-xl-12">
                                                                 <label for="basiInput" class="form-label">Choose Products...</label>
-                                                                <select class="form-select" data-choices data-choices-removeItem multiple id="section" name="product[]" required>
+                                                                <select class="form-select" data-choices data-choices-removeItem multiple id="product-select-create" name="product[]" required>
                                                                     <option value="">Choose Products...</option>
                                                                         <?php foreach ($products as $product): ?>
                                                                             <option value="<?php echo $product['product_id']; ?>"><?php echo htmlspecialchars($product['full_product_name']); ?></option>
@@ -405,7 +405,7 @@
                                                         <div class="row g-3 mt-3">
                                                             <div class="col-xl-12">
                                                                 <label for="basiInput" class="form-label">Choose A Filter</label>
-                                                                    <select class="form-select" data-choices data-choices-removeItem multiple id="section" name="product[]" required>
+                                                                    <select class="form-select" multiple id="product-select-edit" name="product[]" required>
                                                                         <option value="">Choose Products...</option>
                                                                                         
                                                                             <?php foreach ($products as $product): ?>
@@ -471,23 +471,25 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Initialize Choices.js on all selects
-    const sectionChoices = new Choices('#section', { searchEnabled: true, searchPlaceholderValue: 'Search for filter...', placeholder: true, placeholderValue: 'Choose filter...' });
+    // 1. Initialize the Filter dropdown (Keep the ID 'section' if you didn't change it there)
+    const filterEl = document.querySelector('#section');
+    if (filterEl) {
+        new Choices(filterEl, { searchEnabled: true, placeholder: true });
+    }
+
+    // 2. Initialize the Product dropdowns with the Remove Button enabled
+    const productIds = ['#product-select-create', '#product-select-edit'];
+    productIds.forEach(id => {
+        const el = document.querySelector(id);
+        if (el) {
+            new Choices(el, {
+                removeItemButton: true, // This adds the 'x' button
+                searchEnabled: true,
+                placeholder: true,
+                placeholderValue: 'Select products'
+            });
+        }
+    });
 });
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </html>

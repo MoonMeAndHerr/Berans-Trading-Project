@@ -3538,3 +3538,40 @@
     "error": "",
     "ip": "::1"
 }
+[2025-12-19 23:44:50] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "127.0.0.1"
+}
+[2025-12-19 23:44:51] Login attempt failed - {
+    "username": "",
+    "error": "",
+    "ip": "127.0.0.1"
+}
+[2025-12-19 23:44:57] Login attempt started - {
+    "username": "admin",
+    "ip": "127.0.0.1",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/143.0.0.0 Safari\/537.36"
+}
+[2025-12-19 23:44:57] Attempting database query for user - {
+    "username": "admin"
+}
+[2025-12-19 23:44:57] User found in database - {
+    "staff_id": 1,
+    "username": "admin"
+}
+[2025-12-19 23:44:57] Password verification successful - {
+    "staff_id": 1
+}
+[2025-12-19 23:44:57] Session created - {
+    "staff_id": 1,
+    "username": "admin",
+    "role": "admin"
+}
+[2025-12-19 23:44:57] Session token created in database - {
+    "staff_id": "1",
+    "token": "eceb73f7312c5944eba4b697967fb239"
+}
+[2025-12-19 23:44:57] Last login updated - {
+    "staff_id": "1"
+}
